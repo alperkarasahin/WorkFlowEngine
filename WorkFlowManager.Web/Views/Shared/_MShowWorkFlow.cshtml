@@ -1,0 +1,98 @@
+﻿@model WorkFlowManager.Common.ViewModels.WorkFlowView
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/workflow")
+@Styles.Render("~/Content/css")
+
+<div class="row">
+     <div class="col-lg-12">
+                <div class="box box-info">
+                    @if (Model.Flag)
+                    {
+                        <text>
+                        <div class="box-header with-border">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-2 completedWF row-centered">Completed</div>
+                                    <div class="col-lg-2 row-centered"></div>
+                                    <div class="col-lg-2 revizedWF row-centered">Revized</div>
+                                    <div class="col-lg-2 row-centered"></div>
+                                    <div class="col-lg-2 currentWF row-centered">In Process</div>
+                                    <div class="col-lg-2 row-centered"></div>
+                                </div>
+                            </div>
+                        </div>
+                        </text>
+                    }
+                </div>
+     </div>
+</div>
+
+<div class="wrapper1FullScreen">
+    <div class="div1FullScreen">
+    </div>
+</div>
+<div class="wrapper2FullScreen">
+    <div class="div2FullScreen">
+        <div id="isAkisiGoruntulemeBolumu" class="mermaid">
+
+        </div>
+    </div>
+</div>     
+
+
+
+<script>
+    $(function () {
+        $(".wrapper1FullScreen").scroll(function () {
+            $(".wrapper2FullScreen")
+                .scrollLeft($(".wrapper1FullScreen").scrollLeft());
+        });
+        $(".wrapper2FullScreen").scroll(function () {
+            $(".wrapper1FullScreen")
+                .scrollLeft($(".wrapper2FullScreen").scrollLeft());
+        });
+    });
+
+    mermaidAPI.initialize({
+        startOnLoad: true,
+
+    });
+
+    $(function () {
+        var text = '@Html.Raw(Model.WorkFlowText)';
+        var element = document.getElementById('isAkisiGoruntulemeBolumu')
+        $WF.IslAkisiGoruntule(mermaidAPI, text, element);
+    });
+</script>
+
+         
+<style>
+
+    .completedWF{ 
+        border-radius: 5px;
+        background-color:#9f6;
+        border-style:solid;
+        border-color:#333;
+        border-width:2px;
+    }
+    .currentWF{ 
+        border-radius: 5px;
+        background-color: yellow;
+        border-style:solid;
+        border-color:#333;
+        border-width:2px;
+    }
+    .revizedWF{
+        border-radius: 5px;
+        background-color:#196;
+        border-style:solid;
+        border-color:#333;
+        border-width:2px;
+        margin:1px;
+    }
+    .row-centered {
+        text-align:center;
+    }
+</style>           

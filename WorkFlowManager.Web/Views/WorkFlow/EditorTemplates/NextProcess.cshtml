@@ -1,0 +1,4 @@
+﻿@model WorkFlowManager.Common.ViewModels.NextProcess
+
+@Html.DropDownListFor(m => m.Process.NextProcessId, Model.MainProcessList, "Select", new { Id = Model.Process.ProcessUniqueCode, onchange = "UserSelectionChanged("+(Model.Process.NextProcessId != null? Model.Process.NextProcessId.ToString() : "\"\"") + ", this);" })
+

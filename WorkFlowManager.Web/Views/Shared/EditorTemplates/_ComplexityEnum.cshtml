@@ -1,0 +1,10 @@
+﻿
+@using WorkFlowManager.Common.Extensions
+@using WorkFlowManager.Common.Enums
+
+@model WorkFlowManager.Common.Enums.FormComplexity
+
+@(Html.Kendo().DropDownListFor(m => m)
+                    .OptionLabel("Select...")
+                    .BindTo(EnumHelper.GetSelectList(typeof(FormComplexity)))
+)

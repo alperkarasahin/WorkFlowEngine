@@ -1,0 +1,320 @@
+﻿@using WorkFlowManager.Common.Extensions;
+@using WorkFlowManager.Common.Enums;
+@{
+    var islemTurBilgi = Model.ProcessType.GetDescription();
+    ViewBag.Title = Model.Id == 0 ? "New "+ islemTurBilgi : islemTurBilgi + " Edit";
+}
+
+@model WorkFlowManager.Common.ViewModels.ProcessForm
+
+@using (Html.BeginForm("Save", "WorkFlow", new { gorevId = Model.TaskId }, FormMethod.Post , new { @class = "form-horizontal" }))
+{
+
+
+    @Html.AntiForgeryToken();
+
+    if (Model.ConditionId != 0 && Model.ConditionId != null) { 
+        <div class="panel panel-info">
+            <div class="panel-heading text-center">
+                <h3 class="panel-title">@Model.ConditionName</h3>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@(Model.Id == 0 ? "New "+ islemTurBilgi : string.Format("{0} Edit Form", Model.Name))</h3>
+                    </div><!-- /.box-header -->
+                    <!-- form start -->
+                    <div class="box-body">
+                                @if (Model.Id != 0)
+                                {
+                                    @Html.HiddenFor(x => x.Id)
+                                }
+                                @Html.HiddenFor(x => x.TaskId)
+                                @Html.HiddenFor(x => x.ProcessType)
+                                @Html.HiddenFor(x => x.ProcessUniqueCode)
+                                @Html.HiddenFor(x => x.IsStandardForm, new {@Id="formGirisiStantartId" })
+                                
+
+                                @if (Model.ConditionId != 0 && Model.ConditionId != null)
+                                {
+                                    @Html.HiddenFor(x => x.ConditionId)
+                                }
+
+
+                                @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
+                                {
+                                    @Html.HiddenFor(x => x.Value)
+                                }
+
+
+                                @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.DecisionPoint)
+                                {
+                                    @Html.HiddenFor(x => x.AssignedRole)
+                                }
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        @Html.ValidationSummary()
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(x => x.Name, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(x => x.Name, new { @Id="islemTanim", @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.Name)
+                                    </div>
+                                </div>
+
+                                @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.DecisionPoint)
+                                {
+                                    <div class="form-group">
+                                        @Html.LabelFor(x => x.AssignedRole, new { @class = "col-sm-3 control-label" })
+                                        <div class="col-sm-9">
+                                            @Html.TextBoxFor(x => x.AssignedRole, new { @class = "form-control", @disabled = "disabled" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(x => x.DecisionMethodId, new { @class = "col-sm-3 control-label" })
+                                        <div class="col-sm-9">
+                                            @Html.DropDownListFor(x => x.DecisionMethodId, (SelectList)Model.DecisionMethodList, "Select", new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(x => x.DecisionMethodId)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(x => x.RepetitionFrequenceByHour, new { @class = "col-sm-3 control-label" , @title= "Repetition Frequence By Hour" })
+                                        <div class="col-sm-9">
+                                            @Html.DropDownListFor(x => x.RepetitionFrequenceByHour, (SelectList)Model.RepetitionHourList, "Select", new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(x => x.RepetitionFrequenceByHour)
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Condition)
+                                {
+                                    <div class="form-group">
+                                        @Html.LabelFor(x => x.AssignedRole, new { @class = "col-sm-3 control-label" })
+                                        <div class="col-sm-9">
+                                            @Html.EnumDropDownListFor(x => x.AssignedRole,"Select", new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(x => x.AssignedRole)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(x => x.Description, new { @class = "col-sm-3 control-label" })
+                                        <div class="col-sm-9">
+                                            @Html.TextAreaFor(x => x.Description, new { @class = "form-control textarea-editor", @placeholder = "Description for User", rows = 7 })
+                                            @Html.ValidationMessageFor(x => x.Description)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(x => x.NextText, new { @class = "col-sm-3 control-label"})
+                                        <div class="col-sm-9">
+                                            @Html.TextBoxFor(x => x.NextText, new { @class = "form-control", @placeholder = "Form buton caption. Default is Save/Next." })
+                                            @Html.ValidationMessageFor(x => x.NextText)
+                                        </div>
+                                    </div>
+
+
+                                }
+
+                            @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
+                            {
+                                if ((Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList) && Model.AssignedRole != WorkFlowManager.Common.Enums.ProjectRole.Sistem)
+                                {
+                                    <div class="form-group">
+                                        @Html.LabelFor(x => x.IsDescriptionMandatory, new { @class = "col-sm-3 control-label" })
+                                        <div class="col-sm-9">
+                                            @Html.CheckBoxFor(x => x.IsDescriptionMandatory, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(x => x.IsDescriptionMandatory)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(x => x.IsFileUploadMandatory, new { @class = "col-sm-3 control-label" })
+                                        <div class="col-sm-9">
+                                            @Html.CheckBoxFor(x => x.IsFileUploadMandatory, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(x => x.IsFileUploadMandatory)
+                                        </div>
+                                    </div>
+                                }
+
+
+                                if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process)
+                                {
+
+                                    <div class="form-group">
+                                        @Html.Label("Standart Form", new { @class = "col-sm-3 control-label" })
+                                        <div class="col-sm-9">
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <input name="standartFormSecim" type="checkbox" data-on-color="info" data-off-color="warning">
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div id="standartForm" class="form-group">
+                                                        <div class="col-sm-12">
+                                                            <h5>Standart form will be used</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div id ="ozelForm" class="form-group">
+                                                        <div class="col-sm-12">
+                                                            <h5>If you use Special Form you have to select document type.</h5>
+                                                            <div class="form-group">
+                                                                @Html.LabelFor(x => x.FormViewId, new { @class = "col-sm-3 control-label" })
+                                                                <div class="col-sm-9">
+                                                                    @Html.DropDownListFor(x => x.FormViewId,(SelectList)Model.FormViewList, "Select", new { @Id = "ozelFormViewId", @class = "form-control" })
+                                                                    @Html.ValidationMessageFor(x => x.FormViewId)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                @Html.LabelFor(x => x.SpecialFormAnalysis, new { @class = "col-sm-3 control-label" })
+                                                                <div class="col-sm-9">
+                                                                    @Html.TextAreaFor(x => x.SpecialFormAnalysis, new { @class = "form-control textarea-editor", @placeholder = "Details of special form", rows = 7 })
+                                                                    @Html.ValidationMessageFor(x => x.SpecialFormAnalysis)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            }
+                                <div class="form-group">
+                                    @Html.LabelFor(x => x.NextProcessId, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => x.NextProcessId, (SelectList)Model.MainProcessList, "Select", new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.NextProcessId)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(x => x.MessageForMonitor, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(x => x.MessageForMonitor, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.MessageForMonitor)
+                                    </div>
+                                </div>
+                            }
+
+
+                    </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+        <div class="col-lg-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">Tasks</div>
+                <div class="panel-body">
+                    <input type="submit" value="Save" name="action:Save" class="btn btn-success btn-sm" />
+                    <input type="submit" value="Save/Close" name="action:SaveClose" class="btn btn-primary btn-sm" />
+                    <a href="@Url.Action("Index", new { taskId = Model.TaskId})"> | Cancel</a>
+                </div>
+            </div>
+            @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process|| Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
+            {
+                <div class="panel panel-info">
+                    <div class="panel-heading">Select Monitoring Roles (S-System / U-Unit)</div>
+                    <div class="panel-body post-tag-editor">
+
+                        <ul class="tag-select">
+                            @{ 
+                                    var izleyenRoller = Model.MonitoringRoleList.OrderBy(x => x.ProjectRole.GetDisplayValue()).ToList();
+                                    for (var i = 0; i < izleyenRoller.Count(); i++)
+                                    {
+                                        var izleyenRol = izleyenRoller[i];
+                                    <li data-tag-id="@izleyenRol.ProjectRole.ToString()" class="@(izleyenRol.IsChecked ? "selected" : "")">
+                                        <a href="#">@izleyenRol.ProjectRole.GetDisplayValue()</a>
+
+                                        <input type="hidden" name="MonitoringRoleList[@(i)].ProjectRole" value="@izleyenRol.ProjectRole.ToString()" />
+                                        <input type="hidden" name="MonitoringRoleList[@(i)].IsChecked" value="@izleyenRol.IsChecked.ToString()" class="selected-input" />
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+
+
+        </div>
+    </div><!-- /.row -->
+
+}
+
+<script>
+
+    function ShowStandartForm() {
+        //$('input:radio[name=formSecimRadio]:nth(0)').attr('checked', true);
+        $("input[name='standartFormSecim']").bootstrapSwitch('state',true);
+        $("#ozelForm").addClass('hidden');
+        $("#standartForm").removeClass('hidden');
+        $("#ozelFormViewId").val("");
+        $("#formGirisiStantartId").val(true);
+    }
+
+    function ShowOzelForm() {
+        //$('input:radio[name=formSecimRadio]:nth(1)').attr('checked', true);
+        $("input[name='standartFormSecim']").bootstrapSwitch('state',false);
+        $("#standartForm").addClass('hidden');
+        $("#ozelForm").removeClass('hidden');
+        $("#formGirisiStantartId").val(false);
+    }
+
+    $(function () {
+
+        @if ((Model.IsStandardForm!=null && (bool)Model.IsStandardForm) ||(Model.IsStandardForm == null))
+        {
+            <text>
+                ShowStandartForm();
+            </text>
+        }
+        else
+        {
+            <text>
+                ShowOzelForm();
+            </text>
+        }
+
+
+        $("input[name='standartFormSecim']").on('switchChange.bootstrapSwitch', function (event, state) {
+            if (state) {
+                ShowStandartForm();
+            } else {
+                ShowOzelForm();
+            }
+        });
+
+    });
+
+</script>
+
+
+<script>
+    @if (Model.TemplateFileList!=null && Model.AnalysisFileList!=null)
+    {
+        <text>
+            $("#@Model.TemplateFileList.ComponentName").on('drop', function (event) {
+                event.preventDefault();
+            });
+
+
+            $("#@Model.AnalysisFileList.ComponentName").on('drop', function (event) {
+                event.preventDefault();
+            });
+        </text>
+    }
+
+</script>
+
+<style>
+    .show {
+      display: block !important;
+    }
+    .hidden {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    .invisible {
+      visibility: hidden;
+    }
+</style>

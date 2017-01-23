@@ -1,0 +1,18 @@
+﻿@using WorkFlowManager.Common.Extensions
+@model ICollection<WorkFlowManager.Common.Tables.Document>
+
+
+@foreach (var belge in Model)
+{
+
+    var fileLink = Url.Action("Download", "File", new
+    {
+        fileName = belge.DosyaAdi,
+        ownerId = belge.OwnerId,
+        belgeTuru = belge.FileType
+    });
+    <div style="text-align:center; display: inline-block; width:95px">
+        <a href='@fileLink'><i name="torBelge" title="@belge.DosyaAdi" data-extension="@belge.Extension" class="fa fa-3x" style="@(ViewData["style"]==null?"":ViewData["style"])"></i></a><br />
+        <span title="@belge.DosyaAdi" data-toggle="tooltip">@belge.DosyaAdi.TruncateString(12)</span>
+    </div>
+}

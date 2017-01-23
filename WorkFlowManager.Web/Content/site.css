@@ -1,0 +1,93 @@
+﻿.site-header{
+    background: #2c3e50;
+    color: #eee;
+    margin-bottom:20px;
+}
+
+.site-header .page-header{
+    border:none;
+    padding:0;
+    margin-top:20px;
+    margin-bottom:10px;
+}
+
+.site-header.page-header small {
+    color: #ddd;
+    font-size:16pt;
+}
+
+.site-header a {
+    color:#fff;
+    text-decoration:none;
+}
+
+
+.post > h1 {
+    font-size:16pt;
+    padding:0;
+    margin:0;
+    margin-bottom:5px;
+    height:41px;
+    line-height:41px;
+}
+
+.sidebar .tags .list-group a {
+    position: relative;
+    background:transparent;
+    border-radius:0;
+}
+
+.sidebar .tags .list-group a .name {
+    z-index:2;
+    position:relative;
+}
+
+.sidebar .tags .list-group a .badge {
+    z-index:5;
+    position:relative;
+}
+
+.sidebar .tags .list-group a:hover {
+    background:#ddd;
+}
+
+.sidebar .tags .progress-bar {
+    background: #ddd;
+    border:none;
+    box-shadow:none;
+}
+
+.sidebar .tags .progress {
+    display: block;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:1;
+    padding:6px;
+    margin:0;
+    background: transparent;
+}
+
+.post{
+    margin-bottom:20px;
+}
+
+.post footer{
+    background: #eee;
+    padding:10px;
+    overflow:hidden;
+    font-size:10pt;
+    color:#aaa;
+}
+
+.post .tags {
+    margin :0;
+    margin-top:-1px;
+}
+
+.post .tags li{
+    float: left;
+    margin-right: 5px;
+}

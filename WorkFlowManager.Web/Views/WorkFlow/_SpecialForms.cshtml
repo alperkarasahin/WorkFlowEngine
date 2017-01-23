@@ -1,0 +1,47 @@
+﻿@model int
+
+@(Html.Kendo().Grid<WorkFlowManager.Common.ViewModels.FormViewViewModel>()
+    .Name("gridFormView")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.FormName);
+        columns.Bound(p => p.ViewName);
+        columns.Bound(p => p.FormDescription);
+        columns.Bound(p => p.FormComplexity).Width(150);
+        columns.Bound(p => p.NumberOfPage).Width(120);
+        columns.Bound(p => p.Completed).Width(120).ClientTemplate("<input disabled='disabled' type='checkbox' #= Completed ? checked='checked' :'' # />");
+        columns.Command(command => { command.Edit().UpdateText("Save").CancelText("Cancel"); command.Destroy().Text("Delete"); });
+    })
+    .ToolBar(toolbar => { toolbar.Create().Text("New Record");
+        toolbar.Custom().Name("toolRefreshGrid").Text(" ").Url("#").HtmlAttributes(new { onclick = "gridRefresh('gridFormView'," + @Model + ");" });
+    })
+    .Events(e => { e.Edit("onEditGridFormView"); e.DataBound("onDataBound"); })
+    .Editable(editable => {
+        editable.Mode(GridEditMode.InLine);
+        editable.DisplayDeleteConfirmation("Are you sure you want to delete?");
+    })
+    .Pageable()
+    .Sortable()
+    .Scrollable(scr => scr.Height(400))
+    .Resizable(resize => resize.Columns(true))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Events(events => events.Error("gridError"))
+        .Model(model => model.Id(p => p.Id))
+        .Create(update => update.Action("FormEditingInline_Create", "WorkFlow"))
+        .Read(read => read.Action("FormEditingInline_Read", "WorkFlow", new { taskId = Model }))
+        .Update(update => update.Action("FormEditingInline_Update", "WorkFlow"))
+        .Destroy(update => update.Action("FormEditingInline_Destroy", "WorkFlow"))
+    )
+)
+
+<script type="text/javascript">
+    function onEditGridFormView(e) {
+        //check if model is new
+        if (e.model.isNew()) {
+            e.model.set("TaskId", @Model);
+        }
+        $("#ViewName").attr("readonly", true);
+    }
+</script>

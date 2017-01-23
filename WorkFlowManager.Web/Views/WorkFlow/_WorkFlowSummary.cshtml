@@ -1,0 +1,64 @@
+﻿@model WorkFlowManager.Common.ViewModels.SummaryOfWorkFlowViewModel
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <div class="col-lg-12">
+                    <h3 class="box-title">Number Of Process</h3>
+                </div>
+            </div>
+            <div class="box-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <td>Number Of Condition</td>
+                            <td>@Model.NumberOfCondition</td>
+                        </tr>
+                        <tr>
+                            <td>Number Of Decision Point</td>
+                            <td>@Model.NumberOfDecisionPoint</td>
+                        </tr>
+                        <tr>
+                            <td>Number Of Process Whic Has Special Form</td>
+                            <td>@Model.NumberOfProcessWhicHasSpecialForm</td>
+                        </tr>
+                        <tr>
+                            <td>Number Of Standart Process</td>
+                            <td>@Model.NumberOfStandartProcess</td>
+                        </tr>
+                        <tr>
+                            <th>Number Of Total Process</th>
+                            <th>@Model.NumberOfTotalProcess</th>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <div class="col-lg-12">
+                    <h3 class="box-title">Task List</h3>
+                </div>
+            </div>
+            <div class="box-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr><td>Number Of Will Be Designed Decision Method</td><td>@Model.NumberOfWillBeDesignedDecisionMethod</td></tr>
+                        <tr><td>Number Of Will Be Designed Simple Form(@Model.NumberOfWillBeDesignedSimplePage Page)</td><td>@Model.NumberOfWillBeDesignedSimpleForm</td></tr>
+                        <tr><td>Number Of Will Be Designed Middle Form(@Model.NumberOfWillBeDesignedMiddlePage Page)</td><td>@Model.NumberOfWillBeDesignedMiddleForm</td></tr>
+                        <tr><td>Number Of Will Be Designed Complex Form(@Model.NumberOfWillBeDesignedComplexPage Page)</td><td>@Model.NumberOfWillBeDesignedComplexForm</td></tr>
+                        <tr><th>Number Of Total Job Will Be Completed</th><th>@Model.NumberOfTotalJobWillBeComplete</th></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

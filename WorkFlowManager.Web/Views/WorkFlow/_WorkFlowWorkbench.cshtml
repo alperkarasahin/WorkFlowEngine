@@ -1,0 +1,341 @@
+﻿@using System.Web.Optimization
+@using WorkFlowManager.Common.Tables
+@using WorkFlowManager.Common.Enums
+
+@model WorkFlowManager.Common.ViewModels.WorkFlowViewModel
+
+@{
+    ViewBag.Title = "Workflow Workbench";
+
+    List<int> elementOfTree = new List<int>();
+    List<WorkFlowManager.Common.ViewModels.NextProcess> listOfConditionOption = null;
+    if (Model.NextProcessList != null)
+    {
+        listOfConditionOption = Model.NextProcessList.Where(x =>
+        {
+            if (x.Process.GetType() == typeof(ConditionOption))
+            {
+                return true;
+            }
+            return false;
+        }).ToList();
+    }
+
+}
+
+
+<div class="btn-toolbar">
+    <div class="btn-group">
+        <a href="@Url.Action("New", new { taskId = Model.ActiveTaskId, processType = ProcessType.Process })" class="btn btn-primary btn-sm">
+            <i class="fa fa-arrow-right"></i> New Process
+        </a>
+    </div>
+    <div class="btn-group">
+        <a href="@Url.Action("New", new { taskId = Model.ActiveTaskId, processType = ProcessType.Condition })" class="btn btn-primary btn-sm">
+            <i class="fa fa-arrows"></i> New Condition
+        </a>
+    </div>
+    <div class="btn-group">
+        <a href="@Url.Action("New", new { taskId = Model.ActiveTaskId, processType = ProcessType.DecisionPoint })" class="btn btn-primary btn-sm">
+            <i class="fa fa-arrows"></i> New Decision Point
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <h5><i class="fa fa-check" aria-hidden="true"></i> New Process: Process which has special form or standart form</h5>
+        <h5><i class="fa fa-check" aria-hidden="true"></i> New Condition: Process which has more than one direction </h5>
+        <h5><i class="fa fa-check" aria-hidden="true"></i> New Decision Point: Method which will be developed. Return value must be [Y]es or [N]o</h5>
+    </div>
+</div>
+
+@if (Model.NextProcessList != null)
+{
+    <div class="panel-group" id="accordionTree">
+        @TaskWriter(Model.FirstProcessId, elementOfTree, listOfConditionOption)
+
+        @foreach (var islem in Model.NextProcessList.Where(x => !elementOfTree.Any(t => t == x.Process.Id)).ToList())
+        {
+            @TaskWriter(islem.Process.Id, elementOfTree, listOfConditionOption)
+        }
+    </div>
+    <a class="btn btn-info btn-sm" style="cursor:pointer" title="Full Screen Work Flow" href='@Url.Action("ShowWorkFlowFullScreen", "WorkFlow", new { taskId = Model.ActiveTaskId})' target="_blank">
+        <i class="glyphicon glyphicon-fullscreen"></i>
+    </a>
+
+
+    <div class="wrapper1">
+        <div class="div1">
+        </div>
+    </div>
+    <div class="wrapper2">
+        <div class="div2">
+
+            <div id="isAkisiGoruntulemeBolumu" class="mermaid">
+                @{ Html.RenderAction("ShowWorkFlow", "WorkFlow", new { taskId = Model.ActiveTaskId }); }
+            </div>
+
+        </div>
+    </div>
+    <h5>* You can select process with single click</h5>
+    <h5>* You can edit process with double click</h5>
+}
+
+
+
+
+
+
+@helper TaskWriter(int taskId, List<int> elementOfTree, List<WorkFlowManager.Common.ViewModels.NextProcess> listOfConditionOption)
+{
+
+if (elementOfTree.Contains(taskId) || taskId == 0)
+{
+    return;
+}
+
+List<ConditionOption> ConditionOptionler = null;
+var task = Model.NextProcessList.SingleOrDefault(x => x.Process.Id == taskId);
+
+elementOfTree.Add(taskId);
+
+var ikon = "";
+string linkHref = "#";
+bool silinebilir = true;
+if (task.Process is Condition || task.Process is ConditionOption)
+{
+    linkHref = string.Format("#panelTree_{0}", task.Process.ProcessUniqueCode);
+    ikon = "fa-arrows";
+    if (task.Process is Condition)
+    {
+        ConditionOptionler = listOfConditionOption.Where(x => (x.Process as ConditionOption).ConditionId == task.Process.Id).Select(x => (x.Process as ConditionOption)).ToList();
+    }
+    else //Koşul seçenek ise koşulu karar noktası mı? Karar noktası ise maddelerin silinmesine izin verilmeyecek
+    {
+        var secenekCondition = Model.NextProcessList.Single(x => x.Process.Id == (task.Process as ConditionOption).ConditionId);
+        if (secenekCondition.Process is DecisionPoint)
+        {
+            silinebilir = false;
+        }
+    }
+}
+else
+{
+    ikon = "fa-arrow-right";
+}
+var islemGosterim = "";
+
+
+if (!(task.Process is Condition))
+{
+    islemGosterim = string.Format("{0} {1} <i class=\"fa fa-arrow-right\"></i>", "<i class=\"fa " + @ikon + "\"></i>", task.Process.Name);
+}
+else
+{
+    islemGosterim = string.Format("{0} {1}", "<i class=\"fa " + @ikon + "\"></i>", task.Process.Name);
+}
+var panelId = string.Format("panelTree_{0}", task.Process.ProcessUniqueCode);
+var panelTreeLinkId = string.Format("panelTreeLink_{0}", task.Process.ProcessUniqueCode);
+
+
+    <div class='panel panel-default'>
+        <div class='panel-heading'>
+            <h4 class='panel-title'>
+
+                <a data-toggle='collapse' id="@panelTreeLinkId" href='@linkHref'>@Html.Raw(islemGosterim)</a>
+
+
+                @if (!(task.Process is Condition))
+                {
+                    @Html.EditorFor(x => task)
+                }
+                @if (
+            (
+            silinebilir
+            &&
+            !(task.Process.GetType() == typeof(Condition))
+            ||
+            (task.Process.GetType() == typeof(Condition) && ConditionOptionler != null && ConditionOptionler.Count() == 0)
+            )
+        )
+                {
+                    <a href="@Url.Action("Delete", new { processId = task.Process.Id, taskId = task.Process.TaskId })" data-post="Are you sure you want to delete?" class="pull-right"><i class="glyphicon glyphicon-remove" style="color:red" title="Delete"></i></a>
+                }
+                else
+                {
+                    <i class="glyphicon glyphicon-remove pull-right" style="color:lightgray"></i>
+                }
+                <a href="@Url.Action("Edit", new { processId = task.Process.Id })" class="pull-right"><i class="fa fa-edit" title="Edit"></i></a>
+            </h4>
+        </div>
+
+
+        @if (task.Process is Condition || task.Process is ConditionOption)
+        {
+
+            <text>
+                @Html.Raw(string.Format(
+                        @"<div class='panel-collapse collapse' id='{0}'>
+                            <div class='panel-body'>", @panelId))
+            </text>
+            if (task.Process is Condition)
+            {
+                if (!(task.Process is DecisionPoint))
+                {
+                    <div class="btn-group">
+                        <a href="@Url.Action("New", new { taskId = Model.ActiveTaskId, processType = ProcessType.OptionList, ConditionId = task.Process.Id })" class="btn btn-default btn-sm">
+                            <i class="glyphicon glyphicon-plus"></i> New Option
+                        </a>
+                    </div>
+                }
+                foreach (var option in Model.NextProcessList)
+                {
+                    if (option.Process is ConditionOption)
+                    {
+                        if (((ConditionOption)option.Process).ConditionId == task.Process.Id)
+                        {
+                            @TaskWriter(option.Process.Id, elementOfTree, listOfConditionOption);
+                        }
+                    }
+                }
+            }
+            else if (task.Process is ConditionOption)
+            {
+                if (task.Process.NextProcessId != null)
+                {
+                    @TaskWriter((int)task.Process.NextProcessId, elementOfTree, listOfConditionOption);
+            }
+        }
+
+            <text>
+                @Html.Raw("</div></div>")
+            </text>
+        }
+
+    </div>
+
+
+
+
+if (task.Process.NextProcessId != null)
+{
+        @TaskWriter((int)task.Process.NextProcessId, elementOfTree, listOfConditionOption);
+}
+
+
+}
+
+
+<script src="@Url.Content("~/Scripts/mermaid.js")"></script>
+
+@if (Model.NextProcessList != null)
+{
+    <script>
+
+        $(function(){
+            $(".wrapper1").scroll(function(){
+                $(".wrapper2")
+                    .scrollLeft($(".wrapper1").scrollLeft());
+            });
+            $(".wrapper2").scroll(function(){
+                $(".wrapper1")
+                    .scrollLeft($(".wrapper2").scrollLeft());
+            });
+        });
+
+        function UserSelectionChanged(baslangic, list) {
+
+            if (confirm("Next process will be changed?"))
+            {
+                var processCode = list.id;
+                var nextId = list.value;
+                var taskId = @Model.ActiveTaskId;
+                var url = '@Html.Raw(Url.Action("SetNext", "WorkFlow", new { processCode = "_processCode_", nextId = "_nextId_", taskId = "_taskId_" }))';
+                url = url.replace('_processCode_', processCode);
+                url = url.replace('_nextId_', nextId);
+                url = url.replace('_gorevId_', taskId);
+                window.location = url;
+
+            }
+            else {
+                list.value = baslangic;
+            }
+        }
+
+
+        var DELAY = 700, clicks = 0, timer = null;
+
+        $(function () {
+
+
+            setTimeout(function () {
+                $("g.node").on('click', function (e) {
+
+                    var processCode = this.id;
+                    if (processCode.indexOf("dummy_")>=0){
+                        return;
+                    }
+                    clicks++;  //count clicks
+
+                    if(clicks === 1) {
+
+
+                        timer = setTimeout(function() {
+
+                            var focusId =  "#panelTreeLink_" + processCode;
+
+                            var highlightElement = $(focusId).closest(".panel .panel-default");
+
+                            var elements = $(highlightElement).parentsUntil("#accordionTree").filter(".panel-default")
+                            var reversedElements = elements.toArray().reverse();
+                            var linkElement;
+                            var accordionDivElementId;
+                            jQuery.each(reversedElements, function(i, elem) {
+                                linkElement = $(elem).find("a[id^=panelTreeLink]").first();
+                                //$(linkElement).trigger('click');
+                                accordionDivElementId = "#"+linkElement.attr('id').replace('Link','');
+                                $(accordionDivElementId).collapse('show');
+                            });
+
+
+                            var bookMark ;
+                            if (accordionDivElementId == undefined){
+                                bookMark = focusId;
+                            }
+                            else{
+                                bookMark = accordionDivElementId;
+                            }
+
+
+                            document.location.href = bookMark;
+                            var divBorderColor = $(highlightElement).css('borderColor');
+                            var divBorderWidth = $(highlightElement).css('borderWidth');
+                            $(highlightElement)
+                                .animate({borderColor:'rgb(232, 60, 123)', borderWidth: '10px'}, 600)
+                                .delay(700)
+                                .animate({borderColor:divBorderColor, borderWidth:divBorderWidth}, 1000);
+                            clicks = 0;             //after action performed, reset counter
+                        }, DELAY);
+
+
+                    } else {
+                        clearTimeout(timer);    //prevent single-click action
+                        var url = '@Html.Raw(Url.Action("EditByProcessCode", new { processCode = "_processCode_" }))';
+                        url = url.replace('_processCode_', processCode);
+                        document.location.href = url;
+                        clicks = 0;             //after action performed, reset counter
+                    }
+
+                })
+                .on("dblclick", function(e){
+                    e.preventDefault();  //cancel system double-click event
+                });
+            },
+            1000
+            );
+        });
+
+
+    </script>
+
+}
