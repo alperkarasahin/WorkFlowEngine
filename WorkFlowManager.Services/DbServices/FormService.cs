@@ -22,11 +22,11 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-        private IList<FormViewViewModel> GetAll(int gorevId = 0)
+        private IList<FormViewViewModel> GetAll(int taskId = 0)
         {
             IList<FormViewViewModel> result = new List<FormViewViewModel>();
 
-            result = _unitOfWork.Repository<FormView>().GetList(x => x.TaskId == gorevId)
+            result = _unitOfWork.Repository<FormView>().GetList(x => x.TaskId == taskId)
                 .Select(x => new FormViewViewModel()
                 {
                     FormComplexity = x.FormComplexity,
@@ -43,9 +43,9 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-        public IEnumerable<FormViewViewModel> Read(int gorevId)
+        public IEnumerable<FormViewViewModel> Read(int taskId)
         {
-            return GetAll(gorevId);
+            return GetAll(taskId);
         }
 
         public void Create(FormViewViewModel formView)

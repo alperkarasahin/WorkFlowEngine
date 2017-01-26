@@ -1,45 +1,26 @@
-﻿@model int
+﻿@model IEnumerable<WorkFlowManager.Common.ViewModels.DecisionMethodViewModel>
 
-@(Html.Kendo().Grid<WorkFlowManager.Common.ViewModels.DecisionMethodViewModel>()
-    .Name("gridKararMetot")
-    .Columns(columns =>
-    {
-        columns.Bound(p => p.MethodName);
-        columns.Bound(p => p.MethodDescription);
-        columns.Bound(p => p.MethodSql);
-        columns.Bound(p => p.Completed).Width(120).ClientTemplate("<input disabled='disabled' type='checkbox' #= Completed ? checked='checked' :'' # />"); ;
-        columns.Command(command => { command.Edit().UpdateText("Save").CancelText("Cancel"); command.Destroy().Text("Delete"); });
-    })
-    .ToolBar(toolbar => { toolbar.Create().Text("New Record");
-        toolbar.Custom().Name("toolRefreshGrid").Text(" ").Url("#").HtmlAttributes(new { onclick = "gridRefresh('gridKararMetot'," + @Model + ");" });
-    })
-    .Events(e => { e.Edit("onEditGridKararMetot"); e.DataBound("onDataBound"); })
-    .Editable(editable => {
-        editable.Mode(GridEditMode.InLine);
-        editable.DisplayDeleteConfirmation("Are you sure you want to delete?");
-    })
-    .Pageable()
-    .Sortable()
-    .Scrollable(scr => scr.Height(400))
-    .Resizable(resize => resize.Columns(true))
-    .DataSource(dataSource => dataSource
-        .Ajax()
-        .PageSize(20)
-        .Events(events => events.Error("gridError"))
-        .Model(model => model.Id(p => p.Id))
-        .Create(update => update.Action("DecisionMethodEditingInline_Create", "WorkFlow"))
-        .Read(read => read.Action("DecisionMethodEditingInline_Read", "WorkFlow", new { taskId = Model }))
-        .Update(update => update.Action("DecisionMethodEditingInline_Update", "WorkFlow"))
-        .Destroy(update => update.Action("DecisionMethodEditingInline_Destroy", "WorkFlow"))
-    )
-)
-
-
-<script type="text/javascript">
-    function onEditGridKararMetot(e) {
-        //check if model is new
-        if (e.model.isNew()) {
-            e.model.set("TaskId", @Model);
-        }
-    }
-</script>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <div class="col-lg-12">
+                    <h3 class="box-title">Method Information</h3>
+                </div>
+            </div>
+            <div class="box-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr><td>Name</td><td>Method Sql</td></tr>
+                    </thead>
+                    @foreach (var item in Model)
+                    {
+                        <text>
+                            <tr><td>@item.MethodName</td><td>@item.MethodSql</td></tr>
+                        </text>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

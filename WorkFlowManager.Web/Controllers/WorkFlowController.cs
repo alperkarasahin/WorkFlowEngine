@@ -1,6 +1,4 @@
-﻿using Kendo.Mvc.Extensions;
-using Kendo.Mvc.UI;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -286,9 +284,11 @@ namespace WorkFlowManager.Web.Controllers
         [ChildActionOnly]
         public ActionResult SpecialForm(int taskId)
         {
-            return PartialView("_SpecialForms", taskId);
+            return PartialView("_SpecialForms", _formService.Read(taskId));
         }
 
+
+        /*
         public ActionResult FormEditingInline_Read([DataSourceRequest] DataSourceRequest request, int taskId)
         {
             return Json(_formService.Read(taskId).ToDataSourceResult(request));
@@ -336,13 +336,14 @@ namespace WorkFlowManager.Web.Controllers
 
             return Json(new[] { formView }.ToDataSourceResult(request, ModelState));
         }
-
+        */
         [ChildActionOnly]
         public ActionResult DecisionMethod(int taskId)
         {
-            return PartialView("_DecisionMethod", taskId);
+            return PartialView("_DecisionMethod", _decisionMethodService.Read(taskId));
         }
 
+        /*
         public ActionResult DecisionMethodEditingInline_Read([DataSourceRequest] DataSourceRequest request, int taskId)
         {
             return Json(_decisionMethodService.Read(taskId).ToDataSourceResult(request));
@@ -388,7 +389,7 @@ namespace WorkFlowManager.Web.Controllers
 
             return Json(new[] { decisonMethod }.ToDataSourceResult(request, ModelState));
         }
-
+        */
         [ChildActionOnly]
         public ActionResult WorkFlowSummary(int taskId)
         {

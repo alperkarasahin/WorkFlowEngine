@@ -38,6 +38,26 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                 _unitOfWork.Repository<Task>().Add(task);
                 _unitOfWork.Complete();
             }
+
+
+            var testForm = _unitOfWork.Repository<FormView>().Get(x => x.TaskId == task.Id && x.FormName == "Test Form");
+            if (testForm == null)
+            {
+                testForm = new FormView() { FormName = "Test Form", ViewName = "TestForm", TaskId = task.Id };
+                _unitOfWork.Repository<FormView>().Add(testForm);
+                _unitOfWork.Complete();
+            }
+
+            var testMethod = _unitOfWork.Repository<DecisionMethod>().Get(x => x.TaskId == task.Id && x.MethodName == "Test Method");
+            if (testMethod == null)
+            {
+                testMethod = new DecisionMethod() { MethodName = "Test Method", MethodSql = "TestMethod(Id)", TaskId = task.Id };
+                _unitOfWork.Repository<DecisionMethod>().Add(testMethod);
+                _unitOfWork.Complete();
+            }
+
+
+
             base.Seed(context);
 
 
