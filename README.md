@@ -1,5 +1,5 @@
-# WorkFlowManager
-Simple Work Flow Manager with C# .NET MVC
+# Work Flow Engine
+Simple Work Flow Engine with C# .NET MVC
 
 You can design simple work flow with using three process type.
 * Process: Process which has special form or standart form
