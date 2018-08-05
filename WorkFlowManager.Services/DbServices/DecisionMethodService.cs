@@ -31,7 +31,7 @@ namespace WorkFlowManager.Services.DbServices
                 .Select(x => new DecisionMethodViewModel()
                 {
                     MethodDescription = x.MethodDescription,
-                    MethodSql = x.MethodSql,
+                    MethodFunction = x.MethodFunction,
                     MethodName = x.MethodName,
                     TaskId = x.TaskId,
                     Id = x.Id,
@@ -54,9 +54,6 @@ namespace WorkFlowManager.Services.DbServices
 
         public void Update(DecisionMethodViewModel decisionMethod)
         {
-
-            Mapper.Initialize(cfg => cfg.CreateMap<DecisionMethodViewModel, DecisionMethod>());
-
             DecisionMethod decisionMethodDB = _unitOfWork.Repository<DecisionMethod>().Get(x => x.Id == decisionMethod.Id);
 
             if (decisionMethodDB == null)

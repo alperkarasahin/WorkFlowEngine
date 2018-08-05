@@ -1,0 +1,48 @@
+﻿@using WorkFlowManager.Common.Enums
+@model WorkFlowManager.Common.ViewModels.WorkFlowTraceForm
+
+
+@if (Model.ProcessAssignedRole != ProjectRole.Sistem)
+{
+    <input type="submit" value="Save Draft" name="action:TaslakKaydetOzelForm" class="btn btn-success btn-sm" />
+    <input type="submit" value="@Model.ProcessNextLabel" data-confirm="You will not able to update this form after submit.  Are you sure?" name="action:GonderOzelForm" class="btn btn-primary btn-sm" />
+    <input type="submit" id="GeriAlButton" style="display:none" name="action:GeriAl"/>
+
+    if (Model.GeriGidilebilecekIslemListesi.Count()>0)
+    { 
+        <div class="btn-group">
+            <button type="button" class="btn btn-danger dropdown-toggle btn-sm" data-toggle="dropdown">
+                <i class="fa fa-backward"></i> Previous Step <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                @foreach (var islem in Model.GeriGidilebilecekIslemListesi)
+                {
+                    <li><a href="#" onclick="GeriAl(@islem.ProcessId)">@islem.ProcessName</a></li>
+                }
+            </ul>
+        </div>
+        <text>
+            <script>
+                function GeriAl(gorevIslemId){
+                    if (confirm('Are you sure you want to go to previous step?'))
+                    {
+                        $("[name='WorkFlowIslemForm.HedefGorevIslemId']").val(gorevIslemId);
+                        $("#GeriAlButton").trigger('click');
+                    }
+                }
+            </script>
+        </text>
+    }
+    <a class="btn btn-warning btn-sm" href="@Url.Action("Index", new { controller = "Home" })"> Cancel</a>
+}
+else
+{
+    if (Model.IptalEdilebilir)
+    {
+        <a href="@Url.Action("Iptal", new { workFlowTraceId = Model.Id })" title="@Model.IptalText" data-post="Are you sure you want to @Model.IptalText ?" class="btn btn-danger btn-sm">
+            <i class="fa fa-times"></i> @Model.IptalText
+        </a>
+    }
+
+    <a class="btn btn-warning btn-sm" href="@Url.Action("Index", new { controller = "Home" })"> Cancel</a>
+}

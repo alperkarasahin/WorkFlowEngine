@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
 using WorkFlowManager.Common.Enums;
-using WorkFlowManager.Common.Mappers;
 using WorkFlowManager.Common.Tables;
 using WorkFlowManager.Common.ViewModels;
 
@@ -169,7 +168,7 @@ namespace WorkFlowManager.Services.DbServices
             Process process = _unitOfWork.Repository<Process>().GetForUpdate(x => x.Id == processId, x => x.MonitoringRoleList, x => x.DocumentList);
             int taskId = process.TaskId;
 
-            if (process.GetType() == typeof(Condition)) //Kosula bağlı seçenek varsa silme yapılamaz
+            if (process.GetType() == typeof(Condition))
             {
                 var optionList = _unitOfWork.Repository<ConditionOption>().GetList(x => x.ConditionId == processId);
                 if (optionList.Count() > 0)
@@ -188,173 +187,153 @@ namespace WorkFlowManager.Services.DbServices
                 _unitOfWork.Complete();
             }
 
-            //Belgeler varsa belgeler silinecek
             if (process.DocumentList != null && process.DocumentList.Count() > 0)
             {
                 _unitOfWork.Repository<Document>().RemoveRange(process.DocumentList);
             }
 
-            //1)Silinmek istenen nodun öncesi varsa alınacak
-            //2)Sonrası varsa alınacak
-            //3)Once ki nodun sonrası silinecek nodun sonrası olacak
-
-
-            // 1
             var processList = _unitOfWork.Repository<Process>().GetList(null, x => x.MonitoringRoleList);
-            Process onceki = GetBefore(processId);
+            Process before = GetBefore(processId);
 
-            string islemSonuc = null;
-            Process sonraki = null;
-            if (onceki != null)
+            string result = null;
+            Process after = null;
+            if (before != null)
             {
                 if (process.NextProcessId != null)
                 {
-                    sonraki = _unitOfWork.Repository<Process>().Get((int)process.NextProcessId);
+                    after = _unitOfWork.Repository<Process>().Get((int)process.NextProcessId);
                 }
             }
 
-            if (onceki != null && sonraki != null)
+            if (before != null && after != null)
             {
-                onceki.NextProcessId = sonraki.Id;
-                islemSonuc = string.Format("{0}->{1} link created.", onceki.Name, sonraki.Name);
+                before.NextProcessId = after.Id;
+                result = string.Format("{0}->{1} link created.", before.Name, after.Name);
             }
 
-            //Silme işlemi yapılacak
-            var silinenIslemTanim = process.Name;
+            var deletedTaskName = process.Name;
 
 
-            //İzleyenler varsa silinecek
-            //var izleyenListesi = islemListesi.Single(x => x.Id == islemId).IzleyenRoller;
             if (process.MonitoringRoleList != null && process.MonitoringRoleList.Count() > 0)
             {
                 _unitOfWork.Repository<ProcessMonitoringRole>().RemoveRange(process.MonitoringRoleList);
-                //_unitOfWork.Complete();
             }
 
-            //Başlangıç görevi olup olmadığı kontrol edilecek
-            //Başlangıç görevi ise ilişki kaldırılacak
-            Task gorev = _unitOfWork.Repository<Task>().Get(process.TaskId);
-            if (gorev.StartingProcessId == process.Id)
+            Task task = _unitOfWork.Repository<Task>().Get(process.TaskId);
+            if (task.StartingProcessId == process.Id)
             {
-                gorev.StartingProcessId = null;
-                _unitOfWork.Repository<Task>().Update(gorev);
+                task.StartingProcessId = null;
+                _unitOfWork.Repository<Task>().Update(task);
                 _unitOfWork.Complete();
             }
 
             _unitOfWork.Repository<Process>().Remove(process);
-            if (onceki != null)
+            if (before != null)
             {
-                _unitOfWork.Repository<Process>().Update(onceki);
+                _unitOfWork.Repository<Process>().Update(before);
             }
 
             _unitOfWork.Complete();
 
-            //Başlangıç görevi set edilecek
             SetStartingProcess(taskId);
             SetWorkFlowDiagram(taskId);
 
-            islemSonuc = string.Format("{0} removed. {1}", silinenIslemTanim, islemSonuc);
-            return islemSonuc;
+            result = string.Format("{0} removed. {1}", deletedTaskName, result);
+            return result;
 
         }
-        public int AddOrUpdate<T>(T gorevIslem) where T : Process
+        public int AddOrUpdate<T>(T process) where T : Process
         {
+            T processRecorded = null;
 
-            Mapper.Initialize(cfg => cfg.CreateMap<T, T>());
-            Process gorevIslem_2 = null;
-
-            int? gorevIslem_2_SonrakiId_Baslangic = null;
+            int? processRecordedNextProcessId = null;
 
 
-            if (gorevIslem.Id == 0)
+            if (process.Id == 0)
             {
-                gorevIslem_2 = Mapper.Map<T, T>((T)gorevIslem);
+                processRecorded = process;
+                //processRecorded = Mapper.Map<T, T>(process);
 
 
-                gorevIslem_2.ProcessUniqueCode = Guid.NewGuid().ToString();
-                _unitOfWork.Repository<T>().Add((T)gorevIslem_2);
-                _unitOfWork.Complete();
-                //Kosul noktasi girilmişse Evet ve Hayır isminde iki seçenek girilecek
-                if (gorevIslem.GetType() == typeof(DecisionPoint))
+                processRecorded.ProcessUniqueCode = Guid.NewGuid().ToString();
+                _unitOfWork.Repository<T>().Add(processRecorded);
+                //_unitOfWork.Complete();
+                if (processRecorded.GetType() == typeof(DecisionPoint))
                 {
-                    var secenekEvet = new ConditionOption
+                    var optionYes = new ConditionOption
                     {
-                        TaskId = gorevIslem_2.TaskId,
+                        TaskId = processRecorded.TaskId,
                         Name = "Yes",
                         ProcessUniqueCode = Guid.NewGuid().ToString(),
-                        ConditionId = gorevIslem_2.Id,
-                        AssignedRole = gorevIslem_2.AssignedRole,
+                        //ConditionId = processRecorded.Id,
+                        Condition = (Condition)(object)processRecorded,
+                        AssignedRole = processRecorded.AssignedRole,
                         Value = "Y"
                     };
 
-                    var secenekHayir = new ConditionOption
+                    var optionNo = new ConditionOption
                     {
-                        TaskId = gorevIslem_2.TaskId,
+                        TaskId = processRecorded.TaskId,
                         Name = "No",
                         ProcessUniqueCode = Guid.NewGuid().ToString(),
-                        ConditionId = gorevIslem_2.Id,
-                        AssignedRole = gorevIslem_2.AssignedRole,
+                        //ConditionId = processRecorded.Id,
+                        Condition = (Condition)(object)processRecorded,
+                        AssignedRole = processRecorded.AssignedRole,
                         Value = "N"
                     };
 
-                    _unitOfWork.Repository<ConditionOption>().Add(secenekEvet);
-                    _unitOfWork.Repository<ConditionOption>().Add(secenekHayir);
+                    _unitOfWork.Repository<ConditionOption>().Add(optionYes);
+                    _unitOfWork.Repository<ConditionOption>().Add(optionNo);
+                    //_unitOfWork.Complete();
                 }
-                _unitOfWork.Complete();
             }
             else
             {
-                gorevIslem_2 = _unitOfWork.Repository<T>().GetForUpdate(x => x.Id == gorevIslem.Id, x => x.MonitoringRoleList, x => x.DocumentList);
-                gorevIslem_2_SonrakiId_Baslangic = gorevIslem_2.NextProcessId;
+                processRecorded = _unitOfWork.Repository<T>().GetForUpdate(x => x.Id == process.Id, x => x.MonitoringRoleList, x => x.DocumentList);
+                processRecordedNextProcessId = processRecorded.NextProcessId;
 
-                if (gorevIslem_2.MonitoringRoleList != null)
+                if (processRecorded.MonitoringRoleList != null)
                 {
-                    //Yeni listede olmayanlar silinecek
-                    var silinecekRoller = gorevIslem_2.MonitoringRoleList.Where(x => !gorevIslem.MonitoringRoleList.Any(t => t.ProjectRole == x.ProjectRole)).ToList();
-                    foreach (var izleyenRol in silinecekRoller)
+                    var deletedRoleList = processRecorded.MonitoringRoleList.Where(x => !process.MonitoringRoleList.Any(t => t.ProjectRole == x.ProjectRole)).ToList();
+                    foreach (var role in deletedRoleList)
                     {
-                        _unitOfWork.Repository<ProcessMonitoringRole>().Remove(izleyenRol);
+                        _unitOfWork.Repository<ProcessMonitoringRole>().Remove(role);
                     }
 
-                    //Eski listede olanlar eklenmeyecek
-                    var eklenmeyecekRoller = gorevIslem.MonitoringRoleList.Where(x => gorevIslem_2.MonitoringRoleList.Any(t => t.ProjectRole == x.ProjectRole)).ToList();
-                    foreach (var eklenmeyecekRol in eklenmeyecekRoller)
-                    {
-                        gorevIslem.MonitoringRoleList.Remove(eklenmeyecekRol);
-                        //_unitOfWork.Repository<GorevIslemIzleyenRol>().Remove(izleyenRol);
-                    }
+                    //var notAddedRoleList = process.MonitoringRoleList.Where(x => processRecorded.MonitoringRoleList.Any(t => t.ProjectRole == x.ProjectRole)).ToList();
+                    //foreach (var eklenmeyecekRol in notAddedRoleList)
+                    //{
+                    //    process.MonitoringRoleList.Remove(eklenmeyecekRol);
+                    //}
                 }
 
-                if (gorevIslem_2.DocumentList != null)
+                if (processRecorded.DocumentList != null)
                 {
-                    //Yeni listede olmayanlar silinecek
-                    var silinecekBelgeler = gorevIslem_2.DocumentList.Where(x => !gorevIslem.DocumentList.Any(t => t.MediaName == x.MediaName)).ToList();
-                    foreach (var silinecekBelge in silinecekBelgeler)
+                    var deletedDocumentList = processRecorded.DocumentList.Where(x => !process.DocumentList.Any(t => t.MediaName == x.MediaName)).ToList();
+                    foreach (var document in deletedDocumentList)
                     {
-                        _unitOfWork.Repository<Document>().Remove(silinecekBelge);
+                        _unitOfWork.Repository<Document>().Remove(document);
                     }
 
-                    //Eski listede olanlar eklenmeyecek
-                    var eklenmeyecekBelgeler = gorevIslem.DocumentList.Where(x => gorevIslem_2.DocumentList.Any(t => t.MediaName == x.MediaName)).ToList();
-                    foreach (var eklenmeyecekBelge in eklenmeyecekBelgeler)
-                    {
-                        gorevIslem.DocumentList.Remove(eklenmeyecekBelge);
-                        //_unitOfWork.Repository<GorevIslemIzleyenRol>().Remove(izleyenRol);
-                    }
+                    //var notAddedDocumentList = process.DocumentList.Where(x => processRecorded.DocumentList.Any(t => t.MediaName == x.MediaName)).ToList();
+                    //foreach (var document in notAddedDocumentList)
+                    //{
+                    //    process.DocumentList.Remove(document);
+                    //}
                 }
 
 
 
-                Mapper.Map(gorevIslem, gorevIslem_2);
-                _unitOfWork.Repository<T>().Update((T)gorevIslem_2);
+                Mapper.Map(process, processRecorded);
+                _unitOfWork.Repository<T>().Update(processRecorded);
             }
             _unitOfWork.Complete();
 
-            if (gorevIslem_2_SonrakiId_Baslangic != null && gorevIslem_2.NextProcessId != null && gorevIslem_2_SonrakiId_Baslangic != gorevIslem_2.NextProcessId)
+            if (processRecordedNextProcessId != null && processRecorded.NextProcessId != null && processRecordedNextProcessId != processRecorded.NextProcessId)
             {
-                SetNextByProcessCode(gorevIslem_2.ProcessUniqueCode, gorevIslem_2.NextProcessId);
+                SetNextByProcessCode(processRecorded.ProcessUniqueCode, processRecorded.NextProcessId);
             }
-            return gorevIslem_2.Id;
+            return processRecorded.Id;
         }
 
 
@@ -566,18 +545,18 @@ namespace WorkFlowManager.Services.DbServices
             {
                 process = _unitOfWork.Repository<ConditionOption>().Get(x => x.Id == processId, x => x.MonitoringRoleList, x => x.Condition);
             }
+            if (process.GetType() == typeof(DecisionPoint))
+            {
+                process = _unitOfWork.Repository<DecisionPoint>().Get(x => x.Id == processId, x => x.MonitoringRoleList, x => x.DecisionMethod);
+            }
             return process;
         }
 
         public Process GetProcess(string processCode)
         {
-            Process process = _unitOfWork.Repository<Process>().Get(x => x.ProcessUniqueCode == processCode, x => x.MonitoringRoleList);
+            Process process = _unitOfWork.Repository<Process>().Get(x => x.ProcessUniqueCode == processCode);
 
-            if (process.GetType() == typeof(ConditionOption))
-            {
-                process = _unitOfWork.Repository<ConditionOption>().Get(x => x.ProcessUniqueCode == processCode, x => x.MonitoringRoleList, x => x.Condition);
-            }
-            return process;
+            return GetProcess(process.Id);
         }
 
 
@@ -589,10 +568,9 @@ namespace WorkFlowManager.Services.DbServices
         private void SetStartingProcess(int gorevId)
         {
             Task task = _unitOfWork.Repository<Task>().Get(gorevId);
-            //Tek görev varsa o set edilecek
 
             var processListWhichBeforeIsNull = ProcessListWhichBeforeIsNull(gorevId);
-            if (processListWhichBeforeIsNull.Count() > 0)//Başlangıç işlemi set edilecek, birden fazla geliyorsa değişiklik yapılmayacak
+            if (processListWhichBeforeIsNull.Count() > 0)
             {
                 if (task.StartingProcessId == null || processListWhichBeforeIsNull.Count() == 1)
                 {
@@ -605,44 +583,44 @@ namespace WorkFlowManager.Services.DbServices
 
         }
 
-        public void AddOrUpdate(ProcessType processType, ProcessForm formData)
+        public void AddOrUpdate(ProcessForm formData)
         {
             int processId = 0;
-            if (processType == ProcessType.Process)
+
+            if (formData.ProcessType == ProcessType.Process)
             {
-                processId = AddOrUpdate<Process>(formData.ToProcess<Process>());
+
+
+                var process = Mapper.Map<ProcessForm, Process>(formData);
+                processId = AddOrUpdate(process);
             }
-            else if (processType == ProcessType.Condition)
+            else if (formData.ProcessType == ProcessType.Condition)
             {
-                processId = AddOrUpdate<Condition>(formData.ToProcess<Condition>());
+                var process = Mapper.Map<ProcessForm, Condition>(formData);
+                processId = AddOrUpdate(process);
             }
-            else if (processType == ProcessType.OptionList)
+            else if (formData.ProcessType == ProcessType.OptionList)
             {
-                processId = AddOrUpdate<ConditionOption>(formData.ToProcess<ConditionOption>());
+                var process = Mapper.Map<ProcessForm, ConditionOption>(formData);
+                processId = AddOrUpdate(process);
             }
-            else if (processType == ProcessType.DecisionPoint)
+            else if (formData.ProcessType == ProcessType.DecisionPoint)
             {
-                processId = AddOrUpdate<DecisionPoint>(formData.ToProcess<DecisionPoint>());
+                var process = Mapper.Map<ProcessForm, DecisionPoint>(formData);
+                processId = AddOrUpdate(process);
             }
 
             if (formData.Id == 0 && processId != 0)
             {
                 formData.Id = processId;
-                //Yeni kayıt eklendi
-                //Eklenen işlem yada koşul ise  Görevin başlangıç kaydı boş ise ilk kayıt olarak seçilecek
-                if (processType == ProcessType.Process || processType == ProcessType.Condition)
+                if (formData.ProcessType == ProcessType.Process || formData.ProcessType == ProcessType.Condition)
                 {
                     SetStartingProcess(formData.TaskId);
                 }
-
             }
 
 
             SetWorkFlowDiagram(formData.TaskId);
-            //oluşan grafik veritabanına kaydedilecek
-
-
-
         }
     }
 }

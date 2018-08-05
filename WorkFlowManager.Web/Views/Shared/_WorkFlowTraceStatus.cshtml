@@ -1,0 +1,13 @@
+﻿@model List<WorkFlowManager.Common.ViewModels.WorkFlowTraceVM>
+@using WorkFlowManager.Common.Extensions
+
+<ul class="progress-indicator">
+    @foreach (var workFlowTrace in Model)
+    {
+        var showTask = string.Format("{0}-({1})", workFlowTrace.ProcessName, workFlowTrace.AssignedRole.GetDisplayValue());
+        <li class=@(workFlowTrace.ProcessStatus == WorkFlowManager.Common.Enums.ProcessStatus.Completed?"completed":(workFlowTrace.ProcessStatus == WorkFlowManager.Common.Enums.ProcessStatus.Draft?"active":(workFlowTrace.ProcessStatus == WorkFlowManager.Common.Enums.ProcessStatus.Cancelled?"danger":"")))>
+            <span class="bubble"></span>
+            @showTask <br>
+        </li>
+    }
+</ul>

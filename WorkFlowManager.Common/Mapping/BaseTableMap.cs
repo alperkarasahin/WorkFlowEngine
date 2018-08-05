@@ -1,5 +1,6 @@
-﻿using WorkFlowManager.Common.Tables;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
+using WorkFlowManager.Common.Tables;
 
 namespace WorkFlowManager.Common.Mapping
 {
@@ -9,6 +10,8 @@ namespace WorkFlowManager.Common.Mapping
         {
             // primary key belirtiyoruz.
             HasKey(x => x.Id);
+            Property(x => x.Id)
+                .HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 
         }
     }

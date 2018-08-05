@@ -17,8 +17,8 @@
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/workflow")
+    @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </head>
 <body>
@@ -63,8 +63,6 @@
 <script>
     jQuery(function () {
 
-        console.log(kendo);
-
 
         $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
             checkboxClass: 'icheckbox_minimal-blue',
@@ -82,7 +80,7 @@
         });
 
         //Flat green color scheme for iCheck
-        $('input[type="checkbox"].flat-red, input[type="radio"].flat-green').iCheck({
+        $('input[type="checkbox"].flat-green, input[type="radio"].flat-green').iCheck({
             checkboxClass: 'icheckbox_flat-green',
             radioClass: 'iradio_flat-green'
         });

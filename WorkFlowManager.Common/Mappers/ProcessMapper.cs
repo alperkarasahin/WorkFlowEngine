@@ -13,11 +13,6 @@ namespace WorkFlowManager.Common.Mappers
     {
         public static T ToProcess<T>(this ProcessForm formData) where T : Process
         {
-            Mapper.Initialize(cfg =>
-                cfg.CreateMap<ProcessForm, T>()
-                    .ForMember(a => ((T)a).MonitoringRoleList,
-                        opt => opt.MapFrom(c => c.MonitoringRoleList.Where(x => x.IsChecked == true).Select(t => new ProcessMonitoringRole { ProcessId = c.Id, ProjectRole = t.ProjectRole }))));
-
             Process dto = Mapper.Map<ProcessForm, T>(formData);
 
 
@@ -34,17 +29,6 @@ namespace WorkFlowManager.Common.Mappers
         {
 
             var roleList = ProjectRole.Admin.GetAllValues().Where(x => x != ProjectRole.Sistem).ToList();
-
-
-            Mapper.Initialize(cfg =>
-                cfg.CreateMap<Process, ProcessForm>()
-                    .ForMember(a => a.MonitoringRoleList, opt => opt.MapFrom(c => c.MonitoringRoleList.Select(t => new MonitoringRoleCheckbox { IsChecked = true, ProjectRole = t.ProjectRole })))
-                    .ForMember(a => a.ConditionId, opt => opt.MapFrom(c => (c as ConditionOption).ConditionId))
-                    .ForMember(a => a.ConditionName, opt => opt.MapFrom(c => (c as ConditionOption).Condition.Name))
-                    .ForMember(a => a.DecisionMethodId, opt => opt.MapFrom(c => (c as DecisionPoint).DecisionMethodId))
-                    .ForMember(a => a.RepetitionFrequenceByHour, opt => opt.MapFrom(c => (c as DecisionPoint).RepetitionFrequenceByHour))
-                    .ForMember(a => a.Value, opt => opt.MapFrom(c => (c as ConditionOption).Value))
-                );
 
             ProcessForm dto = Mapper.Map<Process, ProcessForm>(process);
             foreach (var rol in roleList)

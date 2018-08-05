@@ -1,0 +1,221 @@
+﻿@using WorkFlowManager.Common.ViewModels
+@using WorkFlowManager.Common.Extensions
+@model WorkFlowFormViewModel
+@using WorkFlowManager.Common.Enums
+
+@using (Html.BeginForm("", Model.WorkFlowIslemForm.ProcessTaskController, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken();
+
+    <div class="row islemGorevDurum">
+        <div class="col-lg-12">
+            <div class="box box-warning">
+                <div class="container">
+                    @Html.Partial("_WorkFlowTraceStatus", Model.WorkFlowIslemForm.ProgressGorevListesi)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 islemFormBolum">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">@Model.WorkFlowIslemForm.ProcessName</h3>
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessFormViewCompleted)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessFormViewViewName)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessName)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.GorevTanim)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.HedefGorevIslemId)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.IsCondition)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessAssignedRole)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.OwnerId)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessNextLabel)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessComment)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessDescription)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessId)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessStatus)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessTaskId)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessTaskSpecialFormTemplateView)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessTaskController)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.ProcessTaskName)
+                    @Html.HiddenFor(x => x.WorkFlowIslemForm.Id)
+                    
+                    @Html.Hidden("WorkFlowFormType", Model.GetType())
+
+                    <div class="box-tools pull-right">
+                        <div class="btn-group islemRaporBolum" style="display:none">
+                            <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown">
+                                Raporlar <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a class="btn btn-sm" style="cursor:pointer" href='@Url.Action("AkisGoster", Model.WorkFlowIslemForm.ProcessTaskController, new { workFlowTraceId = Model.WorkFlowIslemForm.Id})' target="_blank">
+                                        <span data-toggle="tooltip" title="Süreç"><i class="fa fa-sitemap fa-3x"></i></span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+
+                        <div style="display:none" class="islemButonBolum">
+                            @Html.Partial("_IslemButon", Model.WorkFlowIslemForm)
+                        </div>
+
+                        <a style="cursor:pointer" class="sayfaGenislet" title="Sayfayı Genişletmek İçin Tıklayın">
+                            <i class="fa fa-window-maximize"></i>
+                        </a>
+                        <a style="cursor:pointer; display:none" class="sayfaDaralt" title="Sayfayı Daraltmak İçin Tıklayın">
+                            <i class="fa fa-window-minimize"></i>
+                        </a>
+
+                    </div>
+                </div>
+                <div style="display:none" class="box-header with-border islemGorevDurumMaximum">
+                    @Html.Partial("_WorkFlowTraceStatus", Model.WorkFlowIslemForm.ProgressGorevListesi)
+                </div>
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            @Html.ValidationSummary()
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-12">@Html.ShowLabel(Model.WorkFlowIslemForm.ProcessDescription)</label>
+                    </div>
+                    @if (Model.WorkFlowIslemForm.ListOfOptions != null)
+                    {
+                        <div class="form-group">
+                            <label class="col-sm-2"></label>
+                            <div class="col-sm-10">
+                                @foreach (var item in Model.WorkFlowIslemForm.ListOfOptions)
+                                {
+                                    <text>
+                                        <input type="radio" class="flat-green" data-switch-no-init name="WorkFlowIslemForm.ConditionOptionId" value="@item.Id" @(Model.WorkFlowIslemForm.ConditionOptionId == item.Id ? "checked" : "")>
+                                        <label>@item.FormDescription</label><br />
+                                    </text>
+                                }
+                                @Html.ValidationMessageFor(x => x.WorkFlowIslemForm.ConditionOptionId)
+                            </div>
+                        </div>
+                    }
+
+
+                    @if (Model.WorkFlowIslemForm.ProcessAssignedRole != ProjectRole.Sistem)
+                    {
+                        if (@Model.WorkFlowIslemForm.ProcessFormViewViewName != null)
+                        {
+                            if (!Model.WorkFlowIslemForm.ProcessFormViewCompleted)
+                            {
+                                <h4>@Model.WorkFlowIslemForm.ProcessFormViewViewName is under contruction</h4>
+                            }
+                            else
+                            {
+                                @Html.PartialFor(x => Model, @Model.WorkFlowIslemForm.ProcessFormViewViewName)
+                            }
+                        }
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                @Html.LabelFor(x => x.WorkFlowIslemForm.Description)
+                                @Html.TextAreaFor(x => x.WorkFlowIslemForm.Description, new { @placeholder = "Additional comment", @class = "textarea-editor form-control", rows = 4 })
+                                @Html.ValidationMessageFor(x => x.WorkFlowIslemForm.Description)
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            @Html.Partial("_SatinAlmaIslemler", Model.WorkFlowIslemForm.GormeyeYetkiliIslemListesi)
+        </div>
+        <div class="col-lg-4 islemDetayBolum">
+            <div class="panel panel-info">
+                <div class="panel-heading">Actions</div>
+                <div class="panel-body">
+                    @Html.Partial("_IslemButon", Model.WorkFlowIslemForm)
+                </div>
+            </div>
+
+            @Html.Partial("_Kunye", Model.WorkFlowIslemForm)
+
+            <div class="panel panel-info">
+                <div class="panel-heading">Reports</div>
+                <div class="panel-body">
+                    <a class="btn btn-info btn-sm" style="cursor:pointer" href='@Url.Action("AkisGoster", Model.WorkFlowIslemForm.ProcessTaskController, new { workFlowTraceId = Model.WorkFlowIslemForm.Id})' target="_blank">
+                        <span data-toggle="tooltip" title="Süreç"><i class="fa fa-sitemap fa-2x"></i></span>
+                    </a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+}
+
+
+<script src="@Url.Content("~/Scripts/mermaid.js")"></script>
+
+<script>
+
+    @if (Model.WorkFlowIslemForm.ProcessAssignedRole != ProjectRole.Sistem)
+    {
+    <text>
+
+    $(function () {
+
+        @if (Model.WorkFlowIslemForm.ProcessStatus ==  WorkFlowManager.Common.Enums.ProcessStatus.Completed)
+        {
+            <text>
+
+        
+            setTimeout(function () {
+
+                    $('input').attr("disabled", "disabled");
+                    $('textarea').attr("disabled", "disabled");
+
+                    $("[name='ConditionOptionId']").iCheck('disable');
+                },
+                100
+                );
+
+            </text>
+        }
+    });
+    </text>
+    }
+</script>
+
+<style>
+    .form-group {
+        margin-bottom: 2px;
+    }
+
+    .form-control {
+        height: 25px;
+        padding: 6px 5px;
+    }
+
+    .form-horizontal .control-label {
+        padding-top: 1px;
+    }
+
+    .row-centered {
+        text-align: center;
+    }
+
+    .multiline-label {
+        white-space: pre-wrap;
+    }
+
+    .rowAlert {
+        background-color: burlywood;
+    }
+
+    .container {
+        width: 100%;
+        margin: 2em auto;
+    }
+
+</style>

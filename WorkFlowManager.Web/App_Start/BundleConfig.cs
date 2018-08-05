@@ -26,8 +26,8 @@ namespace WorkFlowManager.Web
 
             bundles.Add(new ScriptBundle("~/bundles/workflow").Include(
                       "~/Scripts/mermaid.js",
-                      "~/Content/plugins/iCheck/icheck.min.js",
                       "~/Scripts/bootstrap-switch.min.js",
+                      "~/Content/plugins/iCheck/icheck.min.js",
                       "~/Scripts/workflow.js",
                       "~/Scripts/kendo.all.min.js",
                       "~/Scripts/PostEditor.js",
@@ -40,9 +40,10 @@ namespace WorkFlowManager.Web
                       "~/Content/kendo.common.min.css",
                       "~/Content/kendo.default.min.css",
                       "~/Content/AdminLTE.min.css",
+                      "~/Content/progress-wizard.min.css",
                       "~/Content/mermaid.dark.css",
-                      "~/Content/plugins/iCheck/all.css",
                       "~/Content/bootstrap-switch.min.css",
+                      "~/Content/plugins/iCheck/all.css",
                       "~/Content/fileUploader.css",
                       "~/Content/workflow.css",
                       "~/Content/site.css"));

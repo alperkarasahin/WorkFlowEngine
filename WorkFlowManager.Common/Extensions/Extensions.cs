@@ -16,6 +16,20 @@ namespace WorkFlowManager.Common.Extensions
 {
     public static class Extensions
     {
+        public static HtmlString ShowLabel(this HtmlHelper htmlHelper, string label)
+        {
+            if (label != null)
+            {
+                var result = string.Join(
+                    "<br/>",
+                    label
+                        .Split(new[] { Environment.NewLine }, StringSplitOptions.None)
+                        .Select(x => HttpUtility.HtmlEncode(x))
+                );
+                return MvcHtmlString.Create(result);
+            }
+            return null;
+        }
 
         public static ViewResult WithMessage(this ViewResult viewResult, Controller controller, string message, MessageType messageType = MessageType.Success)
         {

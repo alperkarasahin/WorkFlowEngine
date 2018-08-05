@@ -66,7 +66,7 @@ namespace WorkFlowManager.Common.ViewModels
         [Display(Name = "Is FileUpload Mandatory")]
         public bool IsFileUploadMandatory { get; set; }
 
-        public bool? IsStandardForm { get; set; }
+        public bool IsStandardForm { get; set; }
 
         [Display(Name = "Select Decision Method")]
         public int? DecisionMethodId { get; set; }
@@ -155,7 +155,7 @@ namespace WorkFlowManager.Common.ViewModels
 
 
         [Display(Name = "Function Name")]
-        public string MethodSql { get; set; }
+        public string MethodFunction { get; set; }
 
         [Display(Name = "Completed")]
         public bool Completed { get; set; }

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<WorkFlowManager.Common.ViewModels.UserProcessViewModel>
+@using WorkFlowManager.Common.Extensions
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-info">
+            <div class="box-header">
+                <h4>Work Flow Trace (Last process was shown on top of list)</h4>
+            </div>
+            <div class="box-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Complete Time</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+
+
+                        @if (Model != null)
+                        {
+                        <tbody>
+                            @foreach (var torSatinAlmaIslem in Model.OrderByDescending(x => x.LastlyModifiedTime).ToList())
+                            {
+                                
+                                <tr>
+                                    <td align="center">
+                                        @if (torSatinAlmaIslem.ProcessStatus == WorkFlowManager.Common.Enums.ProcessStatus.Completed)
+                                        {
+                                            <i class="fa fa-check" aria-hidden="true" title="@WorkFlowManager.Common.Enums.ProcessStatus.Completed.GetDisplayValue()" style="color:#65d074"></i>
+                                        }
+                                        else if (torSatinAlmaIslem.ProcessStatus == WorkFlowManager.Common.Enums.ProcessStatus.Cancelled)
+                                        {
+                                            <i class="fa fa-times" aria-hidden="true" title="@WorkFlowManager.Common.Enums.ProcessStatus.Cancelled.GetDisplayValue()" style="color:#e55c59"></i>
+                                        }
+                                    </td>
+                                    <td>@(string.Format("{0} ({1})", torSatinAlmaIslem.UpdaterName, torSatinAlmaIslem.AssignedRole.ToString()))</td>
+                                    <td>@torSatinAlmaIslem.UpdatedTime.Value.ToString("dd.MM.yyyy HH:mm")</td>
+                                   
+                                    <td>@torSatinAlmaIslem.ProcessName</td>
+                                    <td>@(torSatinAlmaIslem.Description != null ? Html.Raw(torSatinAlmaIslem.Description.Replace(System.Environment.NewLine, "<br/>")) : Html.Raw(""))</td>
+                                </tr>
+                            }
+                        </tbody>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -19,5 +19,7 @@ namespace WorkFlowManager.Common.Tables
         public string WorkFlowDiagram { get; set; }
 
         public string MethodServiceName { get; set; }
+        public string Controller { get; set; }
+        public string SpecialFormTemplateView { get; set; }
     }
 }

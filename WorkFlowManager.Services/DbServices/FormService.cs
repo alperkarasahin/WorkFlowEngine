@@ -57,8 +57,6 @@ namespace WorkFlowManager.Services.DbServices
         public void Update(FormViewViewModel formView)
         {
 
-            Mapper.Initialize(cfg => cfg.CreateMap<FormViewViewModel, FormView>());
-
             FormView formViewDB = _unitOfWork.Repository<FormView>().Get(x => x.Id == formView.Id);
 
             if (formViewDB == null)

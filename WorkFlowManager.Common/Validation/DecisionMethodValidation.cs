@@ -45,7 +45,7 @@ namespace WorkFlowManager.Common.Validation
                             (
                                 (x.MethodName == model.MethodName && x.TaskId == model.TaskId)
                                 ||
-                                (x.MethodSql == model.MethodSql && x.TaskId == model.TaskId)
+                                (x.MethodFunction == model.MethodFunction && x.TaskId == model.TaskId)
                             )
                         )
                     );
@@ -56,9 +56,9 @@ namespace WorkFlowManager.Common.Validation
                         return new ValidationFailure("MethodName", string.Format("{0} used before. Please change it.", model.MethodName));
                     }
 
-                    if (metot != null && metot.MethodSql.CompareTo(model.MethodSql) == 0)
+                    if (metot != null && metot.MethodFunction.CompareTo(model.MethodFunction) == 0)
                     {
-                        return new ValidationFailure("MethodSql", string.Format("{0} used before. Please change it.", model.MethodSql));
+                        return new ValidationFailure("MethodFunction", string.Format("{0} used before. Please change it.", model.MethodFunction));
                     }
 
 

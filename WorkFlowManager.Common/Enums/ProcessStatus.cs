@@ -8,5 +8,7 @@ namespace WorkFlowManager.Common.Enums
         Draft = 5,
         [Display(Name = "Completed")]
         Completed = 10,
+        [Display(Name = "Cancelled")]
+        Cancelled = 15,
     }
 }

@@ -95,6 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\IConstants.cs" />
     <Compile Include="DataAccess\Migrations\Configuration.cs" />
     <Compile Include="DataAccess\Repositories\BaseRepository.cs" />
     <Compile Include="DataAccess\Repositories\IDbContext.cs" />
@@ -102,6 +103,9 @@
     <Compile Include="DataAccess\_Context\DataContext.cs" />
     <Compile Include="DataAccess\_UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="DataAccess\_UnitOfWork\UnitOfWork.cs" />
+    <Compile Include="Dto\FormObject.cs" />
+    <Compile Include="Dto\ServiceDTO.cs" />
+    <Compile Include="Dto\WorlFlowDto.cs" />
     <Compile Include="Enums\FileType.cs" />
     <Compile Include="Enums\FormComplexity.cs" />
     <Compile Include="Enums\Gender.cs" />
@@ -117,7 +121,6 @@
     <Compile Include="Helper\ValidationHelper.cs" />
     <Compile Include="InfraStructure\MultipleButtonAttribute.cs" />
     <Compile Include="InfraStructure\PagedData.cs" />
-    <Compile Include="Mappers\ProcessMapper.cs" />
     <Compile Include="Mapping\BaseTableMap.cs" />
     <Compile Include="Mapping\BaseTableTableMap.cs" />
     <Compile Include="Mapping\DocumentMap.cs" />
@@ -125,30 +128,43 @@
     <Compile Include="Mapping\ProcessMonitoringRoleMap.cs" />
     <Compile Include="Mapping\ProcessMap.cs" />
     <Compile Include="Mapping\TaskMap.cs" />
+    <Compile Include="Mapping\TestFormMap.cs" />
     <Compile Include="Mapping\WorkFlowMap.cs" />
     <Compile Include="Mapping\DecisionMethodMap.cs" />
     <Compile Include="Mapping\DecisionPointMap.cs" />
     <Compile Include="Mapping\ConditionOptionMap.cs" />
+    <Compile Include="Mapping\WorkFlowTraceMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tables\BaseTable.cs" />
     <Compile Include="Tables\Document.cs" />
     <Compile Include="Tables\FormView.cs" />
+    <Compile Include="Tables\MasterTest.cs" />
     <Compile Include="Tables\Task.cs" />
     <Compile Include="Tables\Process.cs" />
     <Compile Include="Tables\ProcessMonitoringRole.cs" />
+    <Compile Include="Tables\TestForm.cs" />
     <Compile Include="Tables\WorkFlow.cs" />
     <Compile Include="Tables\DecisionMethod.cs" />
     <Compile Include="Tables\DecisionPoint.cs" />
     <Compile Include="Tables\Condition.cs" />
     <Compile Include="Tables\ConditionOption.cs" />
+    <Compile Include="Tables\WorkFlowTrace.cs" />
     <Compile Include="Validation\FormViewValidation.cs" />
     <Compile Include="Validation\ProcessFormValidator.cs" />
     <Compile Include="Validation\DecisionMethodValidation.cs" />
+    <Compile Include="Validation\TestFormViewModelValidator.cs" />
+    <Compile Include="Validation\WorkFlowProcessValidator.cs" />
     <Compile Include="ViewModels\AccountViewModels.cs" />
+    <Compile Include="ViewModels\ProcessVM.cs" />
+    <Compile Include="ViewModels\TestFormViewModel.cs" />
+    <Compile Include="ViewModels\WorkFlowFormViewModel.cs" />
+    <Compile Include="ViewModels\WorkFlowTraceVM.cs" />
     <Compile Include="ViewModels\WorkFlowViewModel.cs" />
     <Compile Include="ViewModels\TemplateViewModel.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Mappers\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />

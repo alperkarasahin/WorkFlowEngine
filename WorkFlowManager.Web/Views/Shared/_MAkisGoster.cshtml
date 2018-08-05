@@ -1,0 +1,153 @@
+﻿@model WorkFlowManager.Common.ViewModels.WorkFlowView
+
+@Scripts.Render("~/bundles/jquery")
+@Styles.Render("~/Content/css")
+
+    <!-- Theme style -->
+<link rel="stylesheet" href="@Url.Content("~/Content/AdminLTE.min.css")" />
+
+<link rel="stylesheet" href="@Url.Content("~/Content/mermaid.dark.css")" />
+<script src="@Url.Content("~/Scripts/mermaid.js")"></script>
+
+<div class="row">
+     <div class="col-lg-12">
+                <div class="box box-info">
+                    @if (Model.Flag)
+                    {
+                        <text>
+                        <div class="box-header with-border">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-2"></div>
+                                    <div class="col-lg-2 completedWF row-centered">Completed</div>
+                                    <div class="col-lg-2 revizedWF row-centered">Revized</div>
+                                    <div class="col-lg-2 currentWF row-centered">On Progress</div>
+                                    <div class="col-lg-2 cancelledWF row-centered">Cancelled</div>
+                                    <div class="col-lg-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        </text>
+                    }
+                </div>
+     </div>
+</div>
+
+
+    <div class="wrapper1FullScreen">
+        <div class="div1FullScreen">
+        </div>
+    </div>
+    <div class="wrapper2FullScreen">
+        <div class="div2FullScreen">
+            <div id="isAkisiGoruntulemeBolumu" class="mermaid">
+
+            </div>
+        </div>
+    </div>     
+
+
+<script>
+    $(function () {
+        var curDown = false,
+            curYPos = 0,
+            curXPos = 0;
+
+        $("div.wrapper2FullScreen").mousemove(function (m) {
+            if (curDown === true) {
+                divLeftKontrol(m.pageX);
+            }
+        });
+
+        function divLeftKontrol(currentX) {
+            var scrollLeft = $("div.wrapper2FullScreen").scrollLeft();
+
+            if (curXPos > currentX) {
+                $("div.wrapper2FullScreen").scrollLeft(scrollLeft - 10);
+            } else {
+                $("div.wrapper2FullScreen").scrollLeft(scrollLeft + 10);
+            }
+        }
+
+        $("div.wrapper2FullScreen").mousedown(function (m) {
+            curDown = true;
+            curYPos = m.pageY;
+            curXPos = m.pageX;
+        });
+
+        $("div.wrapper2FullScreen").mouseup(function () {
+            curDown = false;
+        });
+    })
+
+    $(function () {
+
+        $(".wrapper1FullScreen").scroll(function () {
+            $(".wrapper2FullScreen")
+                .scrollLeft($(".wrapper1FullScreen").scrollLeft());
+        });
+        $(".wrapper2FullScreen").scroll(function () {
+            $(".wrapper1FullScreen")
+                .scrollLeft($(".wrapper2FullScreen").scrollLeft());
+        });
+    });
+
+    mermaidAPI.initialize({
+        startOnLoad: true,
+
+    });
+
+    $(function () {
+        var text = '@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.WorkFlowText))';
+        var element = document.getElementById('isAkisiGoruntulemeBolumu')
+        IslAkisiGoruntule(mermaidAPI, text, element);
+    });
+
+    function IslAkisiGoruntule(mermaidAPI, text, element) {
+        var tText = text.replace(/\\n/g, '\n');
+        mermaidAPI.render(element.id, tText, function (svgCode) {
+            element.innerHTML = svgCode;
+            element.firstChild.style.height = element.getAttribute('viewBox').split(' ')[3] + 'px'
+            element.firstChild.style.width = "8000px";
+        });
+    }
+
+</script>
+
+         
+<style>
+
+    .completedWF{ 
+        border-radius: 5px;
+        background-color:#9f6;
+        border-style:solid;
+        border-color:#333;
+        border-width:2px;
+    }
+    .currentWF{ 
+        border-radius: 5px;
+        background-color: yellow;
+        border-style:solid;
+        border-color:#333;
+        border-width:2px;
+    }
+    .revizedWF{
+        border-radius: 5px;
+        background-color:#196;
+        border-style:solid;
+        border-color:#333;
+        border-width:2px;
+        margin:1px;
+    }
+    .cancelledWF{
+        border-radius: 5px;
+        background-color:#e55c59;
+        border-style:solid;
+        border-color:#333;
+        border-width:2px;
+        margin:1px;
+    }
+    .row-centered {
+        text-align:center;
+    }
+</style>           
