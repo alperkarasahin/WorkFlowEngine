@@ -6,8 +6,9 @@ You can design simple work flow with using three process type.
 * Condition: Process which has more than one direction
 * Decision Point: Process which include a method which will be developed. Return value must be [Y]es or [N]o
 
-You can create a relation between all process type. Work flow diagram created automatically with mermaid.js 
+You can create a relation between all process type. Work flow diagram is showed automatically by mermaid.js 
 You can select process with single click or edit process with double click inside diagram.
+You can run workflow with built in work flow engine.
 
 Application includes examples of usage below;
 * UnitOfWork Pattern
@@ -15,6 +16,9 @@ Application includes examples of usage below;
 * IOC Container(Autofac)
 * mermaid.js
 * bootstrap
+* AutoMapper
+* Reflection
+* Hangfire
 
 
 After download you should run command below from package manager console with select Default project:WorkFlowManager.Common
