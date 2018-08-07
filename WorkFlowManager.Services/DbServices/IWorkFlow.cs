@@ -15,7 +15,7 @@ namespace WorkFlowManager.Services.DbServices
         void OzelFormKaydet(WorkFlowFormViewModel formData);
 
 
-        string KararNoktasiSurecKontrolJobCall(string id, string jobId, string hourInterval, string birimId);
+        string KararNoktasiSurecKontrolJobCall(string id, string jobId, string hourInterval);
 
 
         bool FullFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState);

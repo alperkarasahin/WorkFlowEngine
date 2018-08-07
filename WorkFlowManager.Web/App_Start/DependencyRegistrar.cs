@@ -2,6 +2,7 @@
 using Autofac.Integration.Mvc;
 using AutoMapper;
 using Hangfire;
+using System;
 using System.Linq;
 using System.Web.Mvc;
 using WorkFlowManager.Common.DataAccess._Context;
@@ -22,6 +23,10 @@ namespace WorkFlowManager.Web
         public ContainerJobActivator(IContainer container)
         {
             _container = container;
+        }
+        public override object ActivateJob(Type type)
+        {
+            return _container.Resolve(type);
         }
     }
 
@@ -65,11 +70,14 @@ namespace WorkFlowManager.Web
                 .InstancePerLifetimeScope();
 
 
-            builder.RegisterType<TestWorkFlowProcessService>()
-                .AsSelf()
-                .InstancePerLifetimeScope();
 
             builder.RegisterType<WorkFlowDataService>()
+                .AsSelf()
+                .InstancePerBackgroundJob()
+                .InstancePerLifetimeScope();
+
+
+            builder.RegisterType<TestWorkFlowProcessService>()
                 .AsSelf()
                 .InstancePerLifetimeScope();
 
@@ -82,25 +90,6 @@ namespace WorkFlowManager.Web
             builder.RegisterType<WorkFlowService>()
                 .AsSelf()
                 .InstancePerLifetimeScope();
-
-
-
-
-
-
-
-
-            //builder.RegisterType<WorkFlowService>().AsSelf().UsingConstructor(typeof(IUnitOfWork)).InstancePerLifetimeScope();
-
-
-
-            //builder.RegisterType<DocumentService>().AsSelf().UsingConstructor(typeof(IUnitOfWork)).InstancePerLifetimeScope();
-
-
-
-            //builder.RegisterType<FormService>().AsSelf().UsingConstructor(typeof(IUnitOfWork)).InstancePerLifetimeScope();
-            //builder.RegisterType<DecisionMethodService>().AsSelf().UsingConstructor(typeof(IUnitOfWork)).InstancePerLifetimeScope();
-
 
 
 

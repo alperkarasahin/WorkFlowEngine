@@ -42,16 +42,48 @@ namespace WorkFlowManager.Services.DbServices
             return 'N';
         }
 
-        public char IsAgeLessThan20(string ownerid)
+        private int GetOwnerIdFromId(int id)
+        {
+            var workFlowTrace = _unitOfWork.Repository<WorkFlowTrace>().Get(x => x.Id == id);
+            int rslt = -1;
+            if (workFlowTrace != null)
+            {
+                rslt = workFlowTrace.OwnerId;
+            }
+            return rslt;
+        }
+        public char IsAgeLessThan20(string id)
         {
             var rslt = 'N';
-            int ownerId = int.Parse(ownerid);
+            int ownerId = GetOwnerIdFromId(int.Parse(id));
             var testForm = _unitOfWork.Repository<TestForm>().Get(x => x.OwnerId == ownerId);
             if (testForm != null)
             {
                 if (testForm.Age < 20)
                 {
                     rslt = 'Y';
+                }
+            }
+            return rslt;
+        }
+
+
+        public char IsAgeGreaterThan20(string id)
+        {
+            var rslt = 'N';
+            int ownerId = GetOwnerIdFromId(int.Parse(id));
+            var testForm = _unitOfWork.Repository<TestForm>().Get(x => x.OwnerId == ownerId);
+            if (testForm != null)
+            {
+                if (testForm.Age > 20)
+                {
+                    rslt = 'Y';
+                }
+                else
+                {
+                    testForm.Age = testForm.Age + 1;
+                    _unitOfWork.Repository<TestForm>().Update(testForm);
+                    _unitOfWork.Complete();
                 }
             }
             return rslt;
@@ -115,7 +147,7 @@ namespace WorkFlowManager.Services.DbServices
             base.WorkFlowWorkFlowNextProcess(ownerId);
         }
 
-        public string KararNoktasiSurecKontrolJobCall(string id, string jobId, string hourInterval, string birimId)
+        public string KararNoktasiSurecKontrolJobCall(string id, string jobId, string hourInterval)
         {
             base.KararNoktasiSurecKontrolJobCallBase(id, jobId, hourInterval);
 

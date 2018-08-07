@@ -16,7 +16,7 @@ namespace WorkFlowManager.Common.Mapping
                 .HasMaxLength(100);
 
             Property(s => s.JobId)
-                .HasMaxLength(20);
+                .HasMaxLength(50);
 
 
         }

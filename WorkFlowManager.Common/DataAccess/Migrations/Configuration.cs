@@ -187,8 +187,16 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
             var isAgeLessThan20 = _unitOfWork.Repository<DecisionMethod>().Get(x => x.TaskId == task.Id && x.MethodName == "Is Age Less Than 20");
             if (isAgeLessThan20 == null)
             {
-                isAgeLessThan20 = new DecisionMethod() { MethodName = "Is Age Less Than 20", MethodFunction = "IsAgeLessThan20(OwnerId)", TaskId = task.Id };
+                isAgeLessThan20 = new DecisionMethod() { MethodName = "Is Age Less Than 20", MethodFunction = "IsAgeLessThan20(Id)", TaskId = task.Id };
                 _unitOfWork.Repository<DecisionMethod>().Add(isAgeLessThan20);
+                _unitOfWork.Complete();
+            }
+
+            var isAgeGreaterThan20 = _unitOfWork.Repository<DecisionMethod>().Get(x => x.TaskId == task.Id && x.MethodName == "Is Age Greater Than 20");
+            if (isAgeGreaterThan20 == null)
+            {
+                isAgeGreaterThan20 = new DecisionMethod() { MethodName = "Is Age Greater Than 20", MethodFunction = "IsAgeGreaterThan20(Id)", TaskId = task.Id };
+                _unitOfWork.Repository<DecisionMethod>().Add(isAgeGreaterThan20);
                 _unitOfWork.Complete();
             }
 
@@ -280,7 +288,7 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
             if (ifAgeLessThan20 == null)
             {
                 ifAgeLessThan20 = new DecisionPoint();
-                ifAgeLessThan20.AssignedRole = Enums.ProjectRole.Admin;
+                ifAgeLessThan20.AssignedRole = Enums.ProjectRole.Sistem;
                 ifAgeLessThan20.ProcessUniqueCode = Guid.NewGuid().ToString();
                 ifAgeLessThan20.Name = "If Age Less Than 20";
                 ifAgeLessThan20.TaskId = task.Id;
@@ -298,7 +306,7 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                     Name = "Age Less Than 20",
                     ProcessUniqueCode = Guid.NewGuid().ToString(),
                     Condition = ifAgeLessThan20,
-                    AssignedRole = Enums.ProjectRole.Admin,
+                    AssignedRole = Enums.ProjectRole.Sistem,
                     Value = "Y"
                 };
                 _unitOfWork.Repository<ConditionOption>().Add(option3);
@@ -312,7 +320,7 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                     Name = "Age Greater Than 20",
                     ProcessUniqueCode = Guid.NewGuid().ToString(),
                     Condition = ifAgeLessThan20,
-                    AssignedRole = Enums.ProjectRole.Admin,
+                    AssignedRole = Enums.ProjectRole.Sistem,
                     Value = "N"
 
                 };
@@ -355,6 +363,62 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
 
                 _unitOfWork.Complete();
             }
+
+
+
+
+            ConditionOption option5 = _unitOfWork.Repository<ConditionOption>().Get(x => x.Name == "Increase Age" && x.TaskId == task.Id);
+            ConditionOption option6 = _unitOfWork.Repository<ConditionOption>().Get(x => x.Name == "Age Raised To 20" && x.TaskId == task.Id);
+
+            var ifAgeGreaterThan20 = _unitOfWork.Repository<DecisionPoint>().Get(x => x.Name == "If Age Greater Than 20" && x.TaskId == task.Id);
+            if (ifAgeGreaterThan20 == null)
+            {
+                ifAgeGreaterThan20 = new DecisionPoint();
+                ifAgeGreaterThan20.AssignedRole = Enums.ProjectRole.Sistem;
+                ifAgeGreaterThan20.ProcessUniqueCode = Guid.NewGuid().ToString();
+                ifAgeGreaterThan20.Name = "If Age Greater Than 20";
+                ifAgeGreaterThan20.TaskId = task.Id;
+                ifAgeGreaterThan20.DecisionMethod = isAgeGreaterThan20;
+                ifAgeGreaterThan20.RepetitionFrequenceByHour = 1;
+                ageLessThan20.NextProcess = ifAgeGreaterThan20;
+                _unitOfWork.Repository<DecisionPoint>().Add(ifAgeGreaterThan20);
+                _unitOfWork.Complete();
+            }
+
+
+
+            if (option5 == null)
+            {
+                option5 = new ConditionOption
+                {
+                    TaskId = task.Id,
+                    Name = "Increase Age",
+                    ProcessUniqueCode = Guid.NewGuid().ToString(),
+                    Condition = ifAgeGreaterThan20,
+                    AssignedRole = Enums.ProjectRole.Sistem,
+                    Value = "N",
+                    NextProcess = ifAgeGreaterThan20
+                };
+                _unitOfWork.Repository<ConditionOption>().Add(option5);
+                _unitOfWork.Complete();
+            }
+            if (option6 == null)
+            {
+                option6 = new ConditionOption
+                {
+                    TaskId = task.Id,
+                    Name = "Age Raised To 20",
+                    ProcessUniqueCode = Guid.NewGuid().ToString(),
+                    Condition = ifAgeGreaterThan20,
+                    AssignedRole = Enums.ProjectRole.Sistem,
+                    Value = "Y",
+                    NextProcess = ageGreaterThan20
+
+                };
+                _unitOfWork.Repository<ConditionOption>().Add(option6);
+                _unitOfWork.Complete();
+            }
+
 
 
             SetWorkFlowDiagram(_unitOfWork, task.Id);
