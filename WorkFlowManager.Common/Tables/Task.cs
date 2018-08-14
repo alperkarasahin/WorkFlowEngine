@@ -4,6 +4,15 @@ namespace WorkFlowManager.Common.Tables
 {
     public class Task : BaseTable
     {
+        public Task()
+        {
+            ProcessList = new List<Process>();
+        }
+
+        public void AddProcess<T>(T process) where T : Process
+        {
+            ProcessList.Add(process);
+        }
         public int WorkFlowId { get; set; }
         public WorkFlow WorkFlow { get; set; }
         public string Name { get; set; }

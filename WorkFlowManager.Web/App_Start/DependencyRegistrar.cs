@@ -111,19 +111,23 @@ namespace WorkFlowManager.Web
                 cfg.CreateMap<WorkFlowTrace, WorkFlowTraceForm>();
 
                 cfg.CreateMap<ProcessForm, Process>()
-                .Include<ProcessForm, Condition>()
-                .Include<ProcessForm, ConditionOption>()
-                .Include<ProcessForm, DecisionPoint>()
-                .ForMember(a => a.MonitoringRoleList,
-                    opt => opt.MapFrom(c => c.MonitoringRoleList.Where(x => x.IsChecked == true).Select(t => new ProcessMonitoringRole
-                    {
-                        ProcessId = c.Id,
-                        ProjectRole = t.ProjectRole
-                    })));
+                    .ConstructUsing(x => new Process())
+                    .Include<ProcessForm, Condition>()
+                    .Include<ProcessForm, ConditionOption>()
+                    .Include<ProcessForm, DecisionPoint>()
+                    .ForMember(a => a.MonitoringRoleList,
+                        opt => opt.MapFrom(c => c.MonitoringRoleList.Where(x => x.IsChecked == true).Select(t => new ProcessMonitoringRole
+                        {
+                            ProcessId = c.Id,
+                            ProjectRole = t.ProjectRole
+                        })));
 
-                cfg.CreateMap<ProcessForm, Condition>();
-                cfg.CreateMap<ProcessForm, ConditionOption>();
-                cfg.CreateMap<ProcessForm, DecisionPoint>();
+                cfg.CreateMap<ProcessForm, Condition>()
+                    .ConstructUsing(x => new Condition());
+                cfg.CreateMap<ProcessForm, ConditionOption>()
+                    .ConstructUsing(x => new ConditionOption());
+                cfg.CreateMap<ProcessForm, DecisionPoint>()
+                    .ConstructUsing(x => new DecisionPoint());
 
                 cfg.CreateMap<DecisionMethodViewModel, DecisionMethod>();
                 cfg.CreateMap<FormViewViewModel, FormView>();

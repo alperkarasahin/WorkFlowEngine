@@ -1,6 +1,6 @@
 namespace WorkFlowManager.Common.DataAccess.Migrations
 {
-    using System;
+    using Factory;
     using System.Data.Entity.Migrations;
     using System.Text;
     using WorkFlowManager.Common.DataAccess._Context;
@@ -148,282 +148,72 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
             var masterTest1 = _unitOfWork.Repository<MasterTest>().Get(x => x.Name == "Task1 Test");
             if (masterTest1 == null)
             {
-                masterTest1 = new MasterTest()
-                {
-                    Name = "Task1 Test"
-                };
+                masterTest1 = new MasterTest() { Name = "Task1 Test" };
                 _unitOfWork.Repository<MasterTest>().Add(masterTest1);
-                _unitOfWork.Complete();
-            }
 
-            var workFlow = _unitOfWork.Repository<WorkFlow>().Get(x => x.Name == "WorkFlow1");
-            if (workFlow == null)
-            {
-                workFlow = new WorkFlow { Name = "WorkFlow1" };
+
+                var workFlow = new WorkFlow { Name = "WorkFlow1" };
                 _unitOfWork.Repository<WorkFlow>().Add(workFlow);
-                _unitOfWork.Complete();
-            };
 
 
-            #region TASK1
-            var task = _unitOfWork.Repository<Task>().Get(x => x.Name == "Task1");
-
-            if (task == null)
-            {
-                task = new Task { Name = "Task1", WorkFlowId = workFlow.Id, MethodServiceName = "TestWorkFlowProcessService", SpecialFormTemplateView = "OzelFormSablon", Controller = "TestWorkFlowProcess" };
+                #region TASK1
+                var task = new Task { Name = "Task1", WorkFlow = workFlow, MethodServiceName = "TestWorkFlowProcessService", SpecialFormTemplateView = "OzelFormSablon", Controller = "TestWorkFlowProcess" };
                 _unitOfWork.Repository<Task>().Add(task);
-                _unitOfWork.Complete();
-            }
 
 
-            var testForm = _unitOfWork.Repository<FormView>().Get(x => x.TaskId == task.Id && x.FormName == "Test Form");
-            if (testForm == null)
-            {
-                testForm = new FormView() { FormName = "Test Form", ViewName = "TestForm", TaskId = task.Id, Completed = true };
+                var testForm = new FormView() { FormName = "Test Form", ViewName = "TestForm", Task = task, Completed = true };
                 _unitOfWork.Repository<FormView>().Add(testForm);
-                _unitOfWork.Complete();
-            }
 
-            var isAgeLessThan20 = _unitOfWork.Repository<DecisionMethod>().Get(x => x.TaskId == task.Id && x.MethodName == "Is Age Less Than 20");
-            if (isAgeLessThan20 == null)
-            {
-                isAgeLessThan20 = new DecisionMethod() { MethodName = "Is Age Less Than 20", MethodFunction = "IsAgeLessThan20(Id)", TaskId = task.Id };
+                var isAgeLessThan20 = new DecisionMethod() { MethodName = "Is Age Less Than 20", MethodFunction = "IsAgeLessThan20(Id)", Task = task };
                 _unitOfWork.Repository<DecisionMethod>().Add(isAgeLessThan20);
-                _unitOfWork.Complete();
-            }
 
-            var isAgeGreaterThan20 = _unitOfWork.Repository<DecisionMethod>().Get(x => x.TaskId == task.Id && x.MethodName == "Is Age Greater Than 20");
-            if (isAgeGreaterThan20 == null)
-            {
-                isAgeGreaterThan20 = new DecisionMethod() { MethodName = "Is Age Greater Than 20", MethodFunction = "IsAgeGreaterThan20(Id)", TaskId = task.Id };
+                var isAgeGreaterThan20 = new DecisionMethod() { MethodName = "Is Age Greater Than 20", MethodFunction = "IsAgeGreaterThan20(Id)", Task = task };
                 _unitOfWork.Repository<DecisionMethod>().Add(isAgeGreaterThan20);
+
+
                 _unitOfWork.Complete();
-            }
 
 
-
-            var process = _unitOfWork.Repository<Process>().Get(x => x.Name == "Process 1" && x.TaskId == task.Id);
-            if (process == null)
-            {
-                process = new Process();
-                process.AssignedRole = Enums.ProjectRole.Admin;
-                process.ProcessUniqueCode = Guid.NewGuid().ToString();
-                process.Name = "Process 1";
-                process.TaskId = task.Id;
-                _unitOfWork.Repository<Process>().Add(process);
-
+                var process = ProcessFactory.CreateProcess(task, "Process 1", Enums.ProjectRole.Admin);
                 task.StartingProcess = process;
-                _unitOfWork.Repository<Task>().Update(task);
-                _unitOfWork.Complete();
-            }
 
+                var condition = ProcessFactory.CreateCondition(task, "Condition 1", Enums.ProjectRole.Admin);
+                var option1 = ProcessFactory.CreateConditionOption("Option 1", Enums.ProjectRole.Admin, condition);
+                var option2 = ProcessFactory.CreateConditionOption("Option 2", Enums.ProjectRole.Admin, condition);
 
-            var conditon = _unitOfWork.Repository<Condition>().Get(x => x.Name == "Condition 1" && x.TaskId == task.Id);
-            ConditionOption option1 = _unitOfWork.Repository<ConditionOption>().Get(x => x.Name == "Option 1" && x.TaskId == task.Id);
-            ConditionOption option2 = _unitOfWork.Repository<ConditionOption>().Get(x => x.Name == "Option 2" && x.TaskId == task.Id);
-            ConditionOption option3 = _unitOfWork.Repository<ConditionOption>().Get(x => x.Name == "Age Less Than 20" && x.TaskId == task.Id);
-            ConditionOption option4 = _unitOfWork.Repository<ConditionOption>().Get(x => x.Name == "Age Greater Than 20" && x.TaskId == task.Id);
+                process.NextProcess = condition;
 
-
-
-            if (conditon == null)
-            {
-                conditon = new Condition();
-                conditon.AssignedRole = Enums.ProjectRole.Admin;
-                conditon.ProcessUniqueCode = Guid.NewGuid().ToString();
-                conditon.Name = "Condition 1";
-                conditon.TaskId = task.Id;
-                _unitOfWork.Repository<Condition>().Add(conditon);
-            }
-
-            if (option1 == null)
-            {
-                option1 = new ConditionOption
-                {
-                    TaskId = task.Id,
-                    Name = "Option 1",
-                    ProcessUniqueCode = Guid.NewGuid().ToString(),
-                    Condition = conditon,
-                    AssignedRole = Enums.ProjectRole.Admin
-                };
-                _unitOfWork.Repository<ConditionOption>().Add(option1);
-            }
-
-
-            if (option2 == null)
-            {
-                option2 = new ConditionOption
-                {
-                    TaskId = task.Id,
-                    Name = "Option 2",
-                    ProcessUniqueCode = Guid.NewGuid().ToString(),
-                    Condition = conditon,
-                    AssignedRole = Enums.ProjectRole.Admin
-                };
-                _unitOfWork.Repository<ConditionOption>().Add(option2);
-            }
-            process.NextProcess = conditon;
-            _unitOfWork.Complete();
-
-
-            var process2 = _unitOfWork.Repository<Process>().Get(x => x.Name == "Process 2" && x.TaskId == task.Id);
-            if (process2 == null)
-            {
-                process2 = new Process();
-                process2.AssignedRole = Enums.ProjectRole.Admin;
-                process2.ProcessUniqueCode = Guid.NewGuid().ToString();
-                process2.FormView = testForm;
-                process2.Name = "Process 2";
-                process2.TaskId = task.Id;
-                _unitOfWork.Repository<Process>().Add(process2);
-
+                var process2 = ProcessFactory.CreateProcess(task, "Process 2", Enums.ProjectRole.Admin);
                 option1.NextProcess = process2;
-                _unitOfWork.Repository<ConditionOption>().Update(option1);
-
-                _unitOfWork.Complete();
-            }
 
 
-            var ifAgeLessThan20 = _unitOfWork.Repository<DecisionPoint>().Get(x => x.Name == "If Age Less Than 20" && x.TaskId == task.Id);
-            if (ifAgeLessThan20 == null)
-            {
-                ifAgeLessThan20 = new DecisionPoint();
-                ifAgeLessThan20.AssignedRole = Enums.ProjectRole.Sistem;
-                ifAgeLessThan20.ProcessUniqueCode = Guid.NewGuid().ToString();
-                ifAgeLessThan20.Name = "If Age Less Than 20";
-                ifAgeLessThan20.TaskId = task.Id;
-                ifAgeLessThan20.DecisionMethod = isAgeLessThan20;
+                var ifAgeLessThan20 = ProcessFactory.CreateDecisionPoint(task, "If Age Less Than 20", isAgeLessThan20);
 
-                _unitOfWork.Repository<DecisionPoint>().Add(ifAgeLessThan20);
-                _unitOfWork.Complete();
-            }
+                var option3 = ProcessFactory.CreateDecisionPointYesOption("Age Less Than 20", ifAgeLessThan20);
+                var option4 = ProcessFactory.CreateDecisionPointNoOption("Age Greater Than 20", ifAgeLessThan20);
 
-            if (option3 == null)
-            {
-                option3 = new ConditionOption
-                {
-                    TaskId = task.Id,
-                    Name = "Age Less Than 20",
-                    ProcessUniqueCode = Guid.NewGuid().ToString(),
-                    Condition = ifAgeLessThan20,
-                    AssignedRole = Enums.ProjectRole.Sistem,
-                    Value = "Y"
-                };
-                _unitOfWork.Repository<ConditionOption>().Add(option3);
-                _unitOfWork.Complete();
-            }
-            if (option4 == null)
-            {
-                option4 = new ConditionOption
-                {
-                    TaskId = task.Id,
-                    Name = "Age Greater Than 20",
-                    ProcessUniqueCode = Guid.NewGuid().ToString(),
-                    Condition = ifAgeLessThan20,
-                    AssignedRole = Enums.ProjectRole.Sistem,
-                    Value = "N"
+                process2.NextProcess = ifAgeLessThan20;
 
-                };
-                _unitOfWork.Repository<ConditionOption>().Add(option4);
-                _unitOfWork.Complete();
-            }
-
-
-            process2.NextProcess = ifAgeLessThan20;
-            _unitOfWork.Complete();
-
-            var ageLessThan20 = _unitOfWork.Repository<Process>().Get(x => x.Name == "Age Less Than 20 Selected" && x.TaskId == task.Id);
-            if (ageLessThan20 == null)
-            {
-                ageLessThan20 = new Process();
-                ageLessThan20.AssignedRole = Enums.ProjectRole.Admin;
-                ageLessThan20.ProcessUniqueCode = Guid.NewGuid().ToString();
-                ageLessThan20.Name = "Age Less Than 20 Selected";
-                ageLessThan20.TaskId = task.Id;
-                _unitOfWork.Repository<Process>().Add(ageLessThan20);
-
+                var ageLessThan20 = ProcessFactory.CreateProcess(task, "Age Less Than 20 Selected", Enums.ProjectRole.Admin);
                 option3.NextProcess = ageLessThan20;
-                _unitOfWork.Repository<ConditionOption>().Update(option3);
 
-                _unitOfWork.Complete();
-            }
-
-            var ageGreaterThan20 = _unitOfWork.Repository<Process>().Get(x => x.Name == "Age Greater Than 20 Selected" && x.TaskId == task.Id);
-            if (ageGreaterThan20 == null)
-            {
-                ageGreaterThan20 = new Process();
-                ageGreaterThan20.AssignedRole = Enums.ProjectRole.Admin;
-                ageGreaterThan20.ProcessUniqueCode = Guid.NewGuid().ToString();
-                ageGreaterThan20.Name = "Age Greater Than 20 Selected";
-                ageGreaterThan20.TaskId = task.Id;
-                _unitOfWork.Repository<Process>().Add(ageGreaterThan20);
-
+                var ageGreaterThan20 = ProcessFactory.CreateProcess(task, "Age Greater Than 20 Selected", Enums.ProjectRole.Admin);
                 option4.NextProcess = ageGreaterThan20;
-                _unitOfWork.Repository<ConditionOption>().Update(option4);
 
-                _unitOfWork.Complete();
-            }
-
-
-
-
-            ConditionOption option5 = _unitOfWork.Repository<ConditionOption>().Get(x => x.Name == "Increase Age" && x.TaskId == task.Id);
-            ConditionOption option6 = _unitOfWork.Repository<ConditionOption>().Get(x => x.Name == "Age Raised To 20" && x.TaskId == task.Id);
-
-            var ifAgeGreaterThan20 = _unitOfWork.Repository<DecisionPoint>().Get(x => x.Name == "If Age Greater Than 20" && x.TaskId == task.Id);
-            if (ifAgeGreaterThan20 == null)
-            {
-                ifAgeGreaterThan20 = new DecisionPoint();
-                ifAgeGreaterThan20.AssignedRole = Enums.ProjectRole.Sistem;
-                ifAgeGreaterThan20.ProcessUniqueCode = Guid.NewGuid().ToString();
-                ifAgeGreaterThan20.Name = "If Age Greater Than 20";
-                ifAgeGreaterThan20.TaskId = task.Id;
-                ifAgeGreaterThan20.DecisionMethod = isAgeGreaterThan20;
-                ifAgeGreaterThan20.RepetitionFrequenceByHour = 1;
+                var ifAgeGreaterThan20 = ProcessFactory.CreateDecisionPoint(task, "If Age Greater Than 20", isAgeGreaterThan20);
                 ageLessThan20.NextProcess = ifAgeGreaterThan20;
-                _unitOfWork.Repository<DecisionPoint>().Add(ifAgeGreaterThan20);
+
+                var option5 = ProcessFactory.CreateDecisionPointNoOption("Increase Age", ifAgeGreaterThan20);
+                option5.NextProcess = ifAgeGreaterThan20;
+
+                var option6 = ProcessFactory.CreateDecisionPointYesOption("Age Raised To 20", ifAgeGreaterThan20);
+                option6.NextProcess = ageGreaterThan20;
+
                 _unitOfWork.Complete();
+                SetWorkFlowDiagram(_unitOfWork, task.Id);
             }
 
-
-
-            if (option5 == null)
-            {
-                option5 = new ConditionOption
-                {
-                    TaskId = task.Id,
-                    Name = "Increase Age",
-                    ProcessUniqueCode = Guid.NewGuid().ToString(),
-                    Condition = ifAgeGreaterThan20,
-                    AssignedRole = Enums.ProjectRole.Sistem,
-                    Value = "N",
-                    NextProcess = ifAgeGreaterThan20
-                };
-                _unitOfWork.Repository<ConditionOption>().Add(option5);
-                _unitOfWork.Complete();
-            }
-            if (option6 == null)
-            {
-                option6 = new ConditionOption
-                {
-                    TaskId = task.Id,
-                    Name = "Age Raised To 20",
-                    ProcessUniqueCode = Guid.NewGuid().ToString(),
-                    Condition = ifAgeGreaterThan20,
-                    AssignedRole = Enums.ProjectRole.Sistem,
-                    Value = "Y",
-                    NextProcess = ageGreaterThan20
-
-                };
-                _unitOfWork.Repository<ConditionOption>().Add(option6);
-                _unitOfWork.Complete();
-            }
-
-
-
-            SetWorkFlowDiagram(_unitOfWork, task.Id);
             #endregion
-
 
             base.Seed(context);
 

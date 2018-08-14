@@ -64,8 +64,6 @@ namespace WorkFlowManager.Common.ViewModels
         [Display(Name = "Is Description Mandatory")]
         public bool IsDescriptionMandatory { get; set; }
         [Display(Name = "Is FileUpload Mandatory")]
-        public bool IsFileUploadMandatory { get; set; }
-
         public bool IsStandardForm { get; set; }
 
         [Display(Name = "Select Decision Method")]

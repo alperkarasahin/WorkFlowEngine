@@ -20,7 +20,6 @@ namespace WorkFlowManager.Common.ViewModels
         public string Description { get; set; }
         public string SpecialFormAnalysis { get; set; }
         public bool IsDescriptionMandatory { get; set; }
-        public bool IsFileUploadMandatory { get; set; }
         public bool IsStandardForm => (FormViewId == null);
         public string FormDescription => (Description == null ? Name : Description);
         public string MessageForMonitor { get; set; }

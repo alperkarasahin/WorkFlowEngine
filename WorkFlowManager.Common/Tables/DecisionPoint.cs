@@ -1,7 +1,20 @@
-﻿namespace WorkFlowManager.Common.Tables
+﻿using WorkFlowManager.Common.Enums;
+
+namespace WorkFlowManager.Common.Tables
 {
     public class DecisionPoint : Condition
     {
+        public DecisionPoint()
+        {
+
+        }
+        public DecisionPoint(Task task, string name, DecisionMethod decisionMethod, int repetitionFrequenceByHour = 1, string description = null, FormView formView = null) : base(task, name, ProjectRole.Sistem, description, formView)
+        {
+            DecisionMethod = decisionMethod;
+            RepetitionFrequenceByHour = repetitionFrequenceByHour;
+            task.AddProcess(this);
+        }
+
         public int DecisionMethodId { get; set; }
         public DecisionMethod DecisionMethod { get; set; }
         public int RepetitionFrequenceByHour { get; set; }
@@ -11,5 +24,6 @@
 
         public string CancelProcessText { get; set; }
         public string CancelProcessLabel => (CancelProcessText == null ? "Cancel" : CancelProcessText);
+
     }
 }

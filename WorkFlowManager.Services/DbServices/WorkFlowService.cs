@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
 using WorkFlowManager.Common.Enums;
+using WorkFlowManager.Common.Factory;
 using WorkFlowManager.Common.Tables;
 using WorkFlowManager.Common.ViewModels;
 
@@ -260,27 +261,30 @@ namespace WorkFlowManager.Services.DbServices
                 //_unitOfWork.Complete();
                 if (processRecorded.GetType() == typeof(DecisionPoint))
                 {
-                    var optionYes = new ConditionOption
-                    {
-                        TaskId = processRecorded.TaskId,
-                        Name = "Yes",
-                        ProcessUniqueCode = Guid.NewGuid().ToString(),
-                        //ConditionId = processRecorded.Id,
-                        Condition = (Condition)(object)processRecorded,
-                        AssignedRole = processRecorded.AssignedRole,
-                        Value = "Y"
-                    };
+                    var optionYes = ProcessFactory.CreateDecisionPointYesOption("Yes", (DecisionPoint)(object)processRecorded);
+                    //var optionYes = new ConditionOption
+                    //{
+                    //    TaskId = processRecorded.TaskId,
+                    //    Name = "Yes",
+                    //    ProcessUniqueCode = Guid.NewGuid().ToString(),
+                    //    //ConditionId = processRecorded.Id,
+                    //    Condition = (Condition)(object)processRecorded,
+                    //    AssignedRole = processRecorded.AssignedRole,
+                    //    Value = "Y"
+                    //};
 
-                    var optionNo = new ConditionOption
-                    {
-                        TaskId = processRecorded.TaskId,
-                        Name = "No",
-                        ProcessUniqueCode = Guid.NewGuid().ToString(),
-                        //ConditionId = processRecorded.Id,
-                        Condition = (Condition)(object)processRecorded,
-                        AssignedRole = processRecorded.AssignedRole,
-                        Value = "N"
-                    };
+                    //var optionNo = new ConditionOption
+                    //{
+                    //    TaskId = processRecorded.TaskId,
+                    //    Name = "No",
+                    //    ProcessUniqueCode = Guid.NewGuid().ToString(),
+                    //    //ConditionId = processRecorded.Id,
+                    //    Condition = (Condition)(object)processRecorded,
+                    //    AssignedRole = processRecorded.AssignedRole,
+                    //    Value = "N"
+                    //};
+
+                    var optionNo = ProcessFactory.CreateDecisionPointNoOption("No", (DecisionPoint)(object)processRecorded);
 
                     _unitOfWork.Repository<ConditionOption>().Add(optionYes);
                     _unitOfWork.Repository<ConditionOption>().Add(optionNo);

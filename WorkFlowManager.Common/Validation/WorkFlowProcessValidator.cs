@@ -53,36 +53,18 @@ namespace WorkFlowManager.Common.Validation
                     }
 
                     //Bundan sonra ki süreçlerde ozel formlu ya da standart form olmasına göre property ismi değişecek
-                    string propertyNameFormAciklama = "SatinAlmaFormAciklama";
-                    string propertyNameBelgeler = "SatinAlmaBelgeler";
+                    string propertyNameFormAciklama = "Description";
 
                     if (model.ProcessFormViewViewName != null)
                     {
-                        propertyNameFormAciklama = "WorkFlowIslemForm.SatinAlmaFormAciklama";
-                        propertyNameBelgeler = "WorkFlowIslemForm.SatinAlmaBelgeler";
+                        propertyNameFormAciklama = "WorkFlowIslemForm.Description";
                     }
 
                     if (gorevIslem.IsDescriptionMandatory)
                     {
                         if (model.ProcessComment == null)
                         {
-                            return new ValidationFailure(propertyNameFormAciklama, string.Format("{0} işlemi için açıklama girmelisiniz.", gorevIslem.Description));
-                        }
-                        else if (model.ProcessComment.Length > 1000)
-                        {
-                            return new ValidationFailure(propertyNameFormAciklama, string.Format("Açıklama 1000 karakterden fazla olamaz"));
-                        }
-                    }
-
-                    if (gorevIslem.IsFileUploadMandatory)
-                    {
-                        var islemBelgeListesi =
-                            _unitOfWork.Repository<Document>()
-                                .GetList(x => x.OwnerId == model.Id && x.FileType == Enums.FileType.ProcessFile);
-
-                        if (islemBelgeListesi.Count() == 0)
-                        {
-                            return new ValidationFailure(propertyNameBelgeler, string.Format("{0} işlemi için belge yüklemelisiniz.", gorevIslem.Description));
+                            return new ValidationFailure(propertyNameFormAciklama, string.Format("{0} comment required.", gorevIslem.Description));
                         }
                     }
 

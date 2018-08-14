@@ -91,10 +91,6 @@ namespace WorkFlowManager.Services.DbServices
                     ConditionOptionId = workFlowTrace.ConditionOptionId,
                     UpdatedTime = workFlowTrace.UpdatedTime,
                     CreatedTime = workFlowTrace.CreatedTime,
-                    IsFileUploadMandatory =
-                        (workFlowTrace.ConditionOption ?? workFlowTrace.Process)
-                        .IsFileUploadMandatory,
-
                     ProcessMonitoringRolList =
                         (workFlowTrace.ConditionOption ?? workFlowTrace.Process)
                         .MonitoringRoleList

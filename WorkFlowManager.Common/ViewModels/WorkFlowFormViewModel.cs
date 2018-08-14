@@ -93,9 +93,5 @@ namespace WorkFlowManager.Common.ViewModels
         public string ProcessDescription { get; set; }
         public string ProcessNotificationMessage { get; set; }
         public string ProcessName { get; set; }
-        public bool IsFileUploadMandatory { get; set; }
-        /*
-
-    */
     }
 }
