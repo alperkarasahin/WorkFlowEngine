@@ -183,7 +183,7 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
 
                 process.NextProcess = condition;
 
-                var process2 = ProcessFactory.CreateProcess(task, "Process 2", Enums.ProjectRole.Admin);
+                var process2 = ProcessFactory.CreateProcess(task, "Process 2", Enums.ProjectRole.Admin, "Enter your age", testForm);
                 option1.NextProcess = process2;
 
 

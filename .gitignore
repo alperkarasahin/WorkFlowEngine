@@ -210,3 +210,5 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
