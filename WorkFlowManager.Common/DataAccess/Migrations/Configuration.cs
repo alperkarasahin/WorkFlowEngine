@@ -161,14 +161,14 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                 _unitOfWork.Repository<Task>().Add(task);
 
 
-                var testForm = new FormView() { FormName = "Test Form", ViewName = "TestForm", Task = task, Completed = true };
-                _unitOfWork.Repository<FormView>().Add(testForm);
+                var testWorkFlowForm = new FormView() { FormName = "Test Form", ViewName = "TestWorkFlowForm", Task = task, Completed = true };
+                _unitOfWork.Repository<FormView>().Add(testWorkFlowForm);
 
                 var isAgeLessThan20 = new DecisionMethod() { MethodName = "Is Age Less Than 20", MethodFunction = "IsAgeLessThan20(Id)", Task = task };
                 _unitOfWork.Repository<DecisionMethod>().Add(isAgeLessThan20);
 
-                var isAgeGreaterThan20 = new DecisionMethod() { MethodName = "Is Age Greater Than 20", MethodFunction = "IsAgeGreaterThan20(Id)", Task = task };
-                _unitOfWork.Repository<DecisionMethod>().Add(isAgeGreaterThan20);
+                var isAgeGreaterThan20Method = new DecisionMethod() { MethodName = "Is Age Greater Than 20", MethodFunction = "IsAgeGreaterThan20(Id)", Task = task };
+                _unitOfWork.Repository<DecisionMethod>().Add(isAgeGreaterThan20Method);
 
 
                 _unitOfWork.Complete();
@@ -183,7 +183,7 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
 
                 process.NextProcess = condition;
 
-                var process2 = ProcessFactory.CreateProcess(task, "Process 2", Enums.ProjectRole.Admin, "Enter your age", testForm);
+                var process2 = ProcessFactory.CreateProcess(task, "Process 2", Enums.ProjectRole.Admin, "Enter your age", testWorkFlowForm);
                 option1.NextProcess = process2;
 
 
@@ -200,13 +200,13 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                 var ageGreaterThan20 = ProcessFactory.CreateProcess(task, "Age Greater Than 20 Selected", Enums.ProjectRole.Admin);
                 option4.NextProcess = ageGreaterThan20;
 
-                var ifAgeGreaterThan20 = ProcessFactory.CreateDecisionPoint(task, "If Age Greater Than 20", isAgeGreaterThan20);
-                ageLessThan20.NextProcess = ifAgeGreaterThan20;
+                var isAgeRaisedTo20DecisionPoint = ProcessFactory.CreateDecisionPoint(task, "Is Age Raised To 20?", isAgeGreaterThan20Method);
+                ageLessThan20.NextProcess = isAgeRaisedTo20DecisionPoint;
 
-                var option5 = ProcessFactory.CreateDecisionPointNoOption("Increase Age", ifAgeGreaterThan20);
-                option5.NextProcess = ifAgeGreaterThan20;
+                var option5 = ProcessFactory.CreateDecisionPointNoOption("No - Increase Age", isAgeRaisedTo20DecisionPoint);
+                option5.NextProcess = isAgeRaisedTo20DecisionPoint;
 
-                var option6 = ProcessFactory.CreateDecisionPointYesOption("Age Raised To 20", ifAgeGreaterThan20);
+                var option6 = ProcessFactory.CreateDecisionPointYesOption("Yes - Age Raised To 20", isAgeRaisedTo20DecisionPoint);
                 option6.NextProcess = ageGreaterThan20;
 
                 _unitOfWork.Complete();

@@ -7,19 +7,19 @@ using WorkFlowManager.Common.ViewModels;
 
 namespace WorkFlowManager.Common.Validation
 {
-    public class WorkFlowTraceFormValidator : AbstractValidator<WorkFlowTraceForm>
+    public class WorkFlowFormViewModelValidator : AbstractValidator<WorkFlowFormViewModel>
     {
 
 
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public WorkFlowTraceFormValidator(IUnitOfWork unitOfWork)
+        public WorkFlowFormViewModelValidator(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             Validate();
         }
-        public WorkFlowTraceFormValidator()
+        public WorkFlowFormViewModelValidator()
         {
             Validate();
         }
@@ -51,13 +51,11 @@ namespace WorkFlowManager.Common.Validation
                     {
                         gorevIslem = gorevIslemListesi.FirstOrDefault(x => x.Id == model.ProcessId);
                     }
-
-                    //Bundan sonra ki süreçlerde ozel formlu ya da standart form olmasına göre property ismi değişecek
                     string propertyNameFormAciklama = "Description";
 
                     if (model.ProcessFormViewViewName != null)
                     {
-                        propertyNameFormAciklama = "WorkFlowIslemForm.Description";
+                        propertyNameFormAciklama = "Description";
                     }
 
                     if (gorevIslem.IsDescriptionMandatory)

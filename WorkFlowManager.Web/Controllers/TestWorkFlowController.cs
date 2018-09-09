@@ -61,42 +61,25 @@ namespace WorkFlowManager.Web.Controllers
         public ActionResult Index(int workFlowTraceId)
         {
             UserProcessViewModel kullaniciIslemVM = _testWorkFlowProcessService.GetKullaniciProcessVM(workFlowTraceId);
-            if (_testWorkFlowProcessService.WorkFlowYetkiKontrol(kullaniciIslemVM) == false)
+            if (_testWorkFlowProcessService.WorkFlowPermissionCheck(kullaniciIslemVM) == false)
             {
                 return RedirectToAction("Index", new { controller = "Home" }).WithMessage(this, "Erişim Yetkiniz Yok!", MessageType.Danger);
             }
 
+            WorkFlowTrace workFlowTrace = _testWorkFlowProcessService.WorkFlowTraceDetail(workFlowTraceId);
 
-            WorkFlowTrace torSatinAlmaIslem = _testWorkFlowProcessService.WorkFlowTraceDetail(workFlowTraceId);
-            //WorkFlowTraceForm satinAlmaIslemForm = new WorkFlowTraceForm();
-
-
-            WorkFlowTraceForm satinAlmaIslemForm = Mapper.Map<WorkFlowTrace, WorkFlowTraceForm>(torSatinAlmaIslem);
-            int ownerId = satinAlmaIslemForm.OwnerId;
+            WorkFlowFormViewModel workFlowTraceForm = Mapper.Map<WorkFlowTrace, WorkFlowFormViewModel>(workFlowTrace);
+            int ownerId = workFlowTraceForm.OwnerId;
             ActionResult viewResult = null;
 
-            WorkFlowFormViewModel satinAlmaOzelForm = null;
+            WorkFlowFormViewModel workFlowForm = null;
 
             var workFlowBase = _testWorkFlowProcessService.WorkFlowBaseInfo(kullaniciIslemVM);
-            _testWorkFlowProcessService.SetSatinAlmaWorkFlowTraceForm(satinAlmaIslemForm, workFlowBase);
+            _testWorkFlowProcessService.SetSatinAlmaWorkFlowTraceForm(workFlowTraceForm, workFlowBase);
 
+            workFlowForm = _testWorkFlowProcessService.WorkFlowFormLoad(workFlowTraceForm);
 
-            switch (satinAlmaIslemForm.ProcessFormViewViewName)
-            {
-                case "TestForm":
-                    satinAlmaOzelForm = _testWorkFlowProcessService.SatinAlmaOzelForm<TestFormViewModel>(ownerId, satinAlmaIslemForm);
-                    break;
-
-                default:
-                    satinAlmaOzelForm = _testWorkFlowProcessService.SatinAlmaOzelForm<WorkFlowFormViewModel>(ownerId, satinAlmaIslemForm);
-                    break;
-
-            }
-
-            //satinAlmaOzelForm.Controller = workFlowBase.Controller;
-            //satinAlmaOzelForm.OzelFormSablonView = workFlowBase.SpecialFormTemplateView;
-
-            viewResult = View(satinAlmaOzelForm.WorkFlowIslemForm.ProcessTaskSpecialFormTemplateView, satinAlmaOzelForm);
+            viewResult = View(workFlowForm.ProcessTaskSpecialFormTemplateView, workFlowForm);
             return viewResult;
 
         }

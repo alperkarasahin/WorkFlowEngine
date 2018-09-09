@@ -11,6 +11,7 @@ using WorkFlowManager.Common.DataAccess.Repositories;
 using WorkFlowManager.Common.Enums;
 using WorkFlowManager.Common.Tables;
 using WorkFlowManager.Common.ViewModels;
+using WorkFlowManager.Services.CustomForms;
 using WorkFlowManager.Services.DbServices;
 
 namespace WorkFlowManager.Web
@@ -50,6 +51,11 @@ namespace WorkFlowManager.Web
                 .InstancePerBackgroundJob()
                 .InstancePerDependency();
 
+
+            builder.RegisterType<TestWorkFlowForm>()
+                .AsSelf()
+                .InstancePerBackgroundJob()
+                .InstancePerDependency();
 
             builder.RegisterGeneric(typeof(BaseRepository<>))
                 .As(typeof(IRepository<>))
@@ -107,8 +113,8 @@ namespace WorkFlowManager.Web
                 .ForMember(dest => dest.Process, opt => opt.Ignore())
                 .ForMember(dest => dest.Owner, opt => opt.Ignore());
 
-                cfg.CreateMap<WorkFlowTraceForm, WorkFlowTrace>();
-                cfg.CreateMap<WorkFlowTrace, WorkFlowTraceForm>();
+                cfg.CreateMap<WorkFlowFormViewModel, WorkFlowTrace>();
+                cfg.CreateMap<WorkFlowTrace, WorkFlowFormViewModel>();
 
                 cfg.CreateMap<ProcessForm, Process>()
                     .ConstructUsing(x => new Process())
@@ -145,8 +151,11 @@ namespace WorkFlowManager.Web
                     .ForMember(a => a.Value, opt => opt.MapFrom(c => (c as ConditionOption).Value));
 
 
-                cfg.CreateMap<TestForm, TestFormViewModel>();
-                cfg.CreateMap<TestFormViewModel, TestForm>();
+                cfg.CreateMap<TestForm, TestWorkFlowFormViewModel>();
+                cfg.CreateMap<TestWorkFlowFormViewModel, TestForm>();
+
+                cfg.CreateMap<WorkFlowFormViewModel, TestWorkFlowFormViewModel>();
+
             }
             );
 

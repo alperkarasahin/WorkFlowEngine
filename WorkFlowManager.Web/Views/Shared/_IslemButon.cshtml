@@ -1,5 +1,5 @@
 ﻿@using WorkFlowManager.Common.Enums
-@model WorkFlowManager.Common.ViewModels.WorkFlowTraceForm
+@model WorkFlowManager.Common.ViewModels.WorkFlowFormViewModel
 
 
 @if (Model.ProcessAssignedRole != ProjectRole.Sistem)
@@ -26,7 +26,7 @@
                 function GeriAl(gorevIslemId){
                     if (confirm('Are you sure you want to go to previous step?'))
                     {
-                        $("[name='WorkFlowIslemForm.HedefGorevIslemId']").val(gorevIslemId);
+                        $("[name='HedefGorevIslemId']").val(gorevIslemId);
                         $("#GeriAlButton").trigger('click');
                     }
                 }

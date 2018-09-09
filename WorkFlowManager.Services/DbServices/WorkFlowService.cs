@@ -253,42 +253,15 @@ namespace WorkFlowManager.Services.DbServices
             if (process.Id == 0)
             {
                 processRecorded = process;
-                //processRecorded = Mapper.Map<T, T>(process);
-
-
                 processRecorded.ProcessUniqueCode = Guid.NewGuid().ToString();
                 _unitOfWork.Repository<T>().Add(processRecorded);
-                //_unitOfWork.Complete();
                 if (processRecorded.GetType() == typeof(DecisionPoint))
                 {
                     var optionYes = ProcessFactory.CreateDecisionPointYesOption("Yes", (DecisionPoint)(object)processRecorded);
-                    //var optionYes = new ConditionOption
-                    //{
-                    //    TaskId = processRecorded.TaskId,
-                    //    Name = "Yes",
-                    //    ProcessUniqueCode = Guid.NewGuid().ToString(),
-                    //    //ConditionId = processRecorded.Id,
-                    //    Condition = (Condition)(object)processRecorded,
-                    //    AssignedRole = processRecorded.AssignedRole,
-                    //    Value = "Y"
-                    //};
-
-                    //var optionNo = new ConditionOption
-                    //{
-                    //    TaskId = processRecorded.TaskId,
-                    //    Name = "No",
-                    //    ProcessUniqueCode = Guid.NewGuid().ToString(),
-                    //    //ConditionId = processRecorded.Id,
-                    //    Condition = (Condition)(object)processRecorded,
-                    //    AssignedRole = processRecorded.AssignedRole,
-                    //    Value = "N"
-                    //};
-
                     var optionNo = ProcessFactory.CreateDecisionPointNoOption("No", (DecisionPoint)(object)processRecorded);
 
                     _unitOfWork.Repository<ConditionOption>().Add(optionYes);
                     _unitOfWork.Repository<ConditionOption>().Add(optionNo);
-                    //_unitOfWork.Complete();
                 }
             }
             else
@@ -303,12 +276,6 @@ namespace WorkFlowManager.Services.DbServices
                     {
                         _unitOfWork.Repository<ProcessMonitoringRole>().Remove(role);
                     }
-
-                    //var notAddedRoleList = process.MonitoringRoleList.Where(x => processRecorded.MonitoringRoleList.Any(t => t.ProjectRole == x.ProjectRole)).ToList();
-                    //foreach (var eklenmeyecekRol in notAddedRoleList)
-                    //{
-                    //    process.MonitoringRoleList.Remove(eklenmeyecekRol);
-                    //}
                 }
 
                 if (processRecorded.DocumentList != null)
@@ -318,12 +285,6 @@ namespace WorkFlowManager.Services.DbServices
                     {
                         _unitOfWork.Repository<Document>().Remove(document);
                     }
-
-                    //var notAddedDocumentList = process.DocumentList.Where(x => processRecorded.DocumentList.Any(t => t.MediaName == x.MediaName)).ToList();
-                    //foreach (var document in notAddedDocumentList)
-                    //{
-                    //    process.DocumentList.Remove(document);
-                    //}
                 }
 
 

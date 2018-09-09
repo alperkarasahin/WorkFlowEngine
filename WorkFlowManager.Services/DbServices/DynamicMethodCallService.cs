@@ -7,10 +7,6 @@ using WorkFlowManager.Common.DataAccess._UnitOfWork;
 namespace WorkFlowManager.Services.DbServices
 {
 
-    /// <summary>
-    /// Reflection kullanarak dinamik isimle metot çağırma işlemini yapar. 
-    /// <see cref="KararMetot"/> ile girişi yapılan <see cref="KararMetot.MetotSql"/> textinin uygun parametrelerle çağrılması sağlanır.
-    /// </summary>
     public static class DynamicMethodCallService
     {
         public static string Caller(

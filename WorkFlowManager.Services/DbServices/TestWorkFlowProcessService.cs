@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
 using Hangfire;
-using System;
-using System.Collections.Generic;
 using System.Web.Mvc;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
-using WorkFlowManager.Common.Dto;
 using WorkFlowManager.Common.Tables;
 using WorkFlowManager.Common.ViewModels;
-using WorkFlowManager.Services.Constants;
 
 namespace WorkFlowManager.Services.DbServices
 {
@@ -15,7 +11,6 @@ namespace WorkFlowManager.Services.DbServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly WorkFlowDataService _workFlowDataService;
-        List<FormObject> tamamlanmisFormlar = null;
 
         public TestWorkFlowProcessService(
                 IUnitOfWork unitOfWork, WorkFlowDataService workFlowDataService)
@@ -23,11 +18,6 @@ namespace WorkFlowManager.Services.DbServices
         {
             _unitOfWork = unitOfWork;
             _workFlowDataService = workFlowDataService;
-
-            tamamlanmisFormlar = new List<FormObject>
-            {
-                new FormObject(new TestConstants(_unitOfWork, this))
-            };
         }
 
 
@@ -109,26 +99,21 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-        public WorkFlowFormViewModel SatinAlmaOzelForm<T>(int ownerId, WorkFlowTraceForm satinAlmaIslemForm) where T : WorkFlowFormViewModel
+        public bool FormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
         {
-            return base.WorkFlowFormYukle<T>(ownerId, satinAlmaIslemForm, tamamlanmisFormlar);
-        }
-
-        public bool OzelFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
-        {
-            return base.OzelFormValidate(formData, modelState, tamamlanmisFormlar);
+            return base.CustomFormValidate(formData, modelState);
         }
 
 
-        public override void OzelFormKaydet(WorkFlowFormViewModel formData)
+        public override void FormSave(WorkFlowFormViewModel formData)
         {
-            base.OzelFormKaydet(formData, tamamlanmisFormlar);
+            base.CustomFormSave(formData);
         }
 
-        public override void WorkFlowFormKaydet<TClass, TVM>(WorkFlowFormViewModel workFlowFormViewModel)
+        public override void WorkFlowFormSave<TClass, TVM>(WorkFlowFormViewModel workFlowFormViewModel)
         {
-            base.WorkFlowFormKaydet<TClass, TVM>(workFlowFormViewModel);
-            WorkFlowTrace torSatinAlmaIslem = Mapper.Map<WorkFlowTraceForm, WorkFlowTrace>(workFlowFormViewModel.WorkFlowIslemForm);
+            base.WorkFlowFormSave<TClass, TVM>(workFlowFormViewModel);
+            WorkFlowTrace torSatinAlmaIslem = Mapper.Map<WorkFlowFormViewModel, WorkFlowTrace>(workFlowFormViewModel);
             AddOrUpdate(torSatinAlmaIslem);
         }
 
@@ -137,9 +122,9 @@ namespace WorkFlowManager.Services.DbServices
             base.WorkFlowProcessIptal(workFlowTraceId);
         }
 
-        public override void WorkFlowWorkFlowTraceiGeriAl(int workFlowTraceId, int targetProcessId)
+        public override void CancelWorkFlowTrace(int workFlowTraceId, int targetProcessId)
         {
-            base.WorkFlowWorkFlowTraceiGeriAl(workFlowTraceId, targetProcessId);
+            base.CancelWorkFlowTrace(workFlowTraceId, targetProcessId);
         }
 
         public override void WorkFlowWorkFlowNextProcess(int ownerId)
@@ -147,24 +132,13 @@ namespace WorkFlowManager.Services.DbServices
             base.WorkFlowWorkFlowNextProcess(ownerId);
         }
 
-        public string KararNoktasiSurecKontrolJobCall(string id, string jobId, string hourInterval)
+        public string DecisionPointJobCall(string id, string jobId, string hourInterval)
         {
-            base.KararNoktasiSurecKontrolJobCallBase(id, jobId, hourInterval);
+            base.DecisionPointJobCallBase(id, jobId, hourInterval);
 
-            RecurringJob.AddOrUpdate<TestWorkFlowProcessService>(jobId, x => x.KararNoktasiSurecKontrol(int.Parse(id)), Cron.HourInterval(int.Parse(hourInterval)));
+            RecurringJob.AddOrUpdate<TestWorkFlowProcessService>(jobId, x => x.DecisionPointTakeTheNextStep(int.Parse(id)), Cron.HourInterval(int.Parse(hourInterval)));
             return "OK";
         }
-
-        public override bool FullFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
-        {
-            return base.FullFormValidate(formData, modelState, tamamlanmisFormlar);
-        }
-
-        UserProcessViewModel IWorkFlow.KullaniciSonIslemVM(int ownerId)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
 
     }

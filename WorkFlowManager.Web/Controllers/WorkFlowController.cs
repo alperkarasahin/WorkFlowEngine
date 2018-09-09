@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -191,26 +190,6 @@ namespace WorkFlowManager.Web.Controllers
 
         public ActionResult New(int taskId, ProcessType processType = ProcessType.Process, int conditionId = 0)
         {
-            //var _roleList = Global.GetAllRoles();
-            IEnumerable<Process> mainProcessList = null;
-            List<MonitoringRoleCheckbox> monitoringRoleList = null;
-            Condition condition = null;
-
-            //if (processType == ProcessType.OptionList || processType == ProcessType.Process)
-            //{
-            //    monitoringRoleList = _roleList.Select(rol => new MonitoringRoleCheckbox
-            //    {
-            //        ProjectRole = rol,
-            //        IsChecked = false
-            //    }).ToList();
-
-            //    mainProcessList = _workFlowService.GetMainProcessList(taskId);
-
-            //    if (processType == ProcessType.OptionList)
-            //    {
-            //        condition = _unitOfWork.Repository<Condition>().Get(conditionId);
-            //    }
-            //}
             var processForm = new ProcessForm();
 
             processForm.TaskId = taskId;
@@ -218,31 +197,12 @@ namespace WorkFlowManager.Web.Controllers
             processForm.ConditionId = conditionId;
 
             ProcessFormInitialize(ref processForm);
-
-
-            //return View(ViewForm, new ProcessForm
-            //{
-            //    ConditionName = (condition != null ? condition.Name : null),
-            //    AssignedRole = (condition != null ? condition.AssignedRole : (processType == ProcessType.DecisionPoint ? ProjectRole.Sistem : ProjectRole.ProjectProcurmentOfficer)),
-            //    ConditionId = conditionId,
-            //    TaskId = taskId,
-            //    ProcessType = processType,
-            //    MainProcessList = (mainProcessList != null ? new SelectList(mainProcessList, "Id", "NameWithRole") : null),
-            //    DecisionMethodList = (processType == ProcessType.DecisionPoint ? new SelectList(_workFlowService.GetDecisionMethodList(taskId), "Id", "MethodName") : null),
-            //    RepetitionHourList = (processType == ProcessType.DecisionPoint ? new SelectList(Enumerable.Range(1, 24)) : null),
-            //    FormViewList = (processType == ProcessType.Process ? new SelectList(_workFlowService.GetFormViewList(taskId), "Id", "FormName") : null),
-            //    AnalysisFileList = null,
-            //    TemplateFileList = null,
-            //    MonitoringRoleList = monitoringRoleList
-            //});
-
             return View(ViewForm, processForm);
 
         }
 
 
         [HttpGet]
-        // GET: Pydb/IsAkisi
         public ActionResult WorkFlow(int taskId = 0)
         {
             var taskList = _workFlowService.GetTaskList();
@@ -282,7 +242,6 @@ namespace WorkFlowManager.Web.Controllers
         }
 
 
-        // GET: Pydb/IsAkisi
         public ActionResult Index(int taskId = 0)
         {
 

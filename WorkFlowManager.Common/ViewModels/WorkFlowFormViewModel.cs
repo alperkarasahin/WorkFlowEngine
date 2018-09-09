@@ -8,8 +8,8 @@ using WorkFlowManager.Common.Validation;
 
 namespace WorkFlowManager.Common.ViewModels
 {
-    [Validator(typeof(WorkFlowTraceFormValidator))]
-    public class WorkFlowTraceForm
+    [Validator(typeof(WorkFlowFormViewModelValidator))]
+    public class WorkFlowFormViewModel
     {
         public int ProcessId { get; set; }
 
@@ -53,13 +53,6 @@ namespace WorkFlowManager.Common.ViewModels
         public string ProcessTaskController { get; set; }
         public string ProcessTaskSpecialFormTemplateView { get; set; }
     }
-
-
-    public class WorkFlowFormViewModel
-    {
-        public WorkFlowTraceForm WorkFlowIslemForm { get; set; }
-    }
-
 
     [Serializable]
     public class UserProcessViewModel

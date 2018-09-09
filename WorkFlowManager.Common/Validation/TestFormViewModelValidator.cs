@@ -4,15 +4,15 @@ using WorkFlowManager.Common.ViewModels;
 
 namespace WorkFlowManager.Common.Validation
 {
-    public class TestFormViewModelValidator : AbstractValidator<TestFormViewModel>
+    public class TestWorkFlowFormViewModelValidator : AbstractValidator<TestWorkFlowFormViewModel>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public TestFormViewModelValidator()
+        public TestWorkFlowFormViewModelValidator()
         {
 
         }
 
-        public TestFormViewModelValidator(IUnitOfWork unitOfWork)
+        public TestWorkFlowFormViewModelValidator(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             Validate();

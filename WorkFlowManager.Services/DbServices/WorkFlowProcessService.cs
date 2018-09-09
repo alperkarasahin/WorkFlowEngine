@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
+using WorkFlowManager.Common.Constants;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
 using WorkFlowManager.Common.Dto;
 using WorkFlowManager.Common.Enums;
@@ -19,9 +20,9 @@ namespace WorkFlowManager.Services.DbServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly WorkFlowDataService _workFlowDataService;
+        public Dictionary<string, IWorkFlowForm> workFlowFormList = new Dictionary<string, IWorkFlowForm>();
 
-        public abstract void OzelFormKaydet(WorkFlowFormViewModel formData);
-        public abstract bool FullFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState);
+        public abstract void FormSave(WorkFlowFormViewModel formData);
 
         public WorkFlowProcessService(IUnitOfWork unitOfWork, WorkFlowDataService workFlowDataService)
         {
@@ -54,7 +55,7 @@ namespace WorkFlowManager.Services.DbServices
             workFlowTrace.Id = workFlowTraceDB.Id;
         }
 
-        public string KararNoktasiSurecKontrolJobCallBase(string id, string jobId, string hourInterval)
+        public string DecisionPointJobCallBase(string id, string jobId, string hourInterval)
         {
             WorkFlowTrace torSatinAlmaWorkFlowTrace = _unitOfWork.Repository<WorkFlowTrace>().Get(int.Parse(id));
 
@@ -262,11 +263,8 @@ namespace WorkFlowManager.Services.DbServices
                     gorevWorkFlowTrace = gorevWorkFlowTraceListesi.SingleOrDefault(x => x.Id == oncekiIslem.ConditionOptionId);
                 }
 
-                //Güncel işlem tekrar çağrılmamalı
-                //Listeye eklenen birdaha eklenmemeli
                 if (oncekiIslem.ProcessId != gorevWorkFlowTraceId && !oncekiWorkFlowTraceListesi.Any(x => oncekiIslem.ProcessId == x.ProcessId))
                 {
-                    //Eklenecek işlem akış içerisinde geri alınmak istenen işlemden sonra olmamalı
                     List<int> elementOfTree = new List<int>();
                     if (!SonrakiWorkFlowTraceMi(elementOfTree, gorevWorkFlowTraceListesi, gorevWorkFlowTraceId, oncekiIslem.ProcessId))
                     {
@@ -338,11 +336,11 @@ namespace WorkFlowManager.Services.DbServices
             return WorkFlowTrace;
         }
 
-        public virtual void WorkFlowFormKaydet<TClass, TVM>(WorkFlowFormViewModel workFlowFormViewModel)
+        public virtual void WorkFlowFormSave<TClass, TVM>(WorkFlowFormViewModel workFlowFormViewModel)
         where TClass : class
         where TVM : WorkFlowFormViewModel
         {
-            TClass form = _unitOfWork.Repository<TClass>().Get(workFlowFormViewModel.WorkFlowIslemForm.OwnerId);
+            TClass form = _unitOfWork.Repository<TClass>().Get(workFlowFormViewModel.OwnerId);
 
 
             if (form != null)
@@ -360,55 +358,56 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-        public WorkFlowFormViewModel WorkFlowFormYukle<T>(int torId, WorkFlowTraceForm workFlowTraceForm, List<FormObject> tamamlanmisFormlar) where T : WorkFlowFormViewModel
+        public WorkFlowFormViewModel WorkFlowFormLoad(WorkFlowFormViewModel workFlowFormViewModel)
         {
-            WorkFlowFormViewModel workFlowForm = null;
+            WorkFlowFormViewModel workFlowForm = workFlowFormViewModel;
 
-            if (typeof(T) != typeof(WorkFlowFormViewModel))
+            if (workFlowFormViewModel.ProcessFormViewViewName != null)
             {
-                ServiceDTO serviceDTO = new ServiceDTO(workFlowTraceForm);
-
-                var formObject = tamamlanmisFormlar.FirstOrDefault(x => x.ConstantObject.ViewModelType() == typeof(T));
-
-                if (formObject != null)
+                IWorkFlowForm form = GetWorkFlowForm(workFlowFormViewModel.ProcessFormViewViewName);
+                if (form != null)
                 {
-                    formObject.ConstantObject.BelgeTuruAyarla(serviceDTO);
-                    workFlowForm = formObject.ConstantObject.Yukle(serviceDTO);
+                    workFlowForm = form.Load(workFlowFormViewModel);
                 }
             }
-
-            if (workFlowForm == null)
-            {
-                workFlowForm = new WorkFlowFormViewModel();
-            }
-
-            workFlowForm.WorkFlowIslemForm = workFlowTraceForm;
             return workFlowForm;
-
         }
 
-
-        public void OzelFormKaydet(WorkFlowFormViewModel formData, List<FormObject> tamamlanmisFormlar)
+        private IWorkFlowForm GetWorkFlowForm(string formViewName)
         {
-            var formObject = tamamlanmisFormlar.FirstOrDefault(x => x.ConstantObject.ViewModelType() == formData.GetType());
-
-            if (formObject != null)
+            IWorkFlowForm form = null;
+            if (formViewName != null && !workFlowFormList.TryGetValue(formViewName, out form))
             {
-                formObject.ConstantObject.Kaydet(formData);
+                Type type = Type.GetType("WorkFlowManager.Services.CustomForms." + formViewName + ", WorkFlowManager.Services");
+
+                var formObject = DependencyResolver.Current.GetService(type);
+                if (formObject != null)
+                {
+                    workFlowFormList.Add(formViewName, (IWorkFlowForm)formObject);
+
+                    form = (IWorkFlowForm)formObject;
+                }
+            }
+            return form;
+        }
+
+        public void CustomFormSave(WorkFlowFormViewModel formData)
+        {
+            IWorkFlowForm form = GetWorkFlowForm(formData.ProcessFormViewViewName);
+            if (form != null)
+            {
+                form.Save(formData);
             }
         }
 
 
-        public bool OzelFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState, List<FormObject> tamamlanmisFormlar)
+        public bool CustomFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
         {
-
-            var formObject = tamamlanmisFormlar.FirstOrDefault(x => x.ConstantObject.ViewModelType() == formData.GetType());
-
-            if (formObject != null)
+            IWorkFlowForm form = GetWorkFlowForm(formData.ProcessFormViewViewName);
+            if (form != null)
             {
-                return formObject.ConstantObject.Validate(formData, modelState);
+                return form.Validate(formData, modelState);
             }
-
             return true;
         }
 
@@ -435,26 +434,21 @@ namespace WorkFlowManager.Services.DbServices
                         RecurringJob.RemoveIfExists(workFlowTrace.JobId);
                     }
                     _unitOfWork.Repository<WorkFlowTrace>().Remove(workFlowTraceId);
-                    YeniWorkFlowTraceOlustur(cancelProcessId, workFlowTrace.OwnerId);
+                    CreateWorkFlowTrace(cancelProcessId, workFlowTrace.OwnerId);
                 }
             }
         }
 
-        /// <summary>
-        /// Akış içerisinde hedef olarak belirlenen önce ki bir adıma işlemi geri alır.
-        /// </summary>
-        /// <param name="WorkFlowTraceId">Geri alınacak işlem Id si</param>
-        public virtual void WorkFlowWorkFlowTraceiGeriAl(int WorkFlowTraceId, int hedefGorevWorkFlowTraceId)
-        {
 
-            WorkFlowTrace WorkFlowTrace = _unitOfWork.Repository<WorkFlowTrace>().Get(WorkFlowTraceId);
+        public virtual void CancelWorkFlowTrace(int workFlowTraceId, int targetProcessId)
+        {
+            WorkFlowTrace WorkFlowTrace = _unitOfWork.Repository<WorkFlowTrace>().Get(workFlowTraceId);
 
             WorkFlowTrace.ProcessStatus = ProcessStatus.Cancelled;
 
             AddOrUpdate(WorkFlowTrace);
 
-            YeniWorkFlowTraceOlustur(hedefGorevWorkFlowTraceId, WorkFlowTrace.OwnerId);
-
+            CreateWorkFlowTrace(targetProcessId, WorkFlowTrace.OwnerId);
         }
 
 
@@ -463,9 +457,9 @@ namespace WorkFlowManager.Services.DbServices
         {
             var WorkFlowTraceListesi = WorkFlowProcessList(ownerId);
 
-            UserProcessViewModel torSatinAlmaWorkFlowTraceSuAnKi = WorkFlowTraceListesi.OrderByDescending(x => x.Id).First();//Geri doğru sıraladığımız için ilkini aldık
+            UserProcessViewModel torSatinAlmaWorkFlowTraceSuAnKi = WorkFlowTraceListesi.OrderByDescending(x => x.Id).First();
             int suAnKiWorkFlowTraceId = torSatinAlmaWorkFlowTraceSuAnKi.ProcessId;
-            if (torSatinAlmaWorkFlowTraceSuAnKi.ConditionOptionId != null) //Koşula ait seçenek seçilmiş ise
+            if (torSatinAlmaWorkFlowTraceSuAnKi.ConditionOptionId != null)
             {
                 suAnKiWorkFlowTraceId = (int)torSatinAlmaWorkFlowTraceSuAnKi.ConditionOptionId;
             }
@@ -477,20 +471,20 @@ namespace WorkFlowManager.Services.DbServices
 
             Process suAnKiGorevWorkFlowTrace = _unitOfWork.Repository<Process>().Get(x => x.Id == suAnKiWorkFlowTraceId, x => x.NextProcess);
 
-            if (suAnKiGorevWorkFlowTrace.NextProcessId != null)//Sonra ki kaydı varsa devam edilecek
+            if (suAnKiGorevWorkFlowTrace.NextProcessId != null)
             {
-                YeniWorkFlowTraceOlustur(suAnKiGorevWorkFlowTrace.NextProcess, ownerId);
+                CreateNewWorkFlowTrace(suAnKiGorevWorkFlowTrace.NextProcess, ownerId);
             }
         }
 
-        private void YeniWorkFlowTraceOlustur(int sonrakiGorevWorkFlowTraceId, int ownerId)
+        private void CreateWorkFlowTrace(int sonrakiGorevWorkFlowTraceId, int ownerId)
         {
             var sonrakiWorkFlowTrace = _unitOfWork.Repository<Process>().Get(sonrakiGorevWorkFlowTraceId);
-            YeniWorkFlowTraceOlustur(sonrakiWorkFlowTrace, ownerId);
+            CreateNewWorkFlowTrace(sonrakiWorkFlowTrace, ownerId);
         }
 
 
-        private void YeniWorkFlowTraceOlustur(Process sonrakiWorkFlowTrace, int ownerId)
+        private void CreateNewWorkFlowTrace(Process sonrakiWorkFlowTrace, int ownerId)
         {
             WorkFlowTrace torSatinAlmaWorkFlowTrace = new WorkFlowTrace()
             {
@@ -500,27 +494,14 @@ namespace WorkFlowManager.Services.DbServices
             };
             AddOrUpdate(torSatinAlmaWorkFlowTrace);
 
-            //Sonraki işlem sistem tarafından yapılan karar noktası ise ilgili metod çalıştırılıp sonuca göre devam edilecek
             if (sonrakiWorkFlowTrace is DecisionPoint)
             {
-                KararNoktasiSurecKontrol(torSatinAlmaWorkFlowTrace.Id);
+                DecisionPointTakeTheNextStep(torSatinAlmaWorkFlowTrace.Id);
             }
         }
 
 
-
-
-        /// <summary>
-        /// Karar noktası olarak oluşturulmuş <see cref="GorevWorkFlowTrace"/> e ait <see cref="KararNoktasi.KararMetot"/> larının ilgili parametrelerle çalıştırılarak(<see cref="DynamicMethodCallService.Caller(IUnitOfWork, MerkezBankasiService, UserService, string, CacheService)"/>) 
-        /// sürecin <see cref="GorevWorkFlowTrace.SonrakiId"/> adımına geçirilmesinde kullanılır. <param name="WorkFlowTraceId"></param> parametresinden <see cref="WorkFlowTrace"/> objesi çağrılarak <see cref="WorkFlowTrace.GorevWorkFlowTraceId"/> değerinden karar noktasına ulaşılır.
-        /// </summary>
-        /// <remarks>
-        /// İşlem bilgilerini hızlı sorgulamak için cache yapısı <see cref="CacheService.GetWorkFlowTraceListesi(<param name="birimId"/>)"/> şeklinde birim tabanlı kullanılmaktadır.
-        /// Yeni işlem ekleme sonrasında işlemlerin tutulduğu cache <see cref="CacheService.ClearWorkFlowTraceListesi(<param name="birimId"/>)"/> şeklinde silinmektedir.
-        /// Her <see cref="KararNoktasi"/> objesinin <see cref="KosulSecenek"/> türünde bağlı kayıtları bulunmaktadır.  <see cref="KararNoktasi.KararMetot"/> çalışması sonrasında referans edilen <see cref="KosulSecenek.SonrakiId"/>
-        /// <see cref="KararNoktasi.Id"/> ile eşit olması durumunda sistemin düzenli olarak karar metodunu çalıştırması için <see cref="SatinAlmaService.KararNoktasiSurecKontrolJobCall(string, string, string, string)"/> çalışması gerekmetedir.
-        /// </remarks>
-        public void KararNoktasiSurecKontrol(int WorkFlowTraceId)
+        public void DecisionPointTakeTheNextStep(int WorkFlowTraceId)
         {
             WorkFlowTrace workFlowTraceDecisionPoint = _unitOfWork.Repository<WorkFlowTrace>().Get(WorkFlowTraceId);
 
@@ -571,7 +552,7 @@ namespace WorkFlowManager.Services.DbServices
                         parametersValue.Add(kararNoktasi.RepetitionFrequenceByHour);
                         parametersArray = parametersValue.ToArray();
 
-                        var methodJobCallString = string.Format("{0}.KararNoktasiSurecKontrolJobCall({1})", serviceName, string.Join(",", parametersArray));
+                        var methodJobCallString = string.Format("{0}.DecisionPointJobCall({1})", serviceName, string.Join(",", parametersArray));
 
                         DynamicMethodCallService.Caller(
                             _unitOfWork,
@@ -593,53 +574,39 @@ namespace WorkFlowManager.Services.DbServices
             }
         }
 
-        public bool StandartFormKontrol(WorkFlowTraceForm formData, ModelStateDictionary modelState)
+        public bool StandartFormKontrol(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
         {
-            return ValidationHelper.Validate(formData, new WorkFlowTraceFormValidator(_unitOfWork), modelState);
+            return ValidationHelper.Validate(formData, new WorkFlowFormViewModelValidator(_unitOfWork), modelState);
         }
 
-        public bool FullFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState, List<FormObject> tamamlanmisFormlar)
+        public bool FullFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
         {
-            bool resultStandartForm = StandartFormKontrol(formData.WorkFlowIslemForm, modelState);
-            bool resultOzelForm = OzelFormValidate(formData, modelState, tamamlanmisFormlar);
-
+            bool resultStandartForm = StandartFormKontrol(formData, modelState);
+            bool resultOzelForm = CustomFormValidate(formData, modelState);
             return resultOzelForm && resultStandartForm;
         }
 
-        /// <summary>
-        /// Parametre olarak girilen <see cref="GorevWorkFlowTrace"/> i sonra ki adıma ilerletir ya da iptal sonrasi gitmesi gereken adıma götürür.
-        /// </summary>
-        /// <remarks>
-        /// İşlem iptali ya da ilerletilmesi sonucunda cache sıfırlanarak yeni sorguların sağlıklı yapılması sağlanır.
-        /// Bir sonra ki işlemi aynı rol yapacaksa kullanıcıya bir sonra ki işlemi otomatik olarak açılır. Ya da ana menüye dönmesi sağlanır.
-        /// </remarks>
-        /// <param name="WorkFlowTraceId">O an ki işlemin Id sini ifade eder</param>
-        /// <param name="ownerId">İşlemin bağlı olduğu ana kaydı ifade eder <see cref="Tor"/> ya da <see cref="Lot"/> Id si olabilir</param>
-        /// <param name="birimId">İşlemin bağlı olduğu ana kaydın birimini ifade eder</param>
-        /// <param name="WorkFlowTraceIptalId">İptal edilecekse gideceği işlemin Id sini tanımlar</param>
-        /// <param name="WorkFlowTraceIptal">İşlemin iptal edilip edilmeyeceğini belirtir</param>
-        /// <returns>Gidilecek route, mesaj ve mesaj tipi dönülür</returns>
-        public object SonrakiSurecKontrolu(int WorkFlowTraceId)
+        public object SetNextProcessForWorkFlow(int WorkFlowTraceId)
         {
             WorkFlowTrace WorkFlowTrace = WorkFlowTraceDetail(WorkFlowTraceId);
-            int gorevWorkFlowTraceId = WorkFlowTrace.ProcessId;
+            int workFlowTraceProcessId = WorkFlowTrace.ProcessId;
 
-            Process gorevWorkFlowTrace = _unitOfWork.Repository<Process>().Get(gorevWorkFlowTraceId);
+            Process process = _unitOfWork.Repository<Process>().Get(workFlowTraceProcessId);
 
-            var WorkFlowTraceListesi = WorkFlowProcessList(WorkFlowTrace.OwnerId);
-            UserProcessViewModel sonWorkFlowTrace = WorkFlowTraceListesi.OrderByDescending(x => x.Id).First();
-            int sonWorkFlowTraceId = sonWorkFlowTrace.ProcessId;
+            var workFlowProcessList = WorkFlowProcessList(WorkFlowTrace.OwnerId);
+            UserProcessViewModel lastWorkFlowTrace = workFlowProcessList.OrderByDescending(x => x.Id).First();
+            int lastWorkFlowTraceProcessId = lastWorkFlowTrace.ProcessId;
 
-            bool sonrakiWorkFlowTraceiKendisiYapacak = false;
-            if (gorevWorkFlowTrace.Id != sonWorkFlowTraceId)
+            bool nextProcessIsSuitable = false;
+            if (process.Id != lastWorkFlowTraceProcessId)
             {
-                sonrakiWorkFlowTraceiKendisiYapacak = true; //_userService.WorkFlowTraceSirasiGelmis(sonWorkFlowTrace);
+                nextProcessIsSuitable = true;
             }
 
             object routeObject = null;
-            if (sonrakiWorkFlowTraceiKendisiYapacak)
+            if (nextProcessIsSuitable)
             {
-                routeObject = new { workFlowTraceId = sonWorkFlowTrace.Id };
+                routeObject = new { workFlowTraceId = lastWorkFlowTrace.Id };
             }
             else
             {
@@ -648,21 +615,21 @@ namespace WorkFlowManager.Services.DbServices
             return routeObject;
         }
 
-        public bool WorkFlowYetkiKontrol(UserProcessViewModel kullaniciWorkFlowTraceVM)
+        public bool WorkFlowPermissionCheck(UserProcessViewModel userProcessVM)
         {
             bool rslt = true;
             if (
                 !(
                         (
-                            kullaniciWorkFlowTraceVM.AssignedRole != ProjectRole.Sistem
+                            userProcessVM.AssignedRole != ProjectRole.Sistem
                             &&
-                            true //_userService.ProjeRoluVar(kullaniciWorkFlowTraceVM.ProjeId, kullaniciWorkFlowTraceVM.WorkFlowTraceiYapanRol)
+                            true //TODO
                         )
                         ||
                         (
-                            kullaniciWorkFlowTraceVM.AssignedRole == ProjectRole.Sistem
+                            userProcessVM.AssignedRole == ProjectRole.Sistem
                             &&
-                            true //_userService.ProjeErisimYetkisiVar(kullaniciWorkFlowTraceVM.ProjeId)
+                            true //TODO
                         )
                 )
                )
@@ -673,7 +640,6 @@ namespace WorkFlowManager.Services.DbServices
                 logger.Error(errorMessage);
 
                 rslt = false;
-                //return RedirectToAction("Index", new { controller = "Home" }).WithMessage(this, errorMessage, MessageType.Danger);
             }
 
             return rslt;
@@ -684,27 +650,17 @@ namespace WorkFlowManager.Services.DbServices
             return
                 new WorkFlowDTO
                 {
-                    //Controller = kullaniciWorkFlowTraceVM.Controller,
-                    //SpecialFormTemplateView = kullaniciWorkFlowTraceVM.SpecialFormTemplateView,
-                    //TraceId = kullaniciWorkFlowTraceVM.Id,
-                    //TaskName = kullaniciWorkFlowTraceVM.TaskName,
-                    //ProcessId = kullaniciWorkFlowTraceVM.ProcessId,
-                    //TaskId = kullaniciWorkFlowTraceVM.TaskId,
-                    //IsCondition = kullaniciWorkFlowTraceVM.IsCondition
                     GeriGidilebilecekIslemListesi = kullaniciWorkFlowTraceVM.ProcessStatus != ProcessStatus.Completed ? GeriGidilebilecekWorkFlowTraceListesi(kullaniciWorkFlowTraceVM.Id) : new List<UserProcessViewModel>(),
                     GormeyeYetkiliIslemListesi = WorkFlowProcessList(kullaniciWorkFlowTraceVM.OwnerId).Where(x => x.ProcessStatus != ProcessStatus.Draft),
                     ProgressGorevListesi = GorevListesiOlustur(kullaniciWorkFlowTraceVM.Id),
                 };
         }
 
-        public void SetSatinAlmaWorkFlowTraceForm(WorkFlowTraceForm satinAlmaWorkFlowTraceForm, WorkFlowDTO workFlowBase)
+        public void SetSatinAlmaWorkFlowTraceForm(WorkFlowFormViewModel satinAlmaWorkFlowTraceForm, WorkFlowDTO workFlowBase)
         {
             satinAlmaWorkFlowTraceForm.ProgressGorevListesi = workFlowBase.ProgressGorevListesi;
             satinAlmaWorkFlowTraceForm.GeriGidilebilecekIslemListesi = workFlowBase.GeriGidilebilecekIslemListesi;
             satinAlmaWorkFlowTraceForm.GormeyeYetkiliIslemListesi = workFlowBase.GormeyeYetkiliIslemListesi;
-            //satinAlmaWorkFlowTraceForm.ProcessTaskId = workFlowBase.TaskId;
-            //satinAlmaWorkFlowTraceForm.ProcessTaskName = workFlowBase.TaskName;
-            //satinAlmaWorkFlowTraceForm.IsCondition = workFlowBase.IsCondition;
 
             if (satinAlmaWorkFlowTraceForm.IsCondition)
             {

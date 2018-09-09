@@ -110,7 +110,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants\IConstants.cs" />
+    <Compile Include="Constants\IWorkFlowForm.cs" />
     <Compile Include="DataAccess\Migrations\Configuration.cs" />
     <Compile Include="DataAccess\Repositories\BaseRepository.cs" />
     <Compile Include="DataAccess\Repositories\IDbContext.cs" />
@@ -118,8 +118,6 @@
     <Compile Include="DataAccess\_Context\DataContext.cs" />
     <Compile Include="DataAccess\_UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="DataAccess\_UnitOfWork\UnitOfWork.cs" />
-    <Compile Include="Dto\FormObject.cs" />
-    <Compile Include="Dto\ServiceDTO.cs" />
     <Compile Include="Dto\WorlFlowDto.cs" />
     <Compile Include="Enums\FileType.cs" />
     <Compile Include="Enums\FormComplexity.cs" />
@@ -172,7 +170,7 @@
     <Compile Include="Validation\WorkFlowProcessValidator.cs" />
     <Compile Include="ViewModels\AccountViewModels.cs" />
     <Compile Include="ViewModels\ProcessVM.cs" />
-    <Compile Include="ViewModels\TestFormViewModel.cs" />
+    <Compile Include="ViewModels\TestWorkFlowFormViewModel.cs" />
     <Compile Include="ViewModels\WorkFlowFormViewModel.cs" />
     <Compile Include="ViewModels\WorkFlowTraceVM.cs" />
     <Compile Include="ViewModels\WorkFlowViewModel.cs" />
