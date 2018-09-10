@@ -80,7 +80,7 @@ namespace WorkFlowManager.Services.DbServices
         }
         #endregion
 
-        #region Workflow İşlemleri Bölümü
+        #region Workflow
         public int StartWorkFlow(int ownerId, int taskId)
         {
 
@@ -117,9 +117,9 @@ namespace WorkFlowManager.Services.DbServices
             AddOrUpdate(torSatinAlmaIslem);
         }
 
-        public override void WorkFlowProcessIptal(int workFlowTraceId)
+        public override void WorkFlowProcessCancel(int workFlowTraceId)
         {
-            base.WorkFlowProcessIptal(workFlowTraceId);
+            base.WorkFlowProcessCancel(workFlowTraceId);
         }
 
         public override void CancelWorkFlowTrace(int workFlowTraceId, int targetProcessId)

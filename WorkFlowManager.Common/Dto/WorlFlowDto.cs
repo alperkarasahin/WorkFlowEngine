@@ -5,8 +5,8 @@ namespace WorkFlowManager.Common.Dto
 {
     public class WorkFlowDTO
     {
-        public IEnumerable<WorkFlowTraceVM> ProgressGorevListesi { get; set; }
-        public IEnumerable<UserProcessViewModel> GormeyeYetkiliIslemListesi { get; set; }
-        public IEnumerable<UserProcessViewModel> GeriGidilebilecekIslemListesi { get; set; }
+        public IEnumerable<WorkFlowTraceVM> ProgressProcessList { get; set; }
+        public IEnumerable<UserProcessViewModel> AuthorizedProcessList { get; set; }
+        public IEnumerable<UserProcessViewModel> TargetProcessListForCancel { get; set; }
     }
 }

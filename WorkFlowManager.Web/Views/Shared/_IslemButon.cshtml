@@ -8,14 +8,14 @@
     <input type="submit" value="@Model.ProcessNextLabel" data-confirm="You will not able to update this form after submit.  Are you sure?" name="action:GonderOzelForm" class="btn btn-primary btn-sm" />
     <input type="submit" id="GeriAlButton" style="display:none" name="action:GeriAl"/>
 
-    if (Model.GeriGidilebilecekIslemListesi.Count()>0)
+    if (Model.TargetProcessListForCancel.Count()>0)
     { 
         <div class="btn-group">
             <button type="button" class="btn btn-danger dropdown-toggle btn-sm" data-toggle="dropdown">
                 <i class="fa fa-backward"></i> Previous Step <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
-                @foreach (var islem in Model.GeriGidilebilecekIslemListesi)
+                @foreach (var islem in Model.TargetProcessListForCancel)
                 {
                     <li><a href="#" onclick="GeriAl(@islem.ProcessId)">@islem.ProcessName</a></li>
                 }
@@ -26,7 +26,7 @@
                 function GeriAl(gorevIslemId){
                     if (confirm('Are you sure you want to go to previous step?'))
                     {
-                        $("[name='HedefGorevIslemId']").val(gorevIslemId);
+                        $("[name='TargetProcessId']").val(gorevIslemId);
                         $("#GeriAlButton").trigger('click');
                     }
                 }

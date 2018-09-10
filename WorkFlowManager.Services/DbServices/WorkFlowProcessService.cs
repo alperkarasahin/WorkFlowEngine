@@ -417,17 +417,17 @@ namespace WorkFlowManager.Services.DbServices
             return _workFlowDataService.GetIslemListesi().SingleOrDefault(x => x.Id == workFlowTraceId);
         }
 
-        public virtual void WorkFlowProcessIptal(int workFlowTraceId)
+        public virtual void WorkFlowProcessCancel(int workFlowTraceId)
         {
             WorkFlowTrace workFlowTrace = WorkFlowTraceDetail(workFlowTraceId);
 
             if (workFlowTrace.Process.GetType() == typeof(DecisionPoint))
             {
-                DecisionPoint kararNoktasi = (DecisionPoint)workFlowTrace.Process;
+                DecisionPoint decisionPoint = (DecisionPoint)workFlowTrace.Process;
 
-                if (kararNoktasi.CancelProcessId != null)
+                if (decisionPoint.CancelProcessId != null)
                 {
-                    int cancelProcessId = (int)kararNoktasi.CancelProcessId;
+                    int cancelProcessId = (int)decisionPoint.CancelProcessId;
 
                     if (workFlowTrace.JobId != null)
                     {
@@ -477,44 +477,44 @@ namespace WorkFlowManager.Services.DbServices
             }
         }
 
-        private void CreateWorkFlowTrace(int sonrakiGorevWorkFlowTraceId, int ownerId)
+        private void CreateWorkFlowTrace(int targetProcessId, int ownerId)
         {
-            var sonrakiWorkFlowTrace = _unitOfWork.Repository<Process>().Get(sonrakiGorevWorkFlowTraceId);
-            CreateNewWorkFlowTrace(sonrakiWorkFlowTrace, ownerId);
+            var targetProcess = _unitOfWork.Repository<Process>().Get(targetProcessId);
+            CreateNewWorkFlowTrace(targetProcess, ownerId);
         }
 
 
-        private void CreateNewWorkFlowTrace(Process sonrakiWorkFlowTrace, int ownerId)
+        private void CreateNewWorkFlowTrace(Process targetProcess, int ownerId)
         {
-            WorkFlowTrace torSatinAlmaWorkFlowTrace = new WorkFlowTrace()
+            WorkFlowTrace workFlowTrace = new WorkFlowTrace()
             {
-                ProcessId = sonrakiWorkFlowTrace.Id,
+                ProcessId = targetProcess.Id,
                 OwnerId = ownerId,
                 ProcessStatus = ProcessStatus.Draft
             };
-            AddOrUpdate(torSatinAlmaWorkFlowTrace);
+            AddOrUpdate(workFlowTrace);
 
-            if (sonrakiWorkFlowTrace is DecisionPoint)
+            if (targetProcess is DecisionPoint)
             {
-                DecisionPointTakeTheNextStep(torSatinAlmaWorkFlowTrace.Id);
+                DecisionPointTakeTheNextStep(workFlowTrace.Id);
             }
         }
 
 
-        public void DecisionPointTakeTheNextStep(int WorkFlowTraceId)
+        public void DecisionPointTakeTheNextStep(int workFlowTraceId)
         {
-            WorkFlowTrace workFlowTraceDecisionPoint = _unitOfWork.Repository<WorkFlowTrace>().Get(WorkFlowTraceId);
+            WorkFlowTrace workFlowTraceDecisionPoint = _unitOfWork.Repository<WorkFlowTrace>().Get(workFlowTraceId);
 
-            DecisionPoint kararNoktasi = _unitOfWork.Repository<DecisionPoint>().Get(x => x.Id == workFlowTraceDecisionPoint.ProcessId, x => x.DecisionMethod, x => x.Task);
+            DecisionPoint decisionPoint = _unitOfWork.Repository<DecisionPoint>().Get(x => x.Id == workFlowTraceDecisionPoint.ProcessId, x => x.DecisionMethod, x => x.Task);
 
-            if (!string.IsNullOrEmpty(kararNoktasi.DecisionMethod.MethodFunction))
+            if (!string.IsNullOrEmpty(decisionPoint.DecisionMethod.MethodFunction))
             {
-                string serviceName = kararNoktasi.Task.MethodServiceName;
-                string methodName = string.Format("{0}.{1}", serviceName, kararNoktasi.DecisionMethod.MethodFunction.Substring(0, kararNoktasi.DecisionMethod.MethodFunction.LastIndexOf("(")));
+                string serviceName = decisionPoint.Task.MethodServiceName;
+                string methodName = string.Format("{0}.{1}", serviceName, decisionPoint.DecisionMethod.MethodFunction.Substring(0, decisionPoint.DecisionMethod.MethodFunction.LastIndexOf("(")));
 
-                var parameters = kararNoktasi.DecisionMethod.MethodFunction.Substring(
-                                        kararNoktasi.DecisionMethod.MethodFunction.LastIndexOf("(") + 1,
-                                            (kararNoktasi.DecisionMethod.MethodFunction.LastIndexOf(")") - kararNoktasi.DecisionMethod.MethodFunction.LastIndexOf("(") - 1))
+                var parameters = decisionPoint.DecisionMethod.MethodFunction.Substring(
+                                        decisionPoint.DecisionMethod.MethodFunction.LastIndexOf("(") + 1,
+                                            (decisionPoint.DecisionMethod.MethodFunction.LastIndexOf(")") - decisionPoint.DecisionMethod.MethodFunction.LastIndexOf("(") - 1))
                                                 .Split(',')
                                                     .Select(p => p.Trim())
                                                         .ToList();
@@ -535,21 +535,21 @@ namespace WorkFlowManager.Services.DbServices
 
                 var methodCallString = string.Format("{0}({1})", methodName, string.Join(",", parametersArray));
 
-                var kararMethodSonuc =
+                var decisionMethodResult =
                     DynamicMethodCallService.Caller(
                         _unitOfWork,
                                     methodCallString,
                                         _workFlowDataService);
 
-                Process kosulSecenek = _unitOfWork.Repository<ConditionOption>().Get(x => x.ConditionId == kararNoktasi.Id && x.Value == kararMethodSonuc);
-                if (kosulSecenek.NextProcessId == kararNoktasi.Id)
+                Process conditionOption = _unitOfWork.Repository<ConditionOption>().Get(x => x.ConditionId == decisionPoint.Id && x.Value == decisionMethodResult);
+                if (conditionOption.NextProcessId == decisionPoint.Id)
                 {
 
                     if (workFlowTraceDecisionPoint.JobId == null)//Job oluşturulmamışsa
                     {
                         string jobId = Guid.NewGuid().ToString();
                         parametersValue.Add(jobId);
-                        parametersValue.Add(kararNoktasi.RepetitionFrequenceByHour);
+                        parametersValue.Add(decisionPoint.RepetitionFrequenceByHour);
                         parametersArray = parametersValue.ToArray();
 
                         var methodJobCallString = string.Format("{0}.DecisionPointJobCall({1})", serviceName, string.Join(",", parametersArray));
@@ -563,7 +563,7 @@ namespace WorkFlowManager.Services.DbServices
                 }
                 else
                 {
-                    workFlowTraceDecisionPoint.ConditionOptionId = kosulSecenek.Id;
+                    workFlowTraceDecisionPoint.ConditionOptionId = conditionOption.Id;
                     AddOrUpdate(workFlowTraceDecisionPoint);
                     if (workFlowTraceDecisionPoint.JobId != null)
                     {
@@ -574,16 +574,16 @@ namespace WorkFlowManager.Services.DbServices
             }
         }
 
-        public bool StandartFormKontrol(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
+        public bool StandartFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
         {
             return ValidationHelper.Validate(formData, new WorkFlowFormViewModelValidator(_unitOfWork), modelState);
         }
 
         public bool FullFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
         {
-            bool resultStandartForm = StandartFormKontrol(formData, modelState);
-            bool resultOzelForm = CustomFormValidate(formData, modelState);
-            return resultOzelForm && resultStandartForm;
+            bool resultStandartForm = StandartFormValidate(formData, modelState);
+            bool resultCustomForm = CustomFormValidate(formData, modelState);
+            return resultCustomForm && resultStandartForm;
         }
 
         public object SetNextProcessForWorkFlow(int WorkFlowTraceId)
@@ -635,7 +635,7 @@ namespace WorkFlowManager.Services.DbServices
                )
 
             {
-                var errorMessage = "Sayfaya Erişim Yetkiniz Yok!";
+                var errorMessage = "Access denied!";
                 NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
                 logger.Error(errorMessage);
 
@@ -650,17 +650,17 @@ namespace WorkFlowManager.Services.DbServices
             return
                 new WorkFlowDTO
                 {
-                    GeriGidilebilecekIslemListesi = kullaniciWorkFlowTraceVM.ProcessStatus != ProcessStatus.Completed ? GeriGidilebilecekWorkFlowTraceListesi(kullaniciWorkFlowTraceVM.Id) : new List<UserProcessViewModel>(),
-                    GormeyeYetkiliIslemListesi = WorkFlowProcessList(kullaniciWorkFlowTraceVM.OwnerId).Where(x => x.ProcessStatus != ProcessStatus.Draft),
-                    ProgressGorevListesi = GorevListesiOlustur(kullaniciWorkFlowTraceVM.Id),
+                    TargetProcessListForCancel = kullaniciWorkFlowTraceVM.ProcessStatus != ProcessStatus.Completed ? GeriGidilebilecekWorkFlowTraceListesi(kullaniciWorkFlowTraceVM.Id) : new List<UserProcessViewModel>(),
+                    AuthorizedProcessList = WorkFlowProcessList(kullaniciWorkFlowTraceVM.OwnerId).Where(x => x.ProcessStatus != ProcessStatus.Draft),
+                    ProgressProcessList = GorevListesiOlustur(kullaniciWorkFlowTraceVM.Id),
                 };
         }
 
         public void SetSatinAlmaWorkFlowTraceForm(WorkFlowFormViewModel satinAlmaWorkFlowTraceForm, WorkFlowDTO workFlowBase)
         {
-            satinAlmaWorkFlowTraceForm.ProgressGorevListesi = workFlowBase.ProgressGorevListesi;
-            satinAlmaWorkFlowTraceForm.GeriGidilebilecekIslemListesi = workFlowBase.GeriGidilebilecekIslemListesi;
-            satinAlmaWorkFlowTraceForm.GormeyeYetkiliIslemListesi = workFlowBase.GormeyeYetkiliIslemListesi;
+            satinAlmaWorkFlowTraceForm.ProgressProcessList = workFlowBase.ProgressProcessList;
+            satinAlmaWorkFlowTraceForm.TargetProcessListForCancel = workFlowBase.TargetProcessListForCancel;
+            satinAlmaWorkFlowTraceForm.AuthorizedProcessList = workFlowBase.AuthorizedProcessList;
 
             if (satinAlmaWorkFlowTraceForm.IsCondition)
             {

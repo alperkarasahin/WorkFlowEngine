@@ -11,7 +11,7 @@
         <div class="col-lg-12">
             <div class="box box-warning">
                 <div class="container">
-                    @Html.Partial("_WorkFlowTraceStatus", Model.ProgressGorevListesi)
+                    @Html.Partial("_WorkFlowTraceStatus", Model.ProgressProcessList)
                 </div>
             </div>
         </div>
@@ -26,7 +26,7 @@
                     @Html.HiddenFor(x => x.ProcessFormViewViewName)
                     @Html.HiddenFor(x => x.ProcessName)
                     @Html.HiddenFor(x => x.GorevTanim)
-                    @Html.HiddenFor(x => x.HedefGorevIslemId)
+                    @Html.HiddenFor(x => x.TargetProcessId)
                     @Html.HiddenFor(x => x.IsCondition)
                     @Html.HiddenFor(x => x.ProcessAssignedRole)
                     @Html.HiddenFor(x => x.OwnerId)
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div style="display:none" class="box-header with-border islemGorevDurumMaximum">
-                    @Html.Partial("_WorkFlowTraceStatus", Model.ProgressGorevListesi)
+                    @Html.Partial("_WorkFlowTraceStatus", Model.ProgressProcessList)
                 </div>
                 <div class="box-body">
 
@@ -127,7 +127,7 @@
                 </div>
             </div>
 
-            @Html.Partial("_SatinAlmaIslemler", Model.GormeyeYetkiliIslemListesi)
+            @Html.Partial("_SatinAlmaIslemler", Model.AuthorizedProcessList)
         </div>
         <div class="col-lg-4 islemDetayBolum">
             <div class="panel panel-info">

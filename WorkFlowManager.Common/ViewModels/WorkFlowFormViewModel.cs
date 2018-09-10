@@ -27,7 +27,6 @@ namespace WorkFlowManager.Common.ViewModels
         public string ProcessComment { get; set; }
         public string ProcessName { get; set; }
         public string ProcessFormViewViewName { get; set; }
-        //public string ProcessFormViewViewName { get; set; }
         public string ProcessNextLabel { get; set; }
 
         public int OwnerId { get; set; }
@@ -36,9 +35,9 @@ namespace WorkFlowManager.Common.ViewModels
 
         public ProcessStatus ProcessStatus { get; set; }
 
-        public IEnumerable<WorkFlowTraceVM> ProgressGorevListesi { get; set; }
-        public IEnumerable<UserProcessViewModel> GormeyeYetkiliIslemListesi { get; set; }
-        public IEnumerable<UserProcessViewModel> GeriGidilebilecekIslemListesi { get; set; }
+        public IEnumerable<WorkFlowTraceVM> ProgressProcessList { get; set; }
+        public IEnumerable<UserProcessViewModel> AuthorizedProcessList { get; set; }
+        public IEnumerable<UserProcessViewModel> TargetProcessListForCancel { get; set; }
 
         public bool ProcessFormViewCompleted { get; set; }
         public int ProcessTaskId { get; set; }
@@ -49,7 +48,7 @@ namespace WorkFlowManager.Common.ViewModels
         public string GorevTanim { get; set; }
 
         //İşlem geri alınırken kullanılacak
-        public int HedefGorevIslemId { get; set; }
+        public int TargetProcessId { get; set; }
         public string ProcessTaskController { get; set; }
         public string ProcessTaskSpecialFormTemplateView { get; set; }
     }

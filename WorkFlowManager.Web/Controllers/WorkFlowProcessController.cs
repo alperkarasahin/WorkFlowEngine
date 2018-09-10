@@ -23,7 +23,7 @@ namespace WorkFlowManager.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]
         public ActionResult Iptal(int workFlowTraceId)
         {
-            _workFlowProcessService.WorkFlowProcessIptal(workFlowTraceId);
+            _workFlowProcessService.WorkFlowProcessCancel(workFlowTraceId);
 
             var surecKontrolSonuc = _workFlowProcessService.SetNextProcessForWorkFlow(workFlowTraceId);
 
@@ -50,7 +50,7 @@ namespace WorkFlowManager.Web.Controllers
             _workFlowProcessService.AddOrUpdate(islem);
 
             var workFlowTraceId = formData.Id;
-            _workFlowProcessService.CancelWorkFlowTrace(workFlowTraceId, formData.HedefGorevIslemId);
+            _workFlowProcessService.CancelWorkFlowTrace(workFlowTraceId, formData.TargetProcessId);
 
             var surecKontrolSonuc = _workFlowProcessService.SetNextProcessForWorkFlow(workFlowTraceId);
 
