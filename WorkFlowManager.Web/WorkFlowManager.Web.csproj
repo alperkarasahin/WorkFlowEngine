@@ -540,7 +540,7 @@
     <Content Include="Views\WorkFlow\_SpecialForms.cshtml" />
     <Content Include="Views\Shared\_MShowWorkFlow.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\_ComplexityEnum.cshtml" />
-    <Content Include="Views\Shared\OzelFormSablon.cshtml" />
+    <Content Include="Views\Shared\WorkFlowTemplate.cshtml" />
     <Content Include="Views\Shared\_WorkFlowTraceStatus.cshtml" />
     <Content Include="Views\Shared\_IslemButon.cshtml" />
     <Content Include="Views\Shared\_SatinAlmaIslemler.cshtml" />

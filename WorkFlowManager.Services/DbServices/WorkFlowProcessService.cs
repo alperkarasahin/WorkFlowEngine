@@ -526,8 +526,16 @@ namespace WorkFlowManager.Services.DbServices
                 {
                     if (!string.IsNullOrWhiteSpace(parameter))
                     {
-                        var value = workFlowTraceDecisionPoint.GetType().GetProperty(parameter).GetValue(workFlowTraceDecisionPoint, null);
-                        parametersValue.Add(value);
+                        var property = workFlowTraceDecisionPoint.GetType().GetProperties().Where(x => x.Name == parameter).FirstOrDefault();
+                        if (property != null)
+                        {
+                            var value = property.GetValue(workFlowTraceDecisionPoint, null);// workFlowTraceDecisionPoint.GetType().GetProperty(parameter).GetValue(workFlowTraceDecisionPoint, null);
+                            parametersValue.Add(value);
+                        }
+                        else
+                        {
+                            parametersValue.Add(parameter);
+                        }
                     }
                 }
 
@@ -547,12 +555,14 @@ namespace WorkFlowManager.Services.DbServices
 
                     if (workFlowTraceDecisionPoint.JobId == null)//Job oluşturulmamışsa
                     {
-                        string jobId = Guid.NewGuid().ToString();
-                        parametersValue.Add(jobId);
-                        parametersValue.Add(decisionPoint.RepetitionFrequenceByHour);
-                        parametersArray = parametersValue.ToArray();
+                        List<object> decisionPointJobCallParameterList = new List<object>();
 
-                        var methodJobCallString = string.Format("{0}.DecisionPointJobCall({1})", serviceName, string.Join(",", parametersArray));
+                        string jobId = Guid.NewGuid().ToString();
+                        decisionPointJobCallParameterList.Add(workFlowTraceId);
+                        decisionPointJobCallParameterList.Add(jobId);
+                        decisionPointJobCallParameterList.Add(decisionPoint.RepetitionFrequenceByHour);
+
+                        var methodJobCallString = string.Format("{0}.DecisionPointJobCall({1})", serviceName, string.Join(",", decisionPointJobCallParameterList.ToArray()));
 
                         DynamicMethodCallService.Caller(
                             _unitOfWork,

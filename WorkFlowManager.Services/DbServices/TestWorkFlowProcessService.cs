@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hangfire;
+using System.Linq;
 using System.Web.Mvc;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
 using WorkFlowManager.Common.Tables;
@@ -42,14 +43,22 @@ namespace WorkFlowManager.Services.DbServices
             }
             return rslt;
         }
-        public char IsAgeLessThan20(string id)
+
+        private int GetSelectedConditionOptionIdForCondition(string conditionName, int ownerId)
+        {
+            var condition = _unitOfWork.Repository<Condition>().GetAll().Where(x => x.Name == conditionName).FirstOrDefault();
+            var option = _unitOfWork.Repository<WorkFlowTrace>().GetAll().Where(x => x.OwnerId == ownerId && x.ProcessId == condition.Id).OrderByDescending(x => x.Id).FirstOrDefault();
+            return (int)option.ConditionOptionId;
+        }
+
+        public char IsAgeLessThan(string id, string age)
         {
             var rslt = 'N';
             int ownerId = GetOwnerIdFromId(int.Parse(id));
             var testForm = _unitOfWork.Repository<TestForm>().Get(x => x.OwnerId == ownerId);
             if (testForm != null)
             {
-                if (testForm.Age < 20)
+                if (testForm.Age < int.Parse(age))
                 {
                     rslt = 'Y';
                 }
@@ -58,14 +67,14 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-        public char IsAgeGreaterThan20(string id)
+        public char IsAgeGreaterThan(string id, string age)
         {
             var rslt = 'N';
             int ownerId = GetOwnerIdFromId(int.Parse(id));
             var testForm = _unitOfWork.Repository<TestForm>().Get(x => x.OwnerId == ownerId);
             if (testForm != null)
             {
-                if (testForm.Age > 20)
+                if (testForm.Age > int.Parse(age))
                 {
                     rslt = 'Y';
                 }
@@ -78,6 +87,22 @@ namespace WorkFlowManager.Services.DbServices
             }
             return rslt;
         }
+
+        public char IsCandidateColorBlind(string id)
+        {
+            var rslt = 'N';
+            int ownerId = GetOwnerIdFromId(int.Parse(id));
+            var conditionOptionId = GetSelectedConditionOptionIdForCondition("Select Eye Condition", ownerId);
+
+            var conditionOption = _unitOfWork.Repository<ConditionOption>().Get(x => x.Id == conditionOptionId);
+            if (conditionOption.Name == "Color-Blind")
+            {
+                rslt = 'Y';
+            }
+            return rslt;
+        }
+
+
         #endregion
 
         #region Workflow

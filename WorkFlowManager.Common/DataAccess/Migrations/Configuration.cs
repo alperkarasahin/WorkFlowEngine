@@ -17,9 +17,11 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
             AutomaticMigrationDataLossAllowed = true;
         }
 
-        private string SentenceForDecisionPoint(string sentence)
+        private string SentenceForDecisionPoint(bool systemAction, string sentence)
         {
             string rslt = "";
+            string prefix = systemAction ? "(system)" : "(user)";
+            sentence = prefix + " " + sentence;
             string[] wordList = sentence.Split(' ');
             int i = 0;
 
@@ -85,16 +87,16 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                     {
                         if (islem.NextProcess.GetType() == typeof(Condition) || islem.NextProcess.GetType() == typeof(DecisionPoint))
                         {
-                            workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{{""{5}""}};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.Name), islem.Name, islem.NextProcess.ProcessUniqueCode, SentenceForDecisionPoint(islem.NextProcess.Name), charForPrefixProcess, charForSuffixProcess);
+                            workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{{""{5}""}};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.GetType() == typeof(DecisionPoint), conditionForOption.Name), islem.Name, islem.NextProcess.ProcessUniqueCode, SentenceForDecisionPoint(islem.NextProcess.GetType() == typeof(DecisionPoint), islem.NextProcess.Name), charForPrefixProcess, charForSuffixProcess);
                         }
                         else
                         {
-                            workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{6}""{5}""{7};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.Name), islem.Name, islem.NextProcess.ProcessUniqueCode, islem.NextProcess.Name, charForPrefixProcess, charForSuffixProcess);
+                            workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{6}""{5}""{7};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.GetType() == typeof(DecisionPoint), conditionForOption.Name), islem.Name, islem.NextProcess.ProcessUniqueCode, islem.NextProcess.Name, charForPrefixProcess, charForSuffixProcess);
                         }
                     }
                     else
                     {
-                        workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}((""{5}""));", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.Name), islem.Name, stopDummyProcessCode, stopDummyProcessName, charForPrefixProcess, charForSuffixProcess);
+                        workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}((""{5}""));", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.GetType() == typeof(DecisionPoint), conditionForOption.Name), islem.Name, stopDummyProcessCode, stopDummyProcessName, charForPrefixProcess, charForSuffixProcess);
                     }
                 }
                 else if (islem.GetType() == typeof(Condition) || islem.GetType() == typeof(DecisionPoint))
@@ -107,7 +109,7 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                     {
                         if (islem.NextProcess.GetType() == typeof(Condition) || islem.NextProcess.GetType() == typeof(DecisionPoint))
                         {
-                            workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}{{""{4}""}};", workFlowDiagram, islem.ProcessUniqueCode, islem.Name, islem.NextProcess.ProcessUniqueCode, SentenceForDecisionPoint(islem.NextProcess.Name), charForPrefixProcess, charForSuffixProcess);
+                            workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}{{""{4}""}};", workFlowDiagram, islem.ProcessUniqueCode, islem.Name, islem.NextProcess.ProcessUniqueCode, SentenceForDecisionPoint(islem.NextProcess.GetType() == typeof(DecisionPoint), islem.NextProcess.Name), charForPrefixProcess, charForSuffixProcess);
                         }
                         else
                         {
@@ -145,69 +147,90 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
             IUnitOfWork _unitOfWork = new UnitOfWork(context);
 
 
-            var masterTest1 = _unitOfWork.Repository<MasterTest>().Get(x => x.Name == "Task1 Test");
+            var masterTest1 = _unitOfWork.Repository<MasterTest>().Get(x => x.Name == "Applicant Information");
             if (masterTest1 == null)
             {
-                masterTest1 = new MasterTest() { Name = "Task1 Test" };
+                masterTest1 = new MasterTest() { Name = "Applicant Information" };
                 _unitOfWork.Repository<MasterTest>().Add(masterTest1);
 
 
-                var workFlow = new WorkFlow { Name = "WorkFlow1" };
+                var workFlow = new WorkFlow { Name = "Application Flow" };
                 _unitOfWork.Repository<WorkFlow>().Add(workFlow);
 
 
                 #region TASK1
-                var task = new Task { Name = "Task1", WorkFlow = workFlow, MethodServiceName = "TestWorkFlowProcessService", SpecialFormTemplateView = "OzelFormSablon", Controller = "TestWorkFlowProcess" };
+                var task = new Task { Name = "Driving License Application Flow", WorkFlow = workFlow, MethodServiceName = "TestWorkFlowProcessService", SpecialFormTemplateView = "WorkFlowTemplate", Controller = "TestWorkFlowProcess" };
                 _unitOfWork.Repository<Task>().Add(task);
 
 
                 var testWorkFlowForm = new FormView() { FormName = "Test Form", ViewName = "TestWorkFlowForm", Task = task, Completed = true };
                 _unitOfWork.Repository<FormView>().Add(testWorkFlowForm);
 
-                var isAgeLessThan20 = new DecisionMethod() { MethodName = "Is Age Less Than 20", MethodFunction = "IsAgeLessThan20(Id)", Task = task };
-                _unitOfWork.Repository<DecisionMethod>().Add(isAgeLessThan20);
+                var isAgeLessThan18 = new DecisionMethod() { MethodName = "Is Age Less Than 18", MethodFunction = "IsAgeLessThan(Id, 18)", Task = task };
+                _unitOfWork.Repository<DecisionMethod>().Add(isAgeLessThan18);
 
-                var isAgeGreaterThan20Method = new DecisionMethod() { MethodName = "Is Age Greater Than 20", MethodFunction = "IsAgeGreaterThan20(Id)", Task = task };
+                var isAgeGreaterThan20Method = new DecisionMethod() { MethodName = "Is Age Greater Than 18", MethodFunction = "IsAgeGreaterThan(Id, 18)", Task = task };
                 _unitOfWork.Repository<DecisionMethod>().Add(isAgeGreaterThan20Method);
 
 
                 _unitOfWork.Complete();
 
 
-                var process = ProcessFactory.CreateProcess(task, "Process 1", Enums.ProjectRole.Admin);
+                var process = ProcessFactory.CreateProcess(task, "Applicant Detail", Enums.ProjectRole.Admin);
+                process.IsDescriptionMandatory = true;
+
                 task.StartingProcess = process;
 
-                var condition = ProcessFactory.CreateCondition(task, "Condition 1", Enums.ProjectRole.Admin);
-                var option1 = ProcessFactory.CreateConditionOption("Option 1", Enums.ProjectRole.Admin, condition);
-                var option2 = ProcessFactory.CreateConditionOption("Option 2", Enums.ProjectRole.Admin, condition);
+                var eyeCondition = ProcessFactory.CreateCondition(task, "Select Eye Condition", Enums.ProjectRole.Admin);
+                var eyeConditionOption1 = ProcessFactory.CreateConditionOption("Blind", Enums.ProjectRole.Admin, eyeCondition);
+                var eyeConditionOption2 = ProcessFactory.CreateConditionOption("Normal", Enums.ProjectRole.Admin, eyeCondition);
+                var eyeConditionOption3 = ProcessFactory.CreateConditionOption("Color-Blind", Enums.ProjectRole.Admin, eyeCondition);
 
-                process.NextProcess = condition;
-
-                var process2 = ProcessFactory.CreateProcess(task, "Process 2", Enums.ProjectRole.Admin, "Enter your age", testWorkFlowForm);
-                option1.NextProcess = process2;
+                process.NextProcess = eyeCondition;
 
 
-                var ifAgeLessThan20 = ProcessFactory.CreateDecisionPoint(task, "If Age Less Than 20", isAgeLessThan20);
+                var candidateBlind = ProcessFactory.CreateProcess(task, "Candidate is not suitable for driving license", Enums.ProjectRole.Admin);
+                eyeConditionOption1.NextProcess = candidateBlind;
 
-                var option3 = ProcessFactory.CreateDecisionPointYesOption("Age Less Than 20", ifAgeLessThan20);
-                var option4 = ProcessFactory.CreateDecisionPointNoOption("Age Greater Than 20", ifAgeLessThan20);
 
-                process2.NextProcess = ifAgeLessThan20;
 
-                var ageLessThan20 = ProcessFactory.CreateProcess(task, "Age Less Than 20 Selected", Enums.ProjectRole.Admin);
-                option3.NextProcess = ageLessThan20;
+                var process2 = ProcessFactory.CreateProcess(task, "Age Information", Enums.ProjectRole.Admin, "Enter your age", testWorkFlowForm);
+                eyeConditionOption2.NextProcess = process2;
+                eyeConditionOption3.NextProcess = process2;
 
-                var ageGreaterThan20 = ProcessFactory.CreateProcess(task, "Age Greater Than 20 Selected", Enums.ProjectRole.Admin);
-                option4.NextProcess = ageGreaterThan20;
+                var ifAgeLessThan18 = ProcessFactory.CreateDecisionPoint(task, "If Age Less Than 18", isAgeLessThan18);
 
-                var isAgeRaisedTo20DecisionPoint = ProcessFactory.CreateDecisionPoint(task, "Is Age Raised To 20?", isAgeGreaterThan20Method);
-                ageLessThan20.NextProcess = isAgeRaisedTo20DecisionPoint;
+                var ifAgeLessThan18Option1 = ProcessFactory.CreateDecisionPointYesOption("Yes - Age Less Than 18", ifAgeLessThan18);
+                var ifAgeLessThan18Option2 = ProcessFactory.CreateDecisionPointNoOption("No - Age Greater Than 18", ifAgeLessThan18);
 
-                var option5 = ProcessFactory.CreateDecisionPointNoOption("No - Increase Age", isAgeRaisedTo20DecisionPoint);
-                option5.NextProcess = isAgeRaisedTo20DecisionPoint;
+                process2.NextProcess = ifAgeLessThan18;
 
-                var option6 = ProcessFactory.CreateDecisionPointYesOption("Yes - Age Raised To 20", isAgeRaisedTo20DecisionPoint);
-                option6.NextProcess = ageGreaterThan20;
+                var isCandidateColorBlind = new DecisionMethod() { MethodName = "Is Candidate Color Blind", MethodFunction = "IsCandidateColorBlind(Id)", Task = task };
+                _unitOfWork.Repository<DecisionMethod>().Add(isCandidateColorBlind);
+
+                var ifCandidateIsColorBlind = ProcessFactory.CreateDecisionPoint(task, "If Candidate Is Color Blind", isCandidateColorBlind);
+
+                var ifCandidateIsColorBlindOption1 = ProcessFactory.CreateDecisionPointYesOption("Yes - Candidate Is Color-blind", ifCandidateIsColorBlind);
+                var ifCandidateIsColorBlindOption2 = ProcessFactory.CreateDecisionPointNoOption("No - Candidate Is Normal", ifCandidateIsColorBlind);
+
+                ifAgeLessThan18Option2.NextProcess = ifCandidateIsColorBlind;
+
+                var isAgeRaisedTo18DecisionPoint = ProcessFactory.CreateDecisionPoint(task, "Is Age Raised To 18?", isAgeGreaterThan20Method);
+                ifAgeLessThan18Option1.NextProcess = isAgeRaisedTo18DecisionPoint;
+
+                var option5 = ProcessFactory.CreateDecisionPointNoOption("No - Increase Age", isAgeRaisedTo18DecisionPoint);
+                option5.NextProcess = isAgeRaisedTo18DecisionPoint;
+
+                var option6 = ProcessFactory.CreateDecisionPointYesOption("Yes - Age Raised To 18", isAgeRaisedTo18DecisionPoint);
+                option6.NextProcess = ifCandidateIsColorBlind;
+
+
+                var normalDrivingLicense = ProcessFactory.CreateProcess(task, "Normal driving license", Enums.ProjectRole.Admin);
+                var restrictedDrivingLicense = ProcessFactory.CreateProcess(task, "Restricted driving license", Enums.ProjectRole.Admin);
+
+                ifCandidateIsColorBlindOption2.NextProcess = normalDrivingLicense;
+                ifCandidateIsColorBlindOption1.NextProcess = restrictedDrivingLicense;
+
 
                 _unitOfWork.Complete();
                 SetWorkFlowDiagram(_unitOfWork, task.Id);

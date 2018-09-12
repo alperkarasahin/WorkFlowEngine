@@ -35,34 +35,29 @@ namespace WorkFlowManager.Common.Validation
                 {
 
                     bool isKosul = model.IsCondition;
-                    Process gorevIslem = null;
+                    Process process = null;
 
                     if (isKosul && model.ConditionOptionId == null)
                     {
                         return new ValidationFailure("ConditionOptionId", string.Format("You must chose an option"));
                     }
-                    var gorevIslemListesi = _unitOfWork.Repository<Process>().GetList(x => x.TaskId == model.ProcessTaskId);
+                    var proessList = _unitOfWork.Repository<Process>().GetList(x => x.TaskId == model.ProcessTaskId);
 
                     if (model.ConditionOptionId != null)
                     {
-                        gorevIslem = gorevIslemListesi.FirstOrDefault(x => x.Id == (int)model.ConditionOptionId);
+                        process = proessList.FirstOrDefault(x => x.Id == (int)model.ConditionOptionId);
                     }
                     else
                     {
-                        gorevIslem = gorevIslemListesi.FirstOrDefault(x => x.Id == model.ProcessId);
+                        process = proessList.FirstOrDefault(x => x.Id == model.ProcessId);
                     }
-                    string propertyNameFormAciklama = "Description";
+                    string descriptionPropertyName = "Description";
 
-                    if (model.ProcessFormViewViewName != null)
+                    if (process.IsDescriptionMandatory)
                     {
-                        propertyNameFormAciklama = "Description";
-                    }
-
-                    if (gorevIslem.IsDescriptionMandatory)
-                    {
-                        if (model.ProcessComment == null)
+                        if (model.Description == null)
                         {
-                            return new ValidationFailure(propertyNameFormAciklama, string.Format("{0} comment required.", gorevIslem.Description));
+                            return new ValidationFailure(descriptionPropertyName, string.Format("{0} is required.", descriptionPropertyName));
                         }
                     }
 

@@ -40,19 +40,6 @@ namespace WorkFlowManager.Services.DbServices
             }
         }
 
-
-        //public IslemOwnerDetail GetProcessOwnerDetail()
-        //{
-        //    var islemOwnerDetail = new IslemOwnerDetail();
-
-        //    islemOwnerDetail.Controller = "TestWorkFlow";
-        //    islemOwnerDetail.SpecialFormTemplateView = "OzelFormSablon";
-
-
-        //    return islemOwnerDetail;
-        //}
-
-
         public UserProcessViewModel GetIslem(int workFlowTraceId)
         {
             var workFlowTrace =

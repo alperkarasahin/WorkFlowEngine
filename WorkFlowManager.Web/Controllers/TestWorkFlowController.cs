@@ -33,8 +33,8 @@ namespace WorkFlowManager.Web.Controllers
 
         public ActionResult Task1Test()
         {
-            var masterTest1 = _unitOfWork.Repository<MasterTest>().Get(x => x.Name == "Task1 Test");
-            var task1 = _unitOfWork.Repository<Task>().Get(x => x.Name == "Task1");
+            var masterTest1 = _unitOfWork.Repository<MasterTest>().GetAll().FirstOrDefault();
+            var task1 = _unitOfWork.Repository<Task>().GetAll().FirstOrDefault();
 
             var masterTestTrace = _unitOfWork.Repository<WorkFlowTrace>().Find(x => x.OwnerId == masterTest1.Id).OrderByDescending(x => x.Id);
             if (masterTestTrace.Count() > 0)
@@ -45,12 +45,6 @@ namespace WorkFlowManager.Web.Controllers
             return StartWorkFlow(masterTest1.Id, task1.Id);
         }
 
-        public ActionResult Task2Test()
-        {
-            var masterTest2 = _unitOfWork.Repository<MasterTest>().Get(x => x.Name == "Task2 Test");
-            var task2 = _unitOfWork.Repository<Task>().Get(x => x.Name == "Task2");
-            return StartWorkFlow(masterTest2.Id, task2.Id);
-        }
 
         public ActionResult StartWorkFlow(int ownerId, int taskId)
         {
