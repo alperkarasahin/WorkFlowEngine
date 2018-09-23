@@ -116,13 +116,12 @@ namespace WorkFlowManager.Web.Controllers
 
         public ActionResult Edit(int processId)
         {
-            var process = _workFlowService.GetProcess(processId);
 
-            if (process == null)
+            if (processId == 0)
                 return HttpNotFound();
 
 
-            var formData = Mapper.Map<Process, ProcessForm>(process);
+            ProcessForm formData = new ProcessForm() { Id = processId };
             ProcessFormInitialize(ref formData);
 
             return View(ViewForm, formData);
@@ -144,8 +143,11 @@ namespace WorkFlowManager.Web.Controllers
         }
         public void ProcessFormInitialize(ref ProcessForm formData)
         {
-            var mainProcessList = _workFlowService.GetMainProcessList(formData.TaskId);
+            var process = _workFlowService.GetProcess(formData.Id);
+            formData.TaskId = process.TaskId;
 
+            var mainProcessList = _workFlowService.GetMainProcessList(formData.TaskId);
+            Mapper.Map(process, formData);
             formData.MainProcessList = (mainProcessList != null ? new SelectList(mainProcessList, "Id", "Name") : null);
 
             if (formData.ProcessType == ProcessType.DecisionPoint)

@@ -25,22 +25,22 @@ namespace WorkFlowManager.Services.DbServices
         {
             _unitOfWork = unitOfWork;
         }
-        public IEnumerable<ProcessVM> GetGorevIslemListesi(int taskId)
+        public IEnumerable<ProcessVM> GetWorkFlowProcessList(int taskId)
         {
             return Mapper.Map<IEnumerable<Process>, IEnumerable<ProcessVM>>(_unitOfWork.Repository<Process>().GetList(x => x.TaskId == taskId));
         }
 
-        public IEnumerable<UserProcessViewModel> GetIslemListesi()
+        public IEnumerable<UserProcessViewModel> GetWorkFlowTraceList()
         {
-            var islemList = GetIslemIdListesi();
+            var islemList = GetWorkFlowTraceIdList();
 
             foreach (var workFlowTraceId in islemList)
             {
-                yield return GetIslem(workFlowTraceId);
+                yield return GetWorkFlowTrace(workFlowTraceId);
             }
         }
 
-        public UserProcessViewModel GetIslem(int workFlowTraceId)
+        public UserProcessViewModel GetWorkFlowTrace(int workFlowTraceId)
         {
             var workFlowTrace =
                 _unitOfWork.Repository<WorkFlowTrace>()
@@ -54,8 +54,6 @@ namespace WorkFlowManager.Services.DbServices
             UserProcessViewModel userProcess = null;
             if (workFlowTrace != null)
             {
-                //var processOwnerDetail = GetProcessOwnerDetail();
-
                 userProcess =
                 new UserProcessViewModel
                 {
@@ -63,6 +61,7 @@ namespace WorkFlowManager.Services.DbServices
                     ProcessStatus = workFlowTrace.ProcessStatus,
                     OwnerId = workFlowTrace.OwnerId,
                     ProcessId = workFlowTrace.ProcessId,
+                    ProcessVariableName = (workFlowTrace.Process.GetType() == typeof(Condition) ? ((Condition)workFlowTrace.Process).VariableName : null),
                     AssignedRole = workFlowTrace.Process.AssignedRole,
                     Description = workFlowTrace.Description,
                     ProcessName = workFlowTrace.Process.Name,
@@ -93,7 +92,7 @@ namespace WorkFlowManager.Services.DbServices
             return userProcess;
         }
 
-        private List<int> GetIslemIdListesi()
+        private List<int> GetWorkFlowTraceIdList()
         {
             return
                 _unitOfWork.Repository<WorkFlowTrace>()

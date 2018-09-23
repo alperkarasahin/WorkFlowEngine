@@ -84,7 +84,11 @@ namespace WorkFlowManager.Common.ViewModels
         [Display(Name = "Repetition Frequence By Hour")]
         public int? RepetitionFrequenceByHour { get; set; }
 
+        [StringLength(200)]
         public string Value { get; set; }
+
+        [Display(Name = "Variable Name")]
+        public string VariableName { get; set; }
     }
 
 

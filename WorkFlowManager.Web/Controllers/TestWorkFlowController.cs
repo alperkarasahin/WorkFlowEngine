@@ -25,7 +25,7 @@ namespace WorkFlowManager.Web.Controllers
 
         public ActionResult AkisGoster(int workFlowTraceId)
         {
-            UserProcessViewModel kullaniciIslemVM = _testWorkFlowProcessService.GetKullaniciProcessVM(workFlowTraceId);
+            UserProcessViewModel kullaniciIslemVM = _testWorkFlowProcessService.GetUserProcessVM(workFlowTraceId);
             string gorevAkis = _workFlowService.GetWorkFlowDiagram(kullaniciIslemVM.TaskId);
             var mevcutIsAkisi = _testWorkFlowProcessService.GetIsAkisi(gorevAkis, workFlowTraceId);
             return PartialView("_MAkisGoster", new WorkFlowView { Flag = true, WorkFlowText = mevcutIsAkisi });
@@ -54,7 +54,7 @@ namespace WorkFlowManager.Web.Controllers
 
         public ActionResult Index(int workFlowTraceId)
         {
-            UserProcessViewModel kullaniciIslemVM = _testWorkFlowProcessService.GetKullaniciProcessVM(workFlowTraceId);
+            UserProcessViewModel kullaniciIslemVM = _testWorkFlowProcessService.GetUserProcessVM(workFlowTraceId);
             if (_testWorkFlowProcessService.WorkFlowPermissionCheck(kullaniciIslemVM) == false)
             {
                 return RedirectToAction("Index", new { controller = "Home" }).WithMessage(this, "Erişim Yetkiniz Yok!", MessageType.Danger);
@@ -69,7 +69,7 @@ namespace WorkFlowManager.Web.Controllers
             WorkFlowFormViewModel workFlowForm = null;
 
             var workFlowBase = _testWorkFlowProcessService.WorkFlowBaseInfo(kullaniciIslemVM);
-            _testWorkFlowProcessService.SetSatinAlmaWorkFlowTraceForm(workFlowTraceForm, workFlowBase);
+            _testWorkFlowProcessService.SetWorkFlowTraceForm(workFlowTraceForm, workFlowBase);
 
             workFlowForm = _testWorkFlowProcessService.WorkFlowFormLoad(workFlowTraceForm);
 

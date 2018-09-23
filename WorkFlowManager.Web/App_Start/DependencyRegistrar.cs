@@ -138,18 +138,27 @@ namespace WorkFlowManager.Web
                 cfg.CreateMap<DecisionMethodViewModel, DecisionMethod>();
                 cfg.CreateMap<FormViewViewModel, FormView>();
                 cfg.CreateMap<Process, Process>();
+                cfg.CreateMap<Condition, Condition>();
+                cfg.CreateMap<ConditionOption, ConditionOption>();
+                cfg.CreateMap<DecisionPoint, DecisionPoint>();
+
+                cfg.CreateMap<ProcessMonitoringRole, MonitoringRoleCheckbox>()
+                    .ForMember(a => a.IsChecked, opt => opt.MapFrom(c => true));
 
                 cfg.CreateMap<Process, ProcessForm>()
-                    .ForMember(a => a.MonitoringRoleList, opt => opt.MapFrom(c => c.MonitoringRoleList.Select(t => new MonitoringRoleCheckbox { IsChecked = true, ProjectRole = t.ProjectRole })))
+                    //.ForMember(a => a.MonitoringRoleList, opt => opt.MapFrom(c => c.MonitoringRoleList.Select(t => new MonitoringRoleCheckbox { IsChecked = true, ProjectRole = t.ProjectRole })))
                     .ForMember(a => a.ConditionId, opt => opt.MapFrom(c => (c as ConditionOption).ConditionId))
                     .ForMember(a => a.ConditionName, opt => opt.MapFrom(c => (c as ConditionOption).Condition.Name))
                     .ForMember(a => a.DecisionMethodId, opt => opt.MapFrom(c => (c as DecisionPoint).DecisionMethodId))
-                    .ForMember(a => a.ProcessType, opt => opt.MapFrom(c => (c.GetType() == typeof(ConditionOption) ? ProcessType.OptionList :
-                                                                                (c.GetType() == typeof(DecisionPoint) ? ProcessType.DecisionPoint :
-                                                                                    (c.GetType() == typeof(Condition) ? ProcessType.Condition : ProcessType.Process)))))
+                    .ForMember(a => a.ProcessType, opt => opt.MapFrom(c => (c.GetType() == typeof(DecisionPoint) ? ProcessType.DecisionPoint : ProcessType.Process)))
                     .ForMember(a => a.RepetitionFrequenceByHour, opt => opt.MapFrom(c => (c as DecisionPoint).RepetitionFrequenceByHour))
                     .ForMember(a => a.Value, opt => opt.MapFrom(c => (c as ConditionOption).Value));
 
+                cfg.CreateMap<Condition, ProcessForm>()
+                    .ForMember(a => a.ProcessType, opt => opt.MapFrom(c => ProcessType.Condition));
+
+                cfg.CreateMap<ConditionOption, ProcessForm>()
+                    .ForMember(a => a.ProcessType, opt => opt.MapFrom(c => ProcessType.OptionList));
 
                 cfg.CreateMap<TestForm, TestWorkFlowFormViewModel>();
                 cfg.CreateMap<TestWorkFlowFormViewModel, TestForm>();

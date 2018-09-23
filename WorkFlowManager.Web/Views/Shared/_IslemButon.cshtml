@@ -4,8 +4,8 @@
 
 @if (Model.ProcessAssignedRole != ProjectRole.Sistem)
 {
-    <input type="submit" value="Save Draft" name="action:TaslakKaydetOzelForm" class="btn btn-success btn-sm" />
-    <input type="submit" value="@Model.ProcessNextLabel" data-confirm="You will not able to update this form after submit.  Are you sure?" name="action:GonderOzelForm" class="btn btn-primary btn-sm" />
+    <input type="submit" value="Save Draft" name="action:SaveAsDraft" class="btn btn-success btn-sm" />
+    <input type="submit" value="@Model.ProcessNextLabel" data-confirm="You will not able to update this form after submit.  Are you sure?" name="action:SaveAndSend" class="btn btn-primary btn-sm" />
     <input type="submit" id="GeriAlButton" style="display:none" name="action:GeriAl"/>
 
     if (Model.TargetProcessListForCancel.Count()>0)

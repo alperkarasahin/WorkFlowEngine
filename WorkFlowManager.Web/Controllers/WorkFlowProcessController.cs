@@ -39,9 +39,9 @@ namespace WorkFlowManager.Web.Controllers
             {
                 string errorMessage = "Please enter your cancellation reason.";
                 ModelState.AddModelError("ProcessForm.Description", errorMessage);
-                UserProcessViewModel kullaniciIslemVM = _workFlowProcessService.GetKullaniciProcessVM(formData.Id);
+                UserProcessViewModel kullaniciIslemVM = _workFlowProcessService.GetUserProcessVM(formData.Id);
                 var workFlowBase = _workFlowProcessService.WorkFlowBaseInfo(kullaniciIslemVM);
-                _workFlowProcessService.SetSatinAlmaWorkFlowTraceForm(formData, workFlowBase);
+                _workFlowProcessService.SetWorkFlowTraceForm(formData, workFlowBase);
 
                 return View(formData.ProcessTaskSpecialFormTemplateView, formData).WithMessage(this, "Error occured!", MessageType.Warning);
             }
@@ -59,8 +59,8 @@ namespace WorkFlowManager.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]
-        [MultipleButton(Name = "action", Argument = "TaslakKaydetOzelForm")]
-        public ActionResult TaslakKaydetOzelForm(WorkFlowFormViewModel formData)
+        [MultipleButton(Name = "action", Argument = "SaveAsDraft")]
+        public ActionResult SaveAsDraft(WorkFlowFormViewModel formData)
         {
             if (ModelState.IsValid)
             {
@@ -75,26 +75,26 @@ namespace WorkFlowManager.Web.Controllers
                     _workFlowProcessService.AddOrUpdate(torSatinAlmaIslem);
                 }
 
-                UserProcessViewModel kullaniciIslemVM = _workFlowProcessService.GetKullaniciProcessVM(formData.Id);
+                UserProcessViewModel kullaniciIslemVM = _workFlowProcessService.GetUserProcessVM(formData.Id);
                 var workFlowBase = _workFlowProcessService.WorkFlowBaseInfo(kullaniciIslemVM);
-                _workFlowProcessService.SetSatinAlmaWorkFlowTraceForm(formData, workFlowBase);
+                _workFlowProcessService.SetWorkFlowTraceForm(formData, workFlowBase);
 
 
                 return View(formData.ProcessTaskSpecialFormTemplateView, formData).WithMessage(this, string.Format("{0} saved successfully.", formData.ProcessName), MessageType.Success);
             }
             else
             {
-                UserProcessViewModel kullaniciIslemVM = _workFlowProcessService.GetKullaniciProcessVM(formData.Id);
+                UserProcessViewModel kullaniciIslemVM = _workFlowProcessService.GetUserProcessVM(formData.Id);
                 var workFlowBase = _workFlowProcessService.WorkFlowBaseInfo(kullaniciIslemVM);
-                _workFlowProcessService.SetSatinAlmaWorkFlowTraceForm(formData, workFlowBase);
+                _workFlowProcessService.SetWorkFlowTraceForm(formData, workFlowBase);
 
                 return View(formData.ProcessTaskSpecialFormTemplateView, formData).WithMessage(this, string.Format("Validation error!"), MessageType.Danger);
             }
         }
 
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]
-        [MultipleButton(Name = "action", Argument = "GonderOzelForm")]
-        public ActionResult KaydetGonderOzelForm(WorkFlowFormViewModel formData)
+        [MultipleButton(Name = "action", Argument = "SaveAndSend")]
+        public ActionResult SaveAndSend(WorkFlowFormViewModel formData)
         {
 
             if (ModelState.IsValid)
@@ -105,14 +105,14 @@ namespace WorkFlowManager.Web.Controllers
                 if (!fullFormValidate)
                 {
 
-                    UserProcessViewModel kullaniciIslemVM = _workFlowProcessService.GetKullaniciProcessVM(formData.Id);
-                    var workFlowBase = _workFlowProcessService.WorkFlowBaseInfo(kullaniciIslemVM);
-                    _workFlowProcessService.SetSatinAlmaWorkFlowTraceForm(formData, workFlowBase);
+                    UserProcessViewModel userProcessVM = _workFlowProcessService.GetUserProcessVM(formData.Id);
+                    var workFlowBase = _workFlowProcessService.WorkFlowBaseInfo(userProcessVM);
+                    _workFlowProcessService.SetWorkFlowTraceForm(formData, workFlowBase);
 
                     return View(formData.ProcessTaskSpecialFormTemplateView, formData).WithMessage(this, "Validation error!", MessageType.Warning);
                 }
 
-                WorkFlowTrace torSatinAlmaIslem = Mapper.Map<WorkFlowFormViewModel, WorkFlowTrace>(formData);
+                WorkFlowTrace workFlowTrace = Mapper.Map<WorkFlowFormViewModel, WorkFlowTrace>(formData);
 
                 if (formData.ProcessFormViewCompleted)
                 {
@@ -122,25 +122,25 @@ namespace WorkFlowManager.Web.Controllers
                     }
                     else
                     {
-                        _workFlowProcessService.AddOrUpdate(torSatinAlmaIslem);
+                        _workFlowProcessService.AddOrUpdate(workFlowTrace);
                     }
                 }
                 else
                 {
-                    _workFlowProcessService.AddOrUpdate(torSatinAlmaIslem);
+                    _workFlowProcessService.AddOrUpdate(workFlowTrace);
                 }
 
 
-                _workFlowProcessService.WorkFlowWorkFlowNextProcess(torSatinAlmaIslem.OwnerId);
-                var surecKontrolSonuc = _workFlowProcessService.SetNextProcessForWorkFlow(torSatinAlmaIslem.Id);
+                _workFlowProcessService.GoToWorkFlowNextProcess(workFlowTrace.OwnerId);
+                var targetProcess = _workFlowProcessService.SetNextProcessForWorkFlow(workFlowTrace.Id);
 
-                return RedirectToAction("Index", surecKontrolSonuc).WithMessage(this, "Saved Successfully.", MessageType.Success);
+                return RedirectToAction("Index", targetProcess).WithMessage(this, "Saved Successfully.", MessageType.Success);
             }
             else
             {
-                UserProcessViewModel kullaniciIslemVM = _workFlowProcessService.GetKullaniciProcessVM(formData.Id);
-                var workFlowBase = _workFlowProcessService.WorkFlowBaseInfo(kullaniciIslemVM);
-                _workFlowProcessService.SetSatinAlmaWorkFlowTraceForm(formData, workFlowBase);
+                UserProcessViewModel userProcessVM = _workFlowProcessService.GetUserProcessVM(formData.Id);
+                var workFlowBase = _workFlowProcessService.WorkFlowBaseInfo(userProcessVM);
+                _workFlowProcessService.SetWorkFlowTraceForm(formData, workFlowBase);
 
                 return View(formData.ProcessTaskSpecialFormTemplateView, formData).WithMessage(this, string.Format("Validation error!"), MessageType.Danger);
             }

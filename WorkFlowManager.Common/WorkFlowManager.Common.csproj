@@ -111,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\IWorkFlowForm.cs" />
+    <Compile Include="Constants\WorkFlowUtil.cs" />
     <Compile Include="DataAccess\Migrations\Configuration.cs" />
     <Compile Include="DataAccess\Repositories\BaseRepository.cs" />
     <Compile Include="DataAccess\Repositories\IDbContext.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="InfraStructure\PagedData.cs" />
     <Compile Include="Mapping\BaseTableMap.cs" />
     <Compile Include="Mapping\BaseTableTableMap.cs" />
+    <Compile Include="Mapping\ConditionMap.cs" />
     <Compile Include="Mapping\DocumentMap.cs" />
     <Compile Include="Mapping\FormViewMap.cs" />
     <Compile Include="Mapping\ProcessMonitoringRoleMap.cs" />
@@ -163,6 +165,7 @@
     <Compile Include="Tables\Condition.cs" />
     <Compile Include="Tables\ConditionOption.cs" />
     <Compile Include="Tables\WorkFlowTrace.cs" />
+    <Compile Include="Tables\WorkFlowEngineVariable.cs" />
     <Compile Include="Validation\FormViewValidation.cs" />
     <Compile Include="Validation\ProcessFormValidator.cs" />
     <Compile Include="Validation\DecisionMethodValidation.cs" />

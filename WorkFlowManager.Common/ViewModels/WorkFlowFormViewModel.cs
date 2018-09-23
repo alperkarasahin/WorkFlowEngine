@@ -78,6 +78,7 @@ namespace WorkFlowManager.Common.ViewModels
         public bool IsCondition { get; set; }
         public int? ConditionOptionId { get; set; }
         public int ProcessId { get; set; }
+        public string ProcessVariableName { get; set; }
 
         public string ProcessUniqueCode { get; set; }
 

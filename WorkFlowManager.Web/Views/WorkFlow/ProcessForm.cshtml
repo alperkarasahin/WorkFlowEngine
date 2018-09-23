@@ -16,7 +16,7 @@
     if (Model.ConditionId != 0 && Model.ConditionId != null) { 
         <div class="panel panel-info">
             <div class="panel-heading text-center">
-                <h3 class="panel-title">@Model.ConditionName</h3>
+                <h3 class="panel-title">Option For @Model.ConditionName</h3>
             </div>
         </div>
     }
@@ -29,143 +29,165 @@
                     </div><!-- /.box-header -->
                     <!-- form start -->
                     <div class="box-body">
-                                @if (Model.Id != 0)
-                                {
-                                    @Html.HiddenFor(x => x.Id)
-                                }
-                                @Html.HiddenFor(x => x.TaskId)
-                                @Html.HiddenFor(x => x.ProcessType)
-                                @Html.HiddenFor(x => x.ProcessUniqueCode)
-                                @Html.HiddenFor(x => x.IsStandardForm, new {@Id="formGirisiStantartId" })
-                                
-
-                                @if (Model.ConditionId != 0 && Model.ConditionId != null)
-                                {
-                                    @Html.HiddenFor(x => x.ConditionId)
-                                }
+                        @if (Model.Id != 0)
+                        {
+                            @Html.HiddenFor(x => x.Id)
+                        }
+                        @Html.HiddenFor(x => x.TaskId)
+                        @Html.HiddenFor(x => x.ProcessType)
+                        @Html.HiddenFor(x => x.ProcessUniqueCode)
+                        @Html.HiddenFor(x => x.IsStandardForm, new { @Id = "formGirisiStantartId" })
 
 
-                                @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
-                                {
-                                    @Html.HiddenFor(x => x.Value)
-                                }
+                        @if (Model.ConditionId != 0 && Model.ConditionId != null)
+                        {
+                                        @Html.HiddenFor(x => x.ConditionId)
+                        }
 
 
-                                @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.DecisionPoint)
-                                {
-                                    @Html.HiddenFor(x => x.AssignedRole)
-                                }
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        @Html.ValidationSummary()
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    @Html.LabelFor(x => x.Name, new { @class = "col-sm-3 control-label" })
-                                    <div class="col-sm-9">
-                                        @Html.TextBoxFor(x => x.Name, new { @Id="islemTanim", @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.Name)
-                                    </div>
-                                </div>
-
-                                @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.DecisionPoint)
-                                {
-                                    <div class="form-group">
-                                        @Html.LabelFor(x => x.AssignedRole, new { @class = "col-sm-3 control-label" })
-                                        <div class="col-sm-9">
-                                            @Html.TextBoxFor(x => x.AssignedRole, new { @class = "form-control", @disabled = "disabled" })
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        @Html.LabelFor(x => x.DecisionMethodId, new { @class = "col-sm-3 control-label" })
-                                        <div class="col-sm-9">
-                                            @Html.DropDownListFor(x => x.DecisionMethodId, (SelectList)Model.DecisionMethodList, "Select", new { @class = "form-control" })
-                                            @Html.ValidationMessageFor(x => x.DecisionMethodId)
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        @Html.LabelFor(x => x.RepetitionFrequenceByHour, new { @class = "col-sm-3 control-label" , @title= "Repetition Frequence By Hour" })
-                                        <div class="col-sm-9">
-                                            @Html.DropDownListFor(x => x.RepetitionFrequenceByHour, (SelectList)Model.RepetitionHourList, "Select", new { @class = "form-control" })
-                                            @Html.ValidationMessageFor(x => x.RepetitionFrequenceByHour)
-                                        </div>
-                                    </div>
-                                }
-
-                                @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Condition)
-                                {
-                                    <div class="form-group">
-                                        @Html.LabelFor(x => x.AssignedRole, new { @class = "col-sm-3 control-label" })
-                                        <div class="col-sm-9">
-                                            @Html.EnumDropDownListFor(x => x.AssignedRole,"Select", new { @class = "form-control" })
-                                            @Html.ValidationMessageFor(x => x.AssignedRole)
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        @Html.LabelFor(x => x.Description, new { @class = "col-sm-3 control-label" })
-                                        <div class="col-sm-9">
-                                            @Html.TextAreaFor(x => x.Description, new { @class = "form-control textarea-editor", @placeholder = "Description for User", rows = 7 })
-                                            @Html.ValidationMessageFor(x => x.Description)
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        @Html.LabelFor(x => x.NextText, new { @class = "col-sm-3 control-label"})
-                                        <div class="col-sm-9">
-                                            @Html.TextBoxFor(x => x.NextText, new { @class = "form-control", @placeholder = "Form buton caption. Default is Save/Next." })
-                                            @Html.ValidationMessageFor(x => x.NextText)
-                                        </div>
-                                    </div>
+                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList && Model.AssignedRole == WorkFlowManager.Common.Enums.ProjectRole.Sistem)
+                        {
+                                        @Html.HiddenFor(x => x.Value)
+                        }
 
 
-                                }
+                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.DecisionPoint)
+                        {
+                                        @Html.HiddenFor(x => x.AssignedRole)
+                        }
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                @Html.ValidationSummary()
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Name, new { @class = "col-sm-3 control-label" })
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(x => x.Name, new { @Id = "islemTanim", @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.Name)
+                            </div>
+                        </div>
 
-                            @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
+                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.DecisionPoint)
+    {
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedRole, new { @class = "col-sm-3 control-label" })
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(x => x.AssignedRole, new { @class = "form-control", @disabled = "disabled" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.DecisionMethodId, new { @class = "col-sm-3 control-label" })
+                        <div class="col-sm-9">
+                            @Html.DropDownListFor(x => x.DecisionMethodId, (SelectList)Model.DecisionMethodList, "Select", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.DecisionMethodId)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.RepetitionFrequenceByHour, new { @class = "col-sm-3 control-label", @title = "Repetition Frequence By Hour" })
+                        <div class="col-sm-9">
+                            @Html.DropDownListFor(x => x.RepetitionFrequenceByHour, (SelectList)Model.RepetitionHourList, "Select", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.RepetitionFrequenceByHour)
+                        </div>
+                    </div>
+}
+
+                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Condition)
+    {
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedRole, new { @class = "col-sm-3 control-label" })
+                        <div class="col-sm-9">
+                            @Html.EnumDropDownListFor(x => x.AssignedRole, "Select", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.AssignedRole)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Description, new { @class = "col-sm-3 control-label" })
+                        <div class="col-sm-9">
+                            @Html.TextAreaFor(x => x.Description, new { @class = "form-control textarea-editor", @placeholder = "Description for User", rows = 7 })
+                            @Html.ValidationMessageFor(x => x.Description)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.NextText, new { @class = "col-sm-3 control-label" })
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(x => x.NextText, new { @class = "form-control", @placeholder = "Form buton caption. Default is Save/Next." })
+                            @Html.ValidationMessageFor(x => x.NextText)
+                        </div>
+                    </div>
+                    if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Condition)
+                    {
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.VariableName, new { @class = "col-sm-3 control-label" })
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(x => x.VariableName, new { @class = "form-control", @placeholder = "VariableName for selected condition list item value." })
+                            @Html.ValidationMessageFor(x => x.NextText)
+                        </div>
+                    </div>
+                    }
+
+}
+
+                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
+                        {
+                            if ((Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList) && Model.AssignedRole != WorkFlowManager.Common.Enums.ProjectRole.Sistem)
                             {
-                                if ((Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList) && Model.AssignedRole != WorkFlowManager.Common.Enums.ProjectRole.Sistem)
-                                {
-                                    <div class="form-group">
-                                        @Html.LabelFor(x => x.IsDescriptionMandatory, new { @class = "col-sm-3 control-label" })
-                                        <div class="col-sm-9">
-                                            @Html.CheckBoxFor(x => x.IsDescriptionMandatory, new { @class = "form-control" })
-                                            @Html.ValidationMessageFor(x => x.IsDescriptionMandatory)
+                                        <div class="form-group">
+                                            @Html.LabelFor(x => x.IsDescriptionMandatory, new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.CheckBoxFor(x => x.IsDescriptionMandatory, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(x => x.IsDescriptionMandatory)
+                                            </div>
                                         </div>
-                                    </div>
-                                }
 
-
-                                if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process)
-                                {
-
-                                    <div class="form-group">
-                                        @Html.Label("Standart Form", new { @class = "col-sm-3 control-label" })
-                                        <div class="col-sm-9">
-                                            <div class="panel panel-info">
-                                                <div class="panel-heading">
-                                                    <input name="standartFormSecim" type="checkbox" data-on-color="info" data-off-color="warning">
+                                        if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
+                                        {
+                                            <div class="form-group">
+                                                @Html.LabelFor(x => x.Value, new { @class = "col-sm-3 control-label" })
+                                                <div class="col-sm-9">
+                                                    @Html.TextBoxFor(x => x.Value, new { @class = "form-control", @placeholder = "Value for option." })
+                                                    @Html.ValidationMessageFor(x => x.Value)
                                                 </div>
-                                                <div class="panel-body">
-                                                    <div id="standartForm" class="form-group">
-                                                        <div class="col-sm-12">
-                                                            <h5>Standart form will be used</h5>
-                                                        </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+
+                                        }
+                            }
+
+
+                            if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process)
+                            {
+                                <div class="form-group">
+                                @Html.Label("Standart Form", new { @class = "col-sm-3 control-label" })
+                                <div class="col-sm-9">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading">
+                                            <input name="standartFormSecim" type="checkbox" data-on-color="info" data-off-color="warning">
+                                        </div>
+                                            <div class="panel-body">
+                                                <div id="standartForm" class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <h5>Standart form will be used</h5>
                                                     </div>
-                                                    <div id ="ozelForm" class="form-group">
-                                                        <div class="col-sm-12">
-                                                            <h5>If you use Special Form you have to select document type.</h5>
-                                                            <div class="form-group">
-                                                                @Html.LabelFor(x => x.FormViewId, new { @class = "col-sm-3 control-label" })
-                                                                <div class="col-sm-9">
-                                                                    @Html.DropDownListFor(x => x.FormViewId,(SelectList)Model.FormViewList, "Select", new { @Id = "ozelFormViewId", @class = "form-control" })
-                                                                    @Html.ValidationMessageFor(x => x.FormViewId)
-                                                                </div>
+                                                </div>
+                                                <div id="ozelForm" class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <h5>If you use Special Form you have to select document type.</h5>
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(x => x.FormViewId, new { @class = "col-sm-3 control-label" })
+                                                            <div class="col-sm-9">
+                                                                @Html.DropDownListFor(x => x.FormViewId, (SelectList)Model.FormViewList, "Select", new { @Id = "ozelFormViewId", @class = "form-control" })
+                                                                @Html.ValidationMessageFor(x => x.FormViewId)
                                                             </div>
-                                                            <div class="form-group">
-                                                                @Html.LabelFor(x => x.SpecialFormAnalysis, new { @class = "col-sm-3 control-label" })
-                                                                <div class="col-sm-9">
-                                                                    @Html.TextAreaFor(x => x.SpecialFormAnalysis, new { @class = "form-control textarea-editor", @placeholder = "Details of special form", rows = 7 })
-                                                                    @Html.ValidationMessageFor(x => x.SpecialFormAnalysis)
-                                                                </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(x => x.SpecialFormAnalysis, new { @class = "col-sm-3 control-label" })
+                                                            <div class="col-sm-9">
+                                                                @Html.TextAreaFor(x => x.SpecialFormAnalysis, new { @class = "form-control textarea-editor", @placeholder = "Details of special form", rows = 7 })
+                                                                @Html.ValidationMessageFor(x => x.SpecialFormAnalysis)
                                                             </div>
                                                         </div>
                                                     </div>
@@ -173,22 +195,23 @@
                                             </div>
                                         </div>
                                     </div>
-                            }
-                                <div class="form-group">
-                                    @Html.LabelFor(x => x.NextProcessId, new { @class = "col-sm-3 control-label" })
-                                    <div class="col-sm-9">
-                                        @Html.DropDownListFor(x => x.NextProcessId, (SelectList)Model.MainProcessList, "Select", new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.NextProcessId)
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    @Html.LabelFor(x => x.MessageForMonitor, new { @class = "col-sm-3 control-label" })
-                                    <div class="col-sm-9">
-                                        @Html.TextBoxFor(x => x.MessageForMonitor, new { @class = "form-control" })
-                                        @Html.ValidationMessageFor(x => x.MessageForMonitor)
-                                    </div>
                                 </div>
                             }
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.NextProcessId, new { @class = "col-sm-3 control-label" })
+                                <div class="col-sm-9">
+                                    @Html.DropDownListFor(x => x.NextProcessId, (SelectList)Model.MainProcessList, "Select", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.NextProcessId)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.MessageForMonitor, new { @class = "col-sm-3 control-label" })
+                                <div class="col-sm-9">
+                                    @Html.TextBoxFor(x => x.MessageForMonitor, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.MessageForMonitor)
+                                </div>
+                            </div>
+                        }
 
 
                     </div><!-- /.box-body -->

@@ -46,10 +46,13 @@ namespace WorkFlowManager.Common.DataAccess._Context
 
 
 
-            modelBuilder.Entity<Condition>().ToTable("ConditionTbl");
+
             modelBuilder.Entity<MasterTest>().ToTable("MasterTestTbl");
+            modelBuilder.Entity<WorkFlowEngineVariable>().ToTable("WorkFlowEngineVariableTbl");
 
             modelBuilder.Configurations.Add(new BaseTableTableMap());
+            modelBuilder.Configurations.Add(new ConditionMap());
+
             modelBuilder.Configurations.Add(new DocumentMap());
 
             modelBuilder.Configurations.Add(new TaskMap());

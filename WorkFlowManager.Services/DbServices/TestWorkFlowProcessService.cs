@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Hangfire;
-using System.Linq;
 using System.Web.Mvc;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
 using WorkFlowManager.Common.Tables;
@@ -44,13 +43,6 @@ namespace WorkFlowManager.Services.DbServices
             return rslt;
         }
 
-        private int GetSelectedConditionOptionIdForCondition(string conditionName, int ownerId)
-        {
-            var condition = _unitOfWork.Repository<Condition>().GetAll().Where(x => x.Name == conditionName).FirstOrDefault();
-            var option = _unitOfWork.Repository<WorkFlowTrace>().GetAll().Where(x => x.OwnerId == ownerId && x.ProcessId == condition.Id).OrderByDescending(x => x.Id).FirstOrDefault();
-            return (int)option.ConditionOptionId;
-        }
-
         public char IsAgeLessThan(string id, string age)
         {
             var rslt = 'N';
@@ -92,10 +84,12 @@ namespace WorkFlowManager.Services.DbServices
         {
             var rslt = 'N';
             int ownerId = GetOwnerIdFromId(int.Parse(id));
-            var conditionOptionId = GetSelectedConditionOptionIdForCondition("Select Eye Condition", ownerId);
 
-            var conditionOption = _unitOfWork.Repository<ConditionOption>().Get(x => x.Id == conditionOptionId);
-            if (conditionOption.Name == "Color-Blind")
+            //var conditionOptionId = GetSelectedConditionOptionIdForCondition("Select Eye Condition", ownerId);
+
+            //var conditionOption = _unitOfWork.Repository<ConditionOption>().Get(x => x.Id == conditionOptionId);
+            var variableEyeCondition = GetVariable("EYECONDITION", ownerId);
+            if (variableEyeCondition.CompareTo("COLORBLIND") == 0)
             {
                 rslt = 'Y';
             }
@@ -152,9 +146,9 @@ namespace WorkFlowManager.Services.DbServices
             base.CancelWorkFlowTrace(workFlowTraceId, targetProcessId);
         }
 
-        public override void WorkFlowWorkFlowNextProcess(int ownerId)
+        public override void GoToWorkFlowNextProcess(int ownerId)
         {
-            base.WorkFlowWorkFlowNextProcess(ownerId);
+            base.GoToWorkFlowNextProcess(ownerId);
         }
 
         public string DecisionPointJobCall(string id, string jobId, string hourInterval)

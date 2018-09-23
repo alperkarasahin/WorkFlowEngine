@@ -10,19 +10,19 @@ namespace WorkFlowManager.Common.Factory
             return new Process(task, name, assignedRole, description, formView);
         }
 
-        public static Condition CreateCondition(Task task, string name, ProjectRole assignedRole, string description = null, FormView formView = null)
+        public static Condition CreateCondition(Task task, string name, ProjectRole assignedRole, string variableName, string description = null, FormView formView = null)
         {
-            return new Condition(task, name, assignedRole, description, formView);
+            return new Condition(task, name, assignedRole, variableName, description, formView);
         }
-        public static DecisionPoint CreateDecisionPoint(Task task, string name, DecisionMethod decisionMethod, int repetitionFrequenceByHour = 1, string description = null, FormView formView = null)
+        public static DecisionPoint CreateDecisionPoint(Task task, string name, DecisionMethod decisionMethod, string variableName = null, int repetitionFrequenceByHour = 1, string description = null, FormView formView = null)
         {
-            return new DecisionPoint(task, name, decisionMethod, repetitionFrequenceByHour, description, formView);
+            return new DecisionPoint(task, name, decisionMethod, variableName, repetitionFrequenceByHour, description, formView);
         }
 
 
-        public static ConditionOption CreateConditionOption(string name, ProjectRole assignedRole, Condition condition)
+        public static ConditionOption CreateConditionOption(string name, ProjectRole assignedRole, Condition condition, string value)
         {
-            return new ConditionOption(condition.Task, name, assignedRole, condition);
+            return new ConditionOption(condition.Task, name, assignedRole, condition, value);
         }
 
         public static ConditionOption CreateDecisionPointYesOption(string name, DecisionPoint decisionPoint)

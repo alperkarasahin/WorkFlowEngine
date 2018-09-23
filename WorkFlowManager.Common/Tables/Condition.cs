@@ -8,9 +8,10 @@ namespace WorkFlowManager.Common.Tables
         public Condition()
         {
         }
-        public Condition(Task task, string name, ProjectRole assignedRole, string description = null, FormView formView = null) : base(task, name, assignedRole, description, formView)
+        public Condition(Task task, string name, ProjectRole assignedRole, string variableName, string description = null, FormView formView = null) : base(task, name, assignedRole, description, formView)
         {
             OptionList = new List<ConditionOption>();
+            VariableName = variableName;
             task.AddProcess(this);
         }
 
@@ -21,5 +22,6 @@ namespace WorkFlowManager.Common.Tables
             OptionList.Add(optionList);
         }
 
+        public string VariableName { get; set; }
     }
 }

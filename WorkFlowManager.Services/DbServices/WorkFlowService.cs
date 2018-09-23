@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using WorkFlowManager.Common.Constants;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
 using WorkFlowManager.Common.Enums;
 using WorkFlowManager.Common.Factory;
@@ -37,34 +37,6 @@ namespace WorkFlowManager.Services.DbServices
                 .Find(x => x.TaskId == gorevId);
         }
 
-        private string SentenceForDecisionPoint(string sentence)
-        {
-            string rslt = "";
-            string[] wordList = sentence.Split(' ');
-            int i = 0;
-
-            foreach (var word in wordList)
-            {
-
-                string wordWithTrim = word.Trim();
-
-                if (wordWithTrim != string.Empty)
-                {
-                    i++;
-
-                    if (i % 2 == 0)
-                    {
-                        rslt = string.Format("{0}<br/>{1}", rslt, wordWithTrim);
-                    }
-                    else
-                    {
-                        rslt = string.Format("{0} {1}", rslt, wordWithTrim);
-                    }
-                }
-            }
-            return rslt.Trim();
-        }
-
 
         public string GetWorkFlowDiagram(int gorevId)
         {
@@ -72,96 +44,9 @@ namespace WorkFlowManager.Services.DbServices
             return gorev.WorkFlowDiagram;
         }
 
-        public void SetWorkFlowDiagram(int gorevId)
+        public void SetWorkFlowDiagram(int taskId)
         {
-            string charForPrefixProcess = "(";
-            string charForSuffixProcess = ")";
-
-            //return "graph TD;A-->B;A-->C;B-->D;D-->A;";
-            string stopDummyProcessCode = "dummy_stopping_point";
-            string stopDummyProcessName = "Stop";
-
-            string startDummyProcessCode = "dummy_starting_point";
-            string startDummyProcessName = "Start";
-
-            var task = _unitOfWork.Repository<Task>().Get(x => x.Id == gorevId);
-            string workFlowDiagram = "";
-            StringBuilder resultDiagram = new StringBuilder();
-
-            if (task.StartingProcessId != null)
-            {
-                var firstProcess = _unitOfWork.Repository<Process>().Get((int)task.StartingProcessId);
-
-                resultDiagram.Append(string.Format(@"{0}((""{1}""))-->{2};", startDummyProcessCode, startDummyProcessName, firstProcess.ProcessUniqueCode));
-                resultDiagram.Append(string.Format("style {0} fill:#f96,stroke:#333,stroke-width:2px;;", startDummyProcessCode));
-            }
-
-            var processList = _unitOfWork.Repository<Process>()
-                .GetList(x => x.TaskId == gorevId, x => x.NextProcess);
-
-
-            foreach (var islem in processList)
-            {
-                workFlowDiagram = "";
-                if (islem.GetType() == typeof(ConditionOption))
-                {
-                    Condition conditionForOption = _unitOfWork.Repository<Condition>().Get(((ConditionOption)islem).ConditionId);
-
-                    if (islem.NextProcess != null)
-                    {
-                        if (islem.NextProcess.GetType() == typeof(Condition) || islem.NextProcess.GetType() == typeof(DecisionPoint))
-                        {
-                            workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{{""{5}""}};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.Name), islem.Name, islem.NextProcess.ProcessUniqueCode, SentenceForDecisionPoint(islem.NextProcess.Name), charForPrefixProcess, charForSuffixProcess);
-                        }
-                        else
-                        {
-                            workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{6}""{5}""{7};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.Name), islem.Name, islem.NextProcess.ProcessUniqueCode, islem.NextProcess.Name, charForPrefixProcess, charForSuffixProcess);
-                        }
-                    }
-                    else
-                    {
-                        workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}((""{5}""));", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.Name), islem.Name, stopDummyProcessCode, stopDummyProcessName, charForPrefixProcess, charForSuffixProcess);
-                    }
-                }
-                else if (islem.GetType() == typeof(Condition) || islem.GetType() == typeof(DecisionPoint))
-                {
-                    //
-                }
-                else if (islem.GetType() == typeof(Process))
-                {
-                    if (islem.NextProcess != null)
-                    {
-                        if (islem.NextProcess.GetType() == typeof(Condition) || islem.NextProcess.GetType() == typeof(DecisionPoint))
-                        {
-                            workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}{{""{4}""}};", workFlowDiagram, islem.ProcessUniqueCode, islem.Name, islem.NextProcess.ProcessUniqueCode, SentenceForDecisionPoint(islem.NextProcess.Name), charForPrefixProcess, charForSuffixProcess);
-                        }
-                        else
-                        {
-                            workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}{5}""{4}""{6};", workFlowDiagram, islem.ProcessUniqueCode, islem.Name, islem.NextProcess.ProcessUniqueCode, islem.NextProcess.Name, charForPrefixProcess, charForSuffixProcess);
-                        }
-                    }
-                    else
-                    {
-                        workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}((""{4}""));", workFlowDiagram, islem.ProcessUniqueCode, islem.Name, stopDummyProcessCode, stopDummyProcessName, charForPrefixProcess, charForSuffixProcess);
-                    }
-                }
-
-                if (workFlowDiagram.CompareTo("") != 0)
-                {
-                    resultDiagram.Append(workFlowDiagram);
-                }
-            }
-
-
-            if (stopDummyProcessCode != null)
-            {
-                workFlowDiagram = string.Format("style {0} fill:#f96,stroke:#333,stroke-width:2px;;", stopDummyProcessCode);
-                resultDiagram.Append(workFlowDiagram);
-            }
-
-            task.WorkFlowDiagram = string.Format("{0}{1}", "graph TD;", resultDiagram.ToString());
-            _unitOfWork.Repository<Task>().Update(task);
-            _unitOfWork.Complete();
+            WorkFlowUtil.SetWorkFlowDiagram(_unitOfWork, taskId);
         }
 
         public string Delete(int processId)

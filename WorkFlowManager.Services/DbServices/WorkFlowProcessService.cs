@@ -69,7 +69,7 @@ namespace WorkFlowManager.Services.DbServices
         {
             var workFlowTraceListesi =
                 _workFlowDataService
-                    .GetIslemListesi();
+                    .GetWorkFlowTraceList();
 
             UserProcessViewModel kullaniciIslem =
                 workFlowTraceListesi
@@ -140,11 +140,11 @@ namespace WorkFlowManager.Services.DbServices
             return string.Format("{0}\\n{1}", gorevAkis, statusString.ToString());
         }
 
-        public IEnumerable<UserProcessViewModel> WorkFlowProcessList(int ownerId)
+        public IEnumerable<UserProcessViewModel> WorkFlowTraceList(int ownerId)
         {
             return
                 _workFlowDataService
-                    .GetIslemListesi()
+                    .GetWorkFlowTraceList()
                         .Where(x => x.OwnerId == ownerId);
         }
 
@@ -156,13 +156,13 @@ namespace WorkFlowManager.Services.DbServices
         {
             UserProcessViewModel kullaniciWorkFlowTrace =
             _workFlowDataService
-                .GetIslemListesi()
+                .GetWorkFlowTraceList()
                     .Single(x => x.Id == workFlowTraceId);
 
             ProcessVM sonrakiGorev = null;
 
 
-            var processList = _workFlowDataService.GetGorevIslemListesi(kullaniciWorkFlowTrace.TaskId);
+            var processList = _workFlowDataService.GetWorkFlowProcessList(kullaniciWorkFlowTrace.TaskId);
 
             if (kullaniciWorkFlowTrace.NextProcessId != null)
             {
@@ -173,7 +173,7 @@ namespace WorkFlowManager.Services.DbServices
             }
 
 
-            var workFlowTraceListesi = WorkFlowProcessList(kullaniciWorkFlowTrace.OwnerId);
+            var workFlowTraceListesi = WorkFlowTraceList(kullaniciWorkFlowTrace.OwnerId);
 
             List<WorkFlowTraceVM> tumWorkFlowTraceler = workFlowTraceListesi
                 .OrderBy(x => x.LastlyModifiedTime)
@@ -227,7 +227,7 @@ namespace WorkFlowManager.Services.DbServices
 
         public List<UserProcessViewModel> GeriGidilebilecekWorkFlowTraceListesi(int WorkFlowTraceId)
         {
-            var birimdekiTumWorkFlowTraceler = _workFlowDataService.GetIslemListesi();
+            var birimdekiTumWorkFlowTraceler = _workFlowDataService.GetWorkFlowTraceList();
 
             UserProcessViewModel kullaniciWorkFlowTrace =
                     birimdekiTumWorkFlowTraceler
@@ -243,7 +243,7 @@ namespace WorkFlowManager.Services.DbServices
             var taskId = kullaniciWorkFlowTrace.TaskId;//WorkFlowTrace.GorevWorkFlowTrace.GorevId;
             var WorkFlowTraceiYapanRol = kullaniciWorkFlowTrace.AssignedRole;
             var gorevWorkFlowTraceId = kullaniciWorkFlowTrace.ProcessId;
-            var gorevWorkFlowTraceListesi = _workFlowDataService.GetGorevIslemListesi(taskId);
+            var gorevWorkFlowTraceListesi = _workFlowDataService.GetWorkFlowProcessList(taskId);
 
             foreach (var oncekiIslem in tumIslemler)
             {
@@ -412,9 +412,9 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-        public UserProcessViewModel GetKullaniciProcessVM(int workFlowTraceId)
+        public UserProcessViewModel GetUserProcessVM(int workFlowTraceId)
         {
-            return _workFlowDataService.GetIslemListesi().SingleOrDefault(x => x.Id == workFlowTraceId);
+            return _workFlowDataService.GetWorkFlowTraceList().SingleOrDefault(x => x.Id == workFlowTraceId);
         }
 
         public virtual void WorkFlowProcessCancel(int workFlowTraceId)
@@ -452,28 +452,70 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-
-        public virtual void WorkFlowWorkFlowNextProcess(int ownerId)
+        public string GetVariable(string key, int ownerId)
         {
-            var WorkFlowTraceListesi = WorkFlowProcessList(ownerId);
-
-            UserProcessViewModel torSatinAlmaWorkFlowTraceSuAnKi = WorkFlowTraceListesi.OrderByDescending(x => x.Id).First();
-            int suAnKiWorkFlowTraceId = torSatinAlmaWorkFlowTraceSuAnKi.ProcessId;
-            if (torSatinAlmaWorkFlowTraceSuAnKi.ConditionOptionId != null)
+            if (key == null)
             {
-                suAnKiWorkFlowTraceId = (int)torSatinAlmaWorkFlowTraceSuAnKi.ConditionOptionId;
+                return null;
+            }
+            var workFlowEngineVariable = _unitOfWork.Repository<WorkFlowEngineVariable>().Get(x => x.OwnerId == ownerId && x.Key == key);
+
+            if (workFlowEngineVariable != null)
+            {
+                return workFlowEngineVariable.Value;
+            }
+            return null;
+        }
+        public void SetVariable(string key, string value, int ownerId)
+        {
+            if (key == null)
+            {
+                return;
+            }
+            var workFlowEngineVariable = _unitOfWork.Repository<WorkFlowEngineVariable>().Get(x => x.OwnerId == ownerId && x.Key == key);
+
+            if (workFlowEngineVariable != null)
+            {
+                workFlowEngineVariable.Value = value;
+                _unitOfWork.Repository<WorkFlowEngineVariable>().Update(workFlowEngineVariable);
+            }
+            else
+            {
+                _unitOfWork.Repository<WorkFlowEngineVariable>().Add(new WorkFlowEngineVariable { OwnerId = ownerId, Key = key, Value = value });
+            }
+            _unitOfWork.Complete();
+        }
+
+        public virtual void GoToWorkFlowNextProcess(int ownerId)
+        {
+            var WorkFlowTraceList = this.WorkFlowTraceList(ownerId);
+
+            UserProcessViewModel userProcessVMCurrent = WorkFlowTraceList.OrderByDescending(x => x.Id).First();
+            int currentUserProcessVMProcessId = userProcessVMCurrent.ProcessId;
+            if (userProcessVMCurrent.ConditionOptionId != null)
+            {
+                currentUserProcessVMProcessId = (int)userProcessVMCurrent.ConditionOptionId;
             }
 
-            WorkFlowTrace torSatinAlmaWorkFlowTraceSuAnKiDB = _unitOfWork.Repository<WorkFlowTrace>().Get(torSatinAlmaWorkFlowTraceSuAnKi.Id);
-            torSatinAlmaWorkFlowTraceSuAnKiDB.ProcessStatus = Common.Enums.ProcessStatus.Completed;
+            WorkFlowTrace workFlowTraceCurrentDB = _unitOfWork.Repository<WorkFlowTrace>().Get(userProcessVMCurrent.Id);
+            workFlowTraceCurrentDB.ProcessStatus = Common.Enums.ProcessStatus.Completed;
 
-            AddOrUpdate(torSatinAlmaWorkFlowTraceSuAnKiDB);
+            AddOrUpdate(workFlowTraceCurrentDB);
 
-            Process suAnKiGorevWorkFlowTrace = _unitOfWork.Repository<Process>().Get(x => x.Id == suAnKiWorkFlowTraceId, x => x.NextProcess);
-
-            if (suAnKiGorevWorkFlowTrace.NextProcessId != null)
+            Process currentProcess = _unitOfWork.Repository<Process>().Get(x => x.Id == currentUserProcessVMProcessId, x => x.NextProcess);
+            if (currentProcess.GetType() == typeof(ConditionOption))
             {
-                CreateNewWorkFlowTrace(suAnKiGorevWorkFlowTrace.NextProcess, ownerId);
+                var key = userProcessVMCurrent.ProcessVariableName;
+                var value = ((ConditionOption)currentProcess).Value;
+                if (key != null)
+                {
+                    SetVariable(key, value, ownerId);
+                }
+            }
+
+            if (currentProcess.NextProcessId != null)
+            {
+                CreateNewWorkFlowTrace(currentProcess.NextProcess, ownerId);
             }
         }
 
@@ -553,7 +595,7 @@ namespace WorkFlowManager.Services.DbServices
                 if (conditionOption.NextProcessId == decisionPoint.Id)
                 {
 
-                    if (workFlowTraceDecisionPoint.JobId == null)//Job oluşturulmamışsa
+                    if (workFlowTraceDecisionPoint.JobId == null)
                     {
                         List<object> decisionPointJobCallParameterList = new List<object>();
 
@@ -579,7 +621,7 @@ namespace WorkFlowManager.Services.DbServices
                     {
                         RecurringJob.RemoveIfExists(workFlowTraceDecisionPoint.JobId);
                     }
-                    WorkFlowWorkFlowNextProcess(workFlowTraceDecisionPoint.OwnerId);
+                    GoToWorkFlowNextProcess(workFlowTraceDecisionPoint.OwnerId);
                 }
             }
         }
@@ -603,7 +645,7 @@ namespace WorkFlowManager.Services.DbServices
 
             Process process = _unitOfWork.Repository<Process>().Get(workFlowTraceProcessId);
 
-            var workFlowProcessList = WorkFlowProcessList(WorkFlowTrace.OwnerId);
+            var workFlowProcessList = WorkFlowTraceList(WorkFlowTrace.OwnerId);
             UserProcessViewModel lastWorkFlowTrace = workFlowProcessList.OrderByDescending(x => x.Id).First();
             int lastWorkFlowTraceProcessId = lastWorkFlowTrace.ProcessId;
 
@@ -661,23 +703,23 @@ namespace WorkFlowManager.Services.DbServices
                 new WorkFlowDTO
                 {
                     TargetProcessListForCancel = kullaniciWorkFlowTraceVM.ProcessStatus != ProcessStatus.Completed ? GeriGidilebilecekWorkFlowTraceListesi(kullaniciWorkFlowTraceVM.Id) : new List<UserProcessViewModel>(),
-                    AuthorizedProcessList = WorkFlowProcessList(kullaniciWorkFlowTraceVM.OwnerId).Where(x => x.ProcessStatus != ProcessStatus.Draft),
+                    AuthorizedProcessList = WorkFlowTraceList(kullaniciWorkFlowTraceVM.OwnerId).Where(x => x.ProcessStatus != ProcessStatus.Draft),
                     ProgressProcessList = GorevListesiOlustur(kullaniciWorkFlowTraceVM.Id),
                 };
         }
 
-        public void SetSatinAlmaWorkFlowTraceForm(WorkFlowFormViewModel satinAlmaWorkFlowTraceForm, WorkFlowDTO workFlowBase)
+        public void SetWorkFlowTraceForm(WorkFlowFormViewModel workFlowFormVM, WorkFlowDTO workFlowBase)
         {
-            satinAlmaWorkFlowTraceForm.ProgressProcessList = workFlowBase.ProgressProcessList;
-            satinAlmaWorkFlowTraceForm.TargetProcessListForCancel = workFlowBase.TargetProcessListForCancel;
-            satinAlmaWorkFlowTraceForm.AuthorizedProcessList = workFlowBase.AuthorizedProcessList;
+            workFlowFormVM.ProgressProcessList = workFlowBase.ProgressProcessList;
+            workFlowFormVM.TargetProcessListForCancel = workFlowBase.TargetProcessListForCancel;
+            workFlowFormVM.AuthorizedProcessList = workFlowBase.AuthorizedProcessList;
 
-            if (satinAlmaWorkFlowTraceForm.IsCondition)
+            if (workFlowFormVM.IsCondition)
             {
-                satinAlmaWorkFlowTraceForm.ListOfOptions =
+                workFlowFormVM.ListOfOptions =
                     _workFlowDataService
-                        .GetGorevIslemListesi(satinAlmaWorkFlowTraceForm.ProcessTaskId)
-                            .Where(x => x.ConditionId == satinAlmaWorkFlowTraceForm.ProcessId)
+                        .GetWorkFlowProcessList(workFlowFormVM.ProcessTaskId)
+                            .Where(x => x.ConditionId == workFlowFormVM.ProcessId)
                                 .ToList();
             }
         }
@@ -687,7 +729,7 @@ namespace WorkFlowManager.Services.DbServices
         {
             IEnumerable<UserProcessViewModel> WorkFlowTraceListesi =
                 _workFlowDataService
-                    .GetIslemListesi()
+                    .GetWorkFlowTraceList()
                         .Where(x => x.OwnerId == ownerId);
 
             var sonWorkFlowTrace = WorkFlowTraceListesi.OrderBy(x => x.Id).LastOrDefault();
