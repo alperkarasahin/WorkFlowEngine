@@ -41,7 +41,7 @@
                                     <td>@(string.Format("{0} ({1})", torSatinAlmaIslem.UpdaterName, torSatinAlmaIslem.AssignedRole.ToString()))</td>
                                     <td>@torSatinAlmaIslem.UpdatedTime.Value.ToString("dd.MM.yyyy HH:mm")</td>
                                    
-                                    <td>@torSatinAlmaIslem.ProcessName</td>
+                                    <td>@torSatinAlmaIslem.ProcessNotificationMessage</td>
                                     <td>@(torSatinAlmaIslem.Description != null ? Html.Raw(torSatinAlmaIslem.Description.Replace(System.Environment.NewLine, "<br/>")) : Html.Raw(""))</td>
                                 </tr>
                             }

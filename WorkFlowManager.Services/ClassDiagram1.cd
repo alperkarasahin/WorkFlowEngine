@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="WorkFlowManager.Services.DbServices.DynamicMethodCallService">
+    <Position X="5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DbServices\DynamicMethodCallService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Services.DbServices.TestWorkFlowProcessService">
+    <Position X="0.5" Y="9.25" Width="3.25" />
+    <InheritanceLine Type="WorkFlowManager.Services.DbServices.WorkFlowProcessService" FixedFromPoint="true">
+      <Path>
+        <Point X="2.125" Y="8.016" />
+        <Point X="2.125" Y="9.25" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>CACIAAAAgAAAAAGBAgAAAgAAAAAQAAAAAAAAwBAAAIA=</HashCode>
+      <FileName>DbServices\TestWorkFlowProcessService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="WorkFlowManager.Services.DbServices.WorkFlowDataService">
+    <Position X="5" Y="3.75" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAEAAgIIAAA=</HashCode>
+      <FileName>DbServices\WorkFlowDataService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Services.DbServices.WorkFlowProcessService">
+    <Position X="0.5" Y="0.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>CoCgAAAQgAAAQkGIEgAIsFQACACYAAIAAAgAAACgQAA=</HashCode>
+      <FileName>DbServices\WorkFlowProcessService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Services.DbServices.WorkFlowService">
+    <Position X="5" Y="6.25" Width="4" />
+    <TypeIdentifier>
+      <HashCode>EAQAAAEARkAAFmAAAgAAAAAAAAEAAAAAAAAAAgAIAAA=</HashCode>
+      <FileName>DbServices\WorkFlowService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="WorkFlowManager.Services.DbServices.IWorkFlow">
+    <Position X="5" Y="1.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAABAAAAAgAAAAAQAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>DbServices\IWorkFlow.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

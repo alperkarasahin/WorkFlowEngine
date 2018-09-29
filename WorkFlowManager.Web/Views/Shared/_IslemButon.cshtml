@@ -6,7 +6,7 @@
 {
     <input type="submit" value="Save Draft" name="action:SaveAsDraft" class="btn btn-success btn-sm" />
     <input type="submit" value="@Model.ProcessNextLabel" data-confirm="You will not able to update this form after submit.  Are you sure?" name="action:SaveAndSend" class="btn btn-primary btn-sm" />
-    <input type="submit" id="GeriAlButton" style="display:none" name="action:GeriAl"/>
+    <input type="submit" id="GeriAlButton" style="display:none" name="action:ReturnTo"/>
 
     if (Model.TargetProcessListForCancel.Count()>0)
     { 
@@ -33,16 +33,16 @@
             </script>
         </text>
     }
-    <a class="btn btn-warning btn-sm" href="@Url.Action("Index", new { controller = "Home" })"> Cancel</a>
+    <a class="btn btn-warning btn-sm" href="@Url.Action("Index", new { controller = "Home" })"> Home</a>
 }
 else
 {
     if (Model.IptalEdilebilir)
     {
-        <a href="@Url.Action("Iptal", new { workFlowTraceId = Model.Id })" title="@Model.IptalText" data-post="Are you sure you want to @Model.IptalText ?" class="btn btn-danger btn-sm">
+        <a href="@Url.Action("CancelProcess", new { workFlowTraceId = Model.Id })" title="@Model.IptalText" data-post="Are you sure you want to @Model.IptalText ?" class="btn btn-danger btn-sm">
             <i class="fa fa-times"></i> @Model.IptalText
         </a>
     }
 
-    <a class="btn btn-warning btn-sm" href="@Url.Action("Index", new { controller = "Home" })"> Cancel</a>
+    <a class="btn btn-warning btn-sm" href="@Url.Action("Index", new { controller = "Home" })"> Home</a>
 }

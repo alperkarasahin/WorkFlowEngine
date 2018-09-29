@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="WorkFlowManager.Common.Tables.Condition">
+    <Position X="6.25" Y="7.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAAEAAAABAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Tables\Condition.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.ConditionOption">
+    <Position X="3" Y="7.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAgAAAEAAA=</HashCode>
+      <FileName>Tables\ConditionOption.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.DecisionPoint">
+    <Position X="6.25" Y="10.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIBAEAAAAAAAAAAAAAAABBAAAAAAEAAAgAAA=</HashCode>
+      <FileName>Tables\DecisionPoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.Process">
+    <Position X="4.25" Y="1.25" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>BABCAAAAAAEgAgAkAAACAAQAABmAAAECCEAAQAAAAAQ=</HashCode>
+      <FileName>Tables\Process.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.Task">
+    <Position X="8.25" Y="1.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AEAAAQgAAQAAIFAAAAAgAIQAAABQAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Tables\Task.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.WorkFlow">
+    <Position X="11.75" Y="1.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Tables\WorkFlow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.WorkFlowEngineVariable">
+    <Position X="8.25" Y="5.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAIAAAAAAQAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Tables\WorkFlowEngineVariable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.WorkFlowTrace">
+    <Position X="11.75" Y="3" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAQAACIggAhAAAAAgAAAAAAAAAAEAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Tables\WorkFlowTrace.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.DecisionMethod">
+    <Position X="11.75" Y="6.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAIAAAAAAAAAAAgAAAAAAEQCAAAAAAA=</HashCode>
+      <FileName>Tables\DecisionMethod.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.FormView">
+    <Position X="11.75" Y="8.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAQAAAAAgIAAAAAAAAAAAgABAAAAEAAAAAAAAE=</HashCode>
+      <FileName>Tables\FormView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Common.Tables.ProcessMonitoringRole">
+    <Position X="9.25" Y="9" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAgAAAAAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Tables\ProcessMonitoringRole.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="WorkFlowManager.Common.Enums.ProcessStatus">
+    <Position X="9.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enums\ProcessStatus.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

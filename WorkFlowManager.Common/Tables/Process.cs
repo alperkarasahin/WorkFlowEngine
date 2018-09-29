@@ -26,7 +26,7 @@ namespace WorkFlowManager.Common.Tables
         public bool IsStandardForm => (FormViewId == null);
         public string NameWithRole => Name + " (" + AssignedRole.GetDisplayValue() + ")";
         public string FormDescription => (Description == null ? Name : Description);
-        public string NotificationMessage => (MessageForMonitor == null ? string.Format("'{0}' Completed.", Name) : MessageForMonitor);
+        public string NotificationMessage => (MessageForMonitor == null ? Name : MessageForMonitor);
         public override string ToString()
         {
             return Name.ToString();

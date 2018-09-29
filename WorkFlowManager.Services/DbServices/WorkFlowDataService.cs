@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
@@ -8,14 +7,6 @@ using WorkFlowManager.Common.ViewModels;
 
 namespace WorkFlowManager.Services.DbServices
 {
-    [Serializable]
-    public class IslemOwnerDetail
-    {
-        public int Id { get; set; }
-        public string Controller { get; set; }
-        public string SpecialFormTemplateView { get; set; }
-    }
-
 
     public class WorkFlowDataService
     {

@@ -30,12 +30,6 @@ namespace WorkFlowManager.Services.DbServices
             _workFlowDataService = workFlowDataService;
         }
 
-        protected int GetWorkFlowOwnerId(string id)
-        {
-            WorkFlowTrace workFlowTrace = _unitOfWork.Repository<WorkFlowTrace>().Get(int.Parse(id));
-            return workFlowTrace.OwnerId;
-        }
-
 
         public virtual void AddOrUpdate(WorkFlowTrace workFlowTrace)
         {
@@ -65,7 +59,7 @@ namespace WorkFlowManager.Services.DbServices
             return "OK";
         }
 
-        public string GetIsAkisi(string gorevAkis, int WorkFlowTraceId)
+        public string GetWorkFlow(string gorevAkis, int WorkFlowTraceId)
         {
             var workFlowTraceListesi =
                 _workFlowDataService
@@ -148,11 +142,7 @@ namespace WorkFlowManager.Services.DbServices
                         .Where(x => x.OwnerId == ownerId);
         }
 
-
-
-
-
-        public List<WorkFlowTraceVM> GorevListesiOlustur(int workFlowTraceId)
+        public List<WorkFlowTraceVM> ProgressProcessList(int workFlowTraceId)
         {
             UserProcessViewModel kullaniciWorkFlowTrace =
             _workFlowDataService
@@ -225,7 +215,7 @@ namespace WorkFlowManager.Services.DbServices
 
         }
 
-        public List<UserProcessViewModel> GeriGidilebilecekWorkFlowTraceListesi(int WorkFlowTraceId)
+        public List<UserProcessViewModel> TargetProcessListForCancel(int WorkFlowTraceId)
         {
             var birimdekiTumWorkFlowTraceler = _workFlowDataService.GetWorkFlowTraceList();
 
@@ -266,7 +256,7 @@ namespace WorkFlowManager.Services.DbServices
                 if (oncekiIslem.ProcessId != gorevWorkFlowTraceId && !oncekiWorkFlowTraceListesi.Any(x => oncekiIslem.ProcessId == x.ProcessId))
                 {
                     List<int> elementOfTree = new List<int>();
-                    if (!SonrakiWorkFlowTraceMi(elementOfTree, gorevWorkFlowTraceListesi, gorevWorkFlowTraceId, oncekiIslem.ProcessId))
+                    if (!SearchProcessInsideNextPath(elementOfTree, gorevWorkFlowTraceListesi, gorevWorkFlowTraceId, oncekiIslem.ProcessId))
                     {
                         oncekiWorkFlowTraceListesi.Add(oncekiIslem);
                     }
@@ -275,7 +265,7 @@ namespace WorkFlowManager.Services.DbServices
             return oncekiWorkFlowTraceListesi.OrderBy(x => x.Id).ToList();
         }
 
-        public bool SonrakiWorkFlowTraceMi(List<int> elementOfTree, IEnumerable<ProcessVM> gorevWorkFlowTraceListesi, int gorevWorkFlowTraceId, int kontrolEdilecekGorevWorkFlowTraceId)
+        public bool SearchProcessInsideNextPath(List<int> elementOfTree, IEnumerable<ProcessVM> gorevWorkFlowTraceListesi, int gorevWorkFlowTraceId, int kontrolEdilecekGorevWorkFlowTraceId)
         {
             if (elementOfTree.Any(x => x == gorevWorkFlowTraceId))
             {
@@ -292,7 +282,7 @@ namespace WorkFlowManager.Services.DbServices
                 var secenekListesi = gorevWorkFlowTraceListesi.Where(x => x.ConditionId == gorevWorkFlowTrace.Id && x.NextProcessId != gorevWorkFlowTrace.Id);
                 foreach (var secenek in secenekListesi)
                 {
-                    if (SonrakiWorkFlowTraceMi(elementOfTree, gorevWorkFlowTraceListesi, secenek.Id, kontrolEdilecekGorevWorkFlowTraceId))
+                    if (SearchProcessInsideNextPath(elementOfTree, gorevWorkFlowTraceListesi, secenek.Id, kontrolEdilecekGorevWorkFlowTraceId))
                     {
                         sonuc = true;
                         break;
@@ -309,7 +299,7 @@ namespace WorkFlowManager.Services.DbServices
                     }
                     else
                     {
-                        sonuc = SonrakiWorkFlowTraceMi(elementOfTree, gorevWorkFlowTraceListesi, (int)gorevWorkFlowTrace.NextProcessId, kontrolEdilecekGorevWorkFlowTraceId);
+                        sonuc = SearchProcessInsideNextPath(elementOfTree, gorevWorkFlowTraceListesi, (int)gorevWorkFlowTrace.NextProcessId, kontrolEdilecekGorevWorkFlowTraceId);
                     }
                 }
             }
@@ -454,36 +444,34 @@ namespace WorkFlowManager.Services.DbServices
 
         public string GetVariable(string key, int ownerId)
         {
-            if (key == null)
+            if (key != null)
             {
-                return null;
-            }
-            var workFlowEngineVariable = _unitOfWork.Repository<WorkFlowEngineVariable>().Get(x => x.OwnerId == ownerId && x.Key == key);
+                var workFlowEngineVariable = _unitOfWork.Repository<WorkFlowEngineVariable>().Get(x => x.OwnerId == ownerId && x.Key == key);
 
-            if (workFlowEngineVariable != null)
-            {
-                return workFlowEngineVariable.Value;
+                if (workFlowEngineVariable != null)
+                {
+                    return workFlowEngineVariable.Value;
+                }
             }
             return null;
         }
         public void SetVariable(string key, string value, int ownerId)
         {
-            if (key == null)
+            if (key != null)
             {
-                return;
-            }
-            var workFlowEngineVariable = _unitOfWork.Repository<WorkFlowEngineVariable>().Get(x => x.OwnerId == ownerId && x.Key == key);
+                var workFlowEngineVariable = _unitOfWork.Repository<WorkFlowEngineVariable>().Get(x => x.OwnerId == ownerId && x.Key == key);
 
-            if (workFlowEngineVariable != null)
-            {
-                workFlowEngineVariable.Value = value;
-                _unitOfWork.Repository<WorkFlowEngineVariable>().Update(workFlowEngineVariable);
+                if (workFlowEngineVariable != null)
+                {
+                    workFlowEngineVariable.Value = value;
+                    _unitOfWork.Repository<WorkFlowEngineVariable>().Update(workFlowEngineVariable);
+                }
+                else
+                {
+                    _unitOfWork.Repository<WorkFlowEngineVariable>().Add(new WorkFlowEngineVariable { OwnerId = ownerId, Key = key, Value = value });
+                }
+                _unitOfWork.Complete();
             }
-            else
-            {
-                _unitOfWork.Repository<WorkFlowEngineVariable>().Add(new WorkFlowEngineVariable { OwnerId = ownerId, Key = key, Value = value });
-            }
-            _unitOfWork.Complete();
         }
 
         public virtual void GoToWorkFlowNextProcess(int ownerId)
@@ -702,9 +690,9 @@ namespace WorkFlowManager.Services.DbServices
             return
                 new WorkFlowDTO
                 {
-                    TargetProcessListForCancel = kullaniciWorkFlowTraceVM.ProcessStatus != ProcessStatus.Completed ? GeriGidilebilecekWorkFlowTraceListesi(kullaniciWorkFlowTraceVM.Id) : new List<UserProcessViewModel>(),
+                    TargetProcessListForCancel = kullaniciWorkFlowTraceVM.ProcessStatus != ProcessStatus.Completed ? TargetProcessListForCancel(kullaniciWorkFlowTraceVM.Id) : new List<UserProcessViewModel>(),
                     AuthorizedProcessList = WorkFlowTraceList(kullaniciWorkFlowTraceVM.OwnerId).Where(x => x.ProcessStatus != ProcessStatus.Draft),
-                    ProgressProcessList = GorevListesiOlustur(kullaniciWorkFlowTraceVM.Id),
+                    ProgressProcessList = ProgressProcessList(kullaniciWorkFlowTraceVM.Id),
                 };
         }
 
@@ -724,23 +712,5 @@ namespace WorkFlowManager.Services.DbServices
             }
         }
 
-
-        public UserProcessViewModel UserLastProcessViewModel(int ownerId)
-        {
-            IEnumerable<UserProcessViewModel> WorkFlowTraceListesi =
-                _workFlowDataService
-                    .GetWorkFlowTraceList()
-                        .Where(x => x.OwnerId == ownerId);
-
-            var sonWorkFlowTrace = WorkFlowTraceListesi.OrderBy(x => x.Id).LastOrDefault();
-            if (sonWorkFlowTrace == null)
-            {
-                sonWorkFlowTrace = new UserProcessViewModel
-                {
-                    Id = 0
-                };
-            }
-            return sonWorkFlowTrace;
-        }
     }
 }

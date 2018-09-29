@@ -50,7 +50,7 @@
                             </button>
                             <ul class="dropdown-menu" role="menu">
                                 <li>
-                                    <a class="btn btn-sm" style="cursor:pointer" href='@Url.Action("AkisGoster", Model.ProcessTaskController, new { workFlowTraceId = Model.Id})' target="_blank">
+                                    <a class="btn btn-sm" style="cursor:pointer" href='@Url.Action("ShowWorkFlow", Model.ProcessTaskController, new { workFlowTraceId = Model.Id})' target="_blank">
                                         <span data-toggle="tooltip" title="Süreç"><i class="fa fa-sitemap fa-3x"></i></span>
                                     </a>
                                 </li>
@@ -142,7 +142,7 @@
             <div class="panel panel-info">
                 <div class="panel-heading">Reports</div>
                 <div class="panel-body">
-                    <a class="btn btn-info btn-sm" style="cursor:pointer" href='@Url.Action("AkisGoster", Model.ProcessTaskController, new { workFlowTraceId = Model.Id})' target="_blank">
+                    <a class="btn btn-info btn-sm" style="cursor:pointer" href='@Url.Action("ShowWorkFlow", Model.ProcessTaskController, new { workFlowTraceId = Model.Id})' target="_blank">
                         <span data-toggle="tooltip" title="Süreç"><i class="fa fa-sitemap fa-2x"></i></span>
                     </a>
                 </div>

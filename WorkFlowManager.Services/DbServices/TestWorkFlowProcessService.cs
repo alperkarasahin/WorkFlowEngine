@@ -22,16 +22,6 @@ namespace WorkFlowManager.Services.DbServices
 
 
         #region Decission Methods
-        public char ReturnYes()
-        {
-            return 'Y';
-        }
-
-        public char ReturnNo()
-        {
-            return 'N';
-        }
-
         private int GetOwnerIdFromId(int id)
         {
             var workFlowTrace = _unitOfWork.Repository<WorkFlowTrace>().Get(x => x.Id == id);
@@ -84,10 +74,6 @@ namespace WorkFlowManager.Services.DbServices
         {
             var rslt = 'N';
             int ownerId = GetOwnerIdFromId(int.Parse(id));
-
-            //var conditionOptionId = GetSelectedConditionOptionIdForCondition("Select Eye Condition", ownerId);
-
-            //var conditionOption = _unitOfWork.Repository<ConditionOption>().Get(x => x.Id == conditionOptionId);
             var variableEyeCondition = GetVariable("EYECONDITION", ownerId);
             if (variableEyeCondition.CompareTo("COLORBLIND") == 0)
             {

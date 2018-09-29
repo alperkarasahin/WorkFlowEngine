@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="WorkFlowManager.Web.Controllers.WorkFlowProcessController">
+    <Position X="0.5" Y="0.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAACAAAAAACAAAAEgAAA=</HashCode>
+      <FileName>Controllers\WorkFlowProcessController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Web.Controllers.WorkFlowController">
+    <Position X="5.25" Y="0.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAIgAQUQBACAAAgAAAAAAAQEiACAGgEEEBAAAAAA=</HashCode>
+      <FileName>Controllers\WorkFlowController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WorkFlowManager.Web.Controllers.TestWorkFlowProcessController">
+    <Position X="0.5" Y="3.75" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAgAAAAAAAAAAACAAAAEABgAAAIA=</HashCode>
+      <FileName>Controllers\TestWorkFlowController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

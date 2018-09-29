@@ -23,11 +23,11 @@ namespace WorkFlowManager.Web.Controllers
             _workFlowService = workFlowService;
         }
 
-        public ActionResult AkisGoster(int workFlowTraceId)
+        public ActionResult ShowWorkFlow(int workFlowTraceId)
         {
             UserProcessViewModel kullaniciIslemVM = _testWorkFlowProcessService.GetUserProcessVM(workFlowTraceId);
             string gorevAkis = _workFlowService.GetWorkFlowDiagram(kullaniciIslemVM.TaskId);
-            var mevcutIsAkisi = _testWorkFlowProcessService.GetIsAkisi(gorevAkis, workFlowTraceId);
+            var mevcutIsAkisi = _testWorkFlowProcessService.GetWorkFlow(gorevAkis, workFlowTraceId);
             return PartialView("_MAkisGoster", new WorkFlowView { Flag = true, WorkFlowText = mevcutIsAkisi });
         }
 

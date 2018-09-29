@@ -21,7 +21,7 @@ namespace WorkFlowManager.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]
-        public ActionResult Iptal(int workFlowTraceId)
+        public ActionResult CancelProcess(int workFlowTraceId)
         {
             _workFlowProcessService.WorkFlowProcessCancel(workFlowTraceId);
 
@@ -32,8 +32,8 @@ namespace WorkFlowManager.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]
-        [MultipleButton(Name = "action", Argument = "GeriAl")]
-        public ActionResult GeriAl(WorkFlowFormViewModel formData)
+        [MultipleButton(Name = "action", Argument = "ReturnTo")]
+        public ActionResult ReturnTo(WorkFlowFormViewModel formData)
         {
             if (formData.Description == null)
             {
