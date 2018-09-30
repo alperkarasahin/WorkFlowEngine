@@ -494,9 +494,9 @@ namespace WorkFlowManager.Services.DbServices
             if (currentProcess.GetType() == typeof(ConditionOption))
             {
                 var key = userProcessVMCurrent.ProcessVariableName;
-                var value = ((ConditionOption)currentProcess).Value;
                 if (key != null)
                 {
+                    var value = ((ConditionOption)currentProcess).Value;
                     SetVariable(key, value, ownerId);
                 }
             }
@@ -559,7 +559,7 @@ namespace WorkFlowManager.Services.DbServices
                         var property = workFlowTraceDecisionPoint.GetType().GetProperties().Where(x => x.Name == parameter).FirstOrDefault();
                         if (property != null)
                         {
-                            var value = property.GetValue(workFlowTraceDecisionPoint, null);// workFlowTraceDecisionPoint.GetType().GetProperty(parameter).GetValue(workFlowTraceDecisionPoint, null);
+                            var value = property.GetValue(workFlowTraceDecisionPoint, null);
                             parametersValue.Add(value);
                         }
                         else
@@ -582,7 +582,6 @@ namespace WorkFlowManager.Services.DbServices
                 Process conditionOption = _unitOfWork.Repository<ConditionOption>().Get(x => x.ConditionId == decisionPoint.Id && x.Value == decisionMethodResult);
                 if (conditionOption.NextProcessId == decisionPoint.Id)
                 {
-
                     if (workFlowTraceDecisionPoint.JobId == null)
                     {
                         List<object> decisionPointJobCallParameterList = new List<object>();
@@ -598,7 +597,6 @@ namespace WorkFlowManager.Services.DbServices
                             _unitOfWork,
                                     methodJobCallString,
                                         _workFlowDataService);
-
                     }
                 }
                 else

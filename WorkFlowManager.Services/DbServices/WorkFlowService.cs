@@ -415,11 +415,11 @@ namespace WorkFlowManager.Services.DbServices
             return GetMainProcessList(gorevId).Where(x => GetBefore(x.Id) == null);
         }
 
-        private void SetStartingProcess(int gorevId)
+        private void SetStartingProcess(int taskId)
         {
-            Task task = _unitOfWork.Repository<Task>().Get(gorevId);
+            Task task = _unitOfWork.Repository<Task>().Get(taskId);
 
-            var processListWhichBeforeIsNull = ProcessListWhichBeforeIsNull(gorevId);
+            var processListWhichBeforeIsNull = ProcessListWhichBeforeIsNull(taskId);
             if (processListWhichBeforeIsNull.Count() > 0)
             {
                 if (task.StartingProcessId == null || processListWhichBeforeIsNull.Count() == 1)
@@ -428,9 +428,7 @@ namespace WorkFlowManager.Services.DbServices
                     _unitOfWork.Repository<Task>().Update(task);
                     _unitOfWork.Complete();
                 }
-
             }
-
         }
 
         public void AddOrUpdate(ProcessForm formData)
