@@ -15,19 +15,24 @@ namespace WorkFlowManager.Common.Enums
         Monitor = 70,
 
         [Description("UNIT")]
-        [Display(Name = "U-Project Manager")]
-        ProjectManager = 80,
+        [Display(Name = "U-Officer")]
+        Officer = 80,
 
-        [Description("UNIT")]
-        [Display(Name = "U-Project Procurement Officer")]
-        ProjectProcurmentOfficer = 100,
 
-        [Description("UNIT")]
-        [Display(Name = "U-Project Finance Officer")]
-        ProjectFinanceOfficer = 110,
+        //[Description("UNIT")]
+        //[Display(Name = "U-Project Manager")]
+        //ProjectManager = 80,
+
+        //[Description("UNIT")]
+        //[Display(Name = "U-Project Procurement Officer")]
+        //ProjectProcurmentOfficer = 100,
+
+        //[Description("UNIT")]
+        //[Display(Name = "U-Project Finance Officer")]
+        //ProjectFinanceOfficer = 110,
 
         [Description("APPLICATION")]
-        [Display(Name = "Sistem")]
-        Sistem = 1000
+        [Display(Name = "System")]
+        System = 1000
     }
 }

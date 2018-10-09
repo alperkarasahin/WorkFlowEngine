@@ -52,7 +52,7 @@ namespace WorkFlowManager.Services.DbServices
                     ProcessStatus = workFlowTrace.ProcessStatus,
                     OwnerId = workFlowTrace.OwnerId,
                     ProcessId = workFlowTrace.ProcessId,
-                    ProcessVariableName = (workFlowTrace.Process.GetType() == typeof(Condition) ? ((Condition)workFlowTrace.Process).VariableName : null),
+                    ProcessVariableName = (workFlowTrace.Process.GetType() == typeof(Condition) || workFlowTrace.Process.GetType() == typeof(DecisionPoint) ? ((Condition)workFlowTrace.Process).VariableName : null),
                     AssignedRole = workFlowTrace.Process.AssignedRole,
                     Description = workFlowTrace.Description,
                     ProcessName = workFlowTrace.Process.Name,

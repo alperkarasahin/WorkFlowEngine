@@ -2,7 +2,7 @@
 @model WorkFlowManager.Common.ViewModels.WorkFlowFormViewModel
 
 
-@if (Model.ProcessAssignedRole != ProjectRole.Sistem)
+@if (Model.ProcessAssignedRole != ProjectRole.System)
 {
     <input type="submit" value="Save Draft" name="action:SaveAsDraft" class="btn btn-success btn-sm" />
     <input type="submit" value="@Model.ProcessNextLabel" data-confirm="You will not able to update this form after submit.  Are you sure?" name="action:SaveAndSend" class="btn btn-primary btn-sm" />

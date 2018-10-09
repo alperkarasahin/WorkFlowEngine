@@ -52,25 +52,25 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                 _unitOfWork.Complete();
 
 
-                var process = ProcessFactory.CreateProcess(task, "Applicant Detail", Enums.ProjectRole.Admin);
+                var process = ProcessFactory.CreateProcess(task, "Applicant Detail", Enums.ProjectRole.Officer);
                 process.IsDescriptionMandatory = true;
 
                 task.StartingProcess = process;
 
-                var eyeCondition = ProcessFactory.CreateCondition(task, "Select Eye Condition", Enums.ProjectRole.Admin, "EYECONDITION");
-                var eyeConditionOption1 = ProcessFactory.CreateConditionOption("Blind", Enums.ProjectRole.Admin, eyeCondition, "BLIND");
-                var eyeConditionOption2 = ProcessFactory.CreateConditionOption("Normal", Enums.ProjectRole.Admin, eyeCondition, "NORMAL");
-                var eyeConditionOption3 = ProcessFactory.CreateConditionOption("Color-Blind", Enums.ProjectRole.Admin, eyeCondition, "COLORBLIND");
+                var eyeCondition = ProcessFactory.CreateCondition(task, "Select Eye Condition", Enums.ProjectRole.Officer, "EYECONDITION");
+                var eyeConditionOption1 = ProcessFactory.CreateConditionOption("Blind", Enums.ProjectRole.Officer, eyeCondition, "BLIND");
+                var eyeConditionOption2 = ProcessFactory.CreateConditionOption("Normal", Enums.ProjectRole.Officer, eyeCondition, "NORMAL");
+                var eyeConditionOption3 = ProcessFactory.CreateConditionOption("Color-Blind", Enums.ProjectRole.Officer, eyeCondition, "COLORBLIND");
 
                 process.NextProcess = eyeCondition;
 
 
-                var candidateBlind = ProcessFactory.CreateProcess(task, "Candidate is not suitable for driving license", Enums.ProjectRole.Admin);
+                var candidateBlind = ProcessFactory.CreateProcess(task, "Candidate is not suitable for driving license", Enums.ProjectRole.Officer);
                 eyeConditionOption1.NextProcess = candidateBlind;
 
 
 
-                var process2 = ProcessFactory.CreateProcess(task, "Age Information", Enums.ProjectRole.Admin, "Enter your age", testWorkFlowForm);
+                var process2 = ProcessFactory.CreateProcess(task, "Age Information", Enums.ProjectRole.Officer, "Enter your age", testWorkFlowForm);
                 eyeConditionOption2.NextProcess = process2;
                 eyeConditionOption3.NextProcess = process2;
 
@@ -101,8 +101,8 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                 option6.NextProcess = ifCandidateIsColorBlind;
 
 
-                var normalDrivingLicense = ProcessFactory.CreateProcess(task, "Normal driving license", Enums.ProjectRole.Admin);
-                var restrictedDrivingLicense = ProcessFactory.CreateProcess(task, "Restricted driving license", Enums.ProjectRole.Admin);
+                var normalDrivingLicense = ProcessFactory.CreateProcess(task, "Normal driving license", Enums.ProjectRole.Officer);
+                var restrictedDrivingLicense = ProcessFactory.CreateProcess(task, "Restricted driving license", Enums.ProjectRole.Officer);
 
                 ifCandidateIsColorBlindOption2.NextProcess = normalDrivingLicense;
                 ifCandidateIsColorBlindOption1.NextProcess = restrictedDrivingLicense;

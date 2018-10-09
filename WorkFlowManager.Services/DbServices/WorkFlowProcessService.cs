@@ -239,7 +239,7 @@ namespace WorkFlowManager.Services.DbServices
             {
                 ProcessVM gorevWorkFlowTrace = gorevWorkFlowTraceListesi.SingleOrDefault(x => x.Id == oncekiIslem.ProcessId);
 
-                if (gorevWorkFlowTrace.AssignedRole == ProjectRole.Sistem)
+                if (gorevWorkFlowTrace.AssignedRole == ProjectRole.System)
                 {
                     continue;
                 }
@@ -659,13 +659,13 @@ namespace WorkFlowManager.Services.DbServices
             if (
                 !(
                         (
-                            userProcessVM.AssignedRole != ProjectRole.Sistem
+                            userProcessVM.AssignedRole != ProjectRole.System
                             &&
                             true //TODO
                         )
                         ||
                         (
-                            userProcessVM.AssignedRole == ProjectRole.Sistem
+                            userProcessVM.AssignedRole == ProjectRole.System
                             &&
                             true //TODO
                         )

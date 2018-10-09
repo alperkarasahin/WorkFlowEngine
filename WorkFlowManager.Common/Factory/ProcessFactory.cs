@@ -27,11 +27,11 @@ namespace WorkFlowManager.Common.Factory
 
         public static ConditionOption CreateDecisionPointYesOption(string name, DecisionPoint decisionPoint)
         {
-            return new ConditionOption(decisionPoint.Task, name, ProjectRole.Sistem, decisionPoint, "Y");
+            return new ConditionOption(decisionPoint.Task, name, ProjectRole.System, decisionPoint, "Y");
         }
         public static ConditionOption CreateDecisionPointNoOption(string name, DecisionPoint decisionPoint)
         {
-            return new ConditionOption(decisionPoint.Task, name, ProjectRole.Sistem, decisionPoint, "N");
+            return new ConditionOption(decisionPoint.Task, name, ProjectRole.System, decisionPoint, "N");
         }
 
 

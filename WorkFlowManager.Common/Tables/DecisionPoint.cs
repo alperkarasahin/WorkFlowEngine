@@ -8,10 +8,11 @@ namespace WorkFlowManager.Common.Tables
         {
 
         }
-        public DecisionPoint(Task task, string name, DecisionMethod decisionMethod, string variableName = null, int repetitionFrequenceByHour = 1, string description = null, FormView formView = null) : base(task, name, ProjectRole.Sistem, variableName, description, formView)
+        public DecisionPoint(Task task, string name, DecisionMethod decisionMethod, string variableName = null, int repetitionFrequenceByHour = 1, string description = null, FormView formView = null) : base(task, name, ProjectRole.System, variableName, description, formView)
         {
             DecisionMethod = decisionMethod;
             RepetitionFrequenceByHour = repetitionFrequenceByHour;
+            AssignedRole = ProjectRole.System;
             task.AddProcess(this);
         }
 

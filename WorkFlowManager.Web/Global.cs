@@ -30,7 +30,7 @@ namespace WorkFlowManager.Web
 
         public static List<ProjectRole> GetAllRoles()
         {
-            return ProjectRole.Admin.GetAllValues().Where(x => x != ProjectRole.Sistem).ToList();
+            return ProjectRole.Admin.GetAllValues().Where(x => x != ProjectRole.System).ToList();
         }
 
     }

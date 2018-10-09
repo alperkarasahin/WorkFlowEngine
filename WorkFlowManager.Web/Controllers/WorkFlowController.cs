@@ -184,7 +184,7 @@ namespace WorkFlowManager.Web.Controllers
             {
                 if (formData.Id == 0)
                 {
-                    formData.AssignedRole = (formData.ProcessType == ProcessType.DecisionPoint ? ProjectRole.Sistem : ProjectRole.ProjectProcurmentOfficer);
+                    formData.AssignedRole = (formData.ProcessType == ProcessType.DecisionPoint ? ProjectRole.System : ProjectRole.Officer);
                 }
             }
             formData = ProcessFormLoad(formData);
