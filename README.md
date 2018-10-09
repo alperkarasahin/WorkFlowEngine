@@ -20,9 +20,11 @@ Application includes examples of usage below;
 * Reflection
 * Hangfire
 
-
 After download you should run command below from package manager console with select Default project:WorkFlowManager.Common
 
 PM> update-database
 
 Happy Designing ;)
+
+
+You can see detail explanation of application from https://medium.com/@alperkarasahin/work-flow-engine-with-c-net-mvc-b8ef2f7ecbdf
