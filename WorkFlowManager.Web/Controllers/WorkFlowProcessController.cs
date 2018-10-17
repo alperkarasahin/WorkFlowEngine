@@ -14,10 +14,29 @@ namespace WorkFlowManager.Web.Controllers
     {
 
         private readonly WorkFlowProcessService _workFlowProcessService;
+        private readonly WorkFlowService _workFlowService;
 
         public WorkFlowProcessController(WorkFlowProcessService workFlowProcessService)
         {
             _workFlowProcessService = workFlowProcessService;
+            _workFlowService = DependencyResolver.Current.GetService<WorkFlowService>();
+        }
+
+        public ActionResult GetProcess(int ownerId, string taskName)
+        {
+            var lastProcessId = _workFlowProcessService.GetLastProcessId(ownerId);
+
+            if (lastProcessId != 0)
+            {
+                return Index(lastProcessId);
+            }
+            return StartWorkFlow(ownerId, taskName);
+        }
+
+        public ActionResult StartWorkFlow(int ownerId, string taskName)
+        {
+            int torSatinAlmaIslemId = _workFlowProcessService.StartWorkFlow(ownerId, taskName);
+            return Index(torSatinAlmaIslemId);
         }
 
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]
@@ -28,6 +47,41 @@ namespace WorkFlowManager.Web.Controllers
             var surecKontrolSonuc = _workFlowProcessService.SetNextProcessForWorkFlow(workFlowTraceId);
 
             return RedirectToAction("Index", surecKontrolSonuc).WithMessage(this, "Process cancelled.", MessageType.Success);
+
+        }
+
+
+        public ActionResult ShowWorkFlow(int workFlowTraceId)
+        {
+            UserProcessViewModel userProcessVM = _workFlowProcessService.GetUserProcessVM(workFlowTraceId);
+            string workFlowDiagram = _workFlowService.GetWorkFlowDiagram(userProcessVM.TaskId);
+            var workFlow = _workFlowProcessService.GetWorkFlow(workFlowDiagram, workFlowTraceId);
+            return PartialView("_MAkisGoster", new WorkFlowView { Flag = true, WorkFlowText = workFlow });
+        }
+
+        public ActionResult Index(int workFlowTraceId)
+        {
+            UserProcessViewModel userProcessVM = _workFlowProcessService.GetUserProcessVM(workFlowTraceId);
+            if (_workFlowProcessService.WorkFlowPermissionCheck(userProcessVM) == false)
+            {
+                return RedirectToAction("Index", new { controller = "Home" }).WithMessage(this, "Access denied!", MessageType.Danger);
+            }
+
+            WorkFlowTrace workFlowTrace = _workFlowProcessService.WorkFlowTraceDetail(workFlowTraceId);
+
+            WorkFlowFormViewModel workFlowTraceForm = Mapper.Map<WorkFlowTrace, WorkFlowFormViewModel>(workFlowTrace);
+            int ownerId = workFlowTraceForm.OwnerId;
+            ActionResult viewResult = null;
+
+            WorkFlowFormViewModel workFlowForm = null;
+
+            var workFlowBase = _workFlowProcessService.WorkFlowBaseInfo(userProcessVM);
+            _workFlowProcessService.SetWorkFlowTraceForm(workFlowTraceForm, workFlowBase);
+
+            workFlowForm = _workFlowProcessService.WorkFlowFormLoad(workFlowTraceForm);
+
+            viewResult = View(workFlowForm.ProcessTaskSpecialFormTemplateView, workFlowForm);
+            return viewResult;
 
         }
 

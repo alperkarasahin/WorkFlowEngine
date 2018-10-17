@@ -1,0 +1,51 @@
+﻿@model WorkFlowManager.Common.ViewModels.HealthInformationFormViewModel
+
+
+<div class="box">
+
+    <div class="box-header with-border">
+        <div class="col-lg-12">
+            <h3 class="box-title">Health Information Sub Process Starting Area</h3>
+        </div>
+    </div>
+    <div class="box-body">
+        @Html.HiddenFor(x => x.OwnerId)
+
+
+        @if (Model.HealthInformationFormList!= null)
+        {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Sub Process</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.HealthInformationFormList)
+            {
+                <tr>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @if (item.Name == "Psychotechnique Result")
+                        {
+                            <a target="_blank" href="@Url.Action("GetProcess", "WorkFlowProcess", new { ownerId= item.Id, taskName="Psychotechnique Report Flow" })">
+                                <i title="Start Psychotechnique Process" class="glyphicon glyphicon-play"></i> <br />
+                            </a>
+                        }
+                        else
+                        {
+                            <a target="_blank" href="@Url.Action("GetProcess", "WorkFlowProcess", new { ownerId= item.Id, taskName="Physical Examination Report Flow" })">
+                                <i title="Start PhysicalExamination Process" class="glyphicon glyphicon-play"></i> <br />
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        }
+    </div>
+</div>

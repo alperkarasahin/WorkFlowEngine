@@ -1,16 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
+using WorkFlowManager.Common.DataAccess._UnitOfWork;
+using WorkFlowManager.Common.Tables;
+using WorkFlowManager.Web.Models;
 
 namespace WorkFlowManager.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IUnitOfWork _unitOfWork;
+        public HomeController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
         public ActionResult Index()
         {
-            return View();
+            var masterTest = _unitOfWork.Repository<MasterTest>().GetAll().FirstOrDefault();
+
+            return View(new WorkFlowTestModel { masterTestId = masterTest.Id });
         }
 
         public ActionResult About()

@@ -1,4 +1,4 @@
-﻿
+﻿@model WorkFlowManager.Web.Models.WorkFlowTestModel
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -12,7 +12,7 @@
 
 <hr />
 
-<a href="@Url.Action("Task1Test", "TestWorkFlowProcess")">
+<a href="@Url.Action("GetProcess", "WorkFlowProcess", new { ownerId = Model.masterTestId, taskName="Driving License Application Flow"  })">
     <i class="glyphicon glyphicon-play fa-5x"></i> <br />
     <span>Task 1 Test</span>
 </a>

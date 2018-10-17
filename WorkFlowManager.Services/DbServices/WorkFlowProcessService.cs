@@ -16,13 +16,13 @@ using WorkFlowManager.Helper;
 
 namespace WorkFlowManager.Services.DbServices
 {
-    public abstract class WorkFlowProcessService
+    public class WorkFlowProcessService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly WorkFlowDataService _workFlowDataService;
         public Dictionary<string, IWorkFlowForm> workFlowFormList = new Dictionary<string, IWorkFlowForm>();
 
-        public abstract void FormSave(WorkFlowFormViewModel formData);
+        //public void FormSave(WorkFlowFormViewModel formData);
 
         public WorkFlowProcessService(IUnitOfWork unitOfWork, WorkFlowDataService workFlowDataService)
         {
@@ -30,6 +30,35 @@ namespace WorkFlowManager.Services.DbServices
             _workFlowDataService = workFlowDataService;
         }
 
+        public int GetLastProcessId(int ownerId)
+        {
+            var workFlowTraceList = _unitOfWork.Repository<WorkFlowTrace>().Find(x => x.OwnerId == ownerId).OrderByDescending(x => x.Id);
+
+
+            if (workFlowTraceList.Count() > 0)
+            {
+                return workFlowTraceList.First().Id;
+            }
+
+            return 0;
+
+        }
+
+
+        public int StartWorkFlow(int ownerId, string taskName)
+        {
+            var task = _unitOfWork.Repository<Task>().GetAll().Where(x => x.Name == taskName).FirstOrDefault();
+            WorkFlowTrace workFlowTrace = null;
+
+            workFlowTrace = new WorkFlowTrace()
+            {
+                ProcessId = (int)task.StartingProcessId,
+                OwnerId = ownerId,
+                ProcessStatus = Common.Enums.ProcessStatus.Draft
+            };
+            AddOrUpdate(workFlowTrace);
+            return workFlowTrace.Id;
+        }
 
         public virtual void AddOrUpdate(WorkFlowTrace workFlowTrace)
         {

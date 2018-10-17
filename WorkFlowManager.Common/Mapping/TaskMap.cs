@@ -20,6 +20,11 @@ namespace WorkFlowManager.Common.Mapping
             Property(t => t.MethodServiceName)
                 .HasMaxLength(100);
 
+            HasOptional(s => s.TopTask)
+                .WithMany(s => s.SubTaskList)
+                .HasForeignKey(s => s.TopTaskId)
+                .WillCascadeOnDelete(false);
+
         }
     }
 }

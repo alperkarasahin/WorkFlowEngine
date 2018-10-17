@@ -86,23 +86,6 @@ namespace WorkFlowManager.Services.DbServices
         #endregion
 
         #region Workflow
-        public int StartWorkFlow(int ownerId, int taskId)
-        {
-
-            var task = _unitOfWork.Repository<Task>().Get(taskId);
-
-            WorkFlowTrace workFlowTrace = null;
-
-            workFlowTrace = new WorkFlowTrace()
-            {
-                ProcessId = (int)task.StartingProcessId,
-                OwnerId = ownerId,
-                ProcessStatus = Common.Enums.ProcessStatus.Draft
-            };
-            AddOrUpdate(workFlowTrace);
-            return workFlowTrace.Id;
-        }
-
 
         public bool FormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
         {
@@ -110,7 +93,7 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-        public override void FormSave(WorkFlowFormViewModel formData)
+        public void FormSave(WorkFlowFormViewModel formData)
         {
             base.CustomFormSave(formData);
         }

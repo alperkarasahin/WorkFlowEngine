@@ -30,5 +30,10 @@ namespace WorkFlowManager.Common.Tables
         public string MethodServiceName { get; set; }
         public string Controller { get; set; }
         public string SpecialFormTemplateView { get; set; }
+
+        public int? TopTaskId { get; set; }
+        public Task TopTask { get; set; }
+
+        public List<Task> SubTaskList { get; set; }
     }
 }

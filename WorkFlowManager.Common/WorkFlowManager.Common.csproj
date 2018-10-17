@@ -141,6 +141,7 @@
     <Compile Include="Mapping\ConditionMap.cs" />
     <Compile Include="Mapping\DocumentMap.cs" />
     <Compile Include="Mapping\FormViewMap.cs" />
+    <Compile Include="Mapping\HealthInformationFormMap.cs" />
     <Compile Include="Mapping\ProcessMonitoringRoleMap.cs" />
     <Compile Include="Mapping\ProcessMap.cs" />
     <Compile Include="Mapping\TaskMap.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Tables\BaseTable.cs" />
     <Compile Include="Tables\Document.cs" />
     <Compile Include="Tables\FormView.cs" />
+    <Compile Include="Tables\HealthInformationForm.cs" />
     <Compile Include="Tables\MasterTest.cs" />
     <Compile Include="Tables\Task.cs" />
     <Compile Include="Tables\Process.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="Validation\WorkFlowProcessValidator.cs" />
     <Compile Include="ViewModels\AccountViewModels.cs" />
     <Compile Include="ViewModels\ProcessVM.cs" />
+    <Compile Include="ViewModels\HealthInformationFormViewModel.cs" />
     <Compile Include="ViewModels\TestWorkFlowFormViewModel.cs" />
     <Compile Include="ViewModels\WorkFlowFormViewModel.cs" />
     <Compile Include="ViewModels\WorkFlowTraceVM.cs" />

@@ -24,22 +24,6 @@ namespace WorkFlowManager.Common.DataAccess._Context
 #endif
         }
 
-        public IDbSet<BaseTable> BaseTableTbl { get; set; }
-
-        public IDbSet<WorkFlow> WorkFlowTbl { get; set; }
-        public IDbSet<Task> TaskTbl { get; set; }
-        public IDbSet<Tables.Process> ProcessTbl { get; set; }
-        public IDbSet<ProcessMonitoringRole> ProcessMonitoringRoleTbl { get; set; }
-        public IDbSet<Condition> ConditionTbl { get; set; }
-        public IDbSet<ConditionOption> ConditionOptionTbl { get; set; }
-
-        public IDbSet<DecisionPoint> DecisionPointTbl { get; set; }
-        public IDbSet<DecisionMethod> DecisionMethodTbl { get; set; }
-
-        public IDbSet<FormView> FormViewTbl { get; set; }
-
-
-
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -66,6 +50,7 @@ namespace WorkFlowManager.Common.DataAccess._Context
             modelBuilder.Configurations.Add(new DecisionPointMap());
             modelBuilder.Configurations.Add(new WorkFlowTraceMap());
             modelBuilder.Configurations.Add(new TestFormMap());
+            modelBuilder.Configurations.Add(new HealthInformationFormMap());
 
 
 

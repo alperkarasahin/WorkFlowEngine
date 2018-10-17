@@ -328,7 +328,6 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\TestWorkFlowController.cs" />
     <Compile Include="Controllers\WorkFlowController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\WorkFlowProcessController.cs" />
@@ -340,6 +339,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\WorkFlowTestModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -547,11 +547,13 @@
     <Content Include="Views\Shared\_SatinAlmaIslemler.cshtml" />
     <Content Include="Views\Shared\_Kunye.cshtml" />
     <Content Include="Views\Shared\_MAkisGoster.cshtml" />
-    <Content Include="Views\TestWorkFlowProcess\TestWorkFlowForm.cshtml" />
+    <Content Include="Views\WorkFlowProcess\TestWorkFlowForm.cshtml" />
+    <Content Include="Views\WorkFlowProcess\HealthInformationWorkFlowForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Base\" />
+    <Folder Include="Views\PsychotechniqueProcess\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

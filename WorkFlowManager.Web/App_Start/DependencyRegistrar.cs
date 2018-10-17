@@ -57,6 +57,11 @@ namespace WorkFlowManager.Web
                 .InstancePerBackgroundJob()
                 .InstancePerDependency();
 
+            builder.RegisterType<HealthInformationWorkFlowForm>()
+                .AsSelf()
+                .InstancePerBackgroundJob()
+                .InstancePerDependency();
+
             builder.RegisterGeneric(typeof(BaseRepository<>))
                 .As(typeof(IRepository<>))
                 .InstancePerDependency();
@@ -166,6 +171,7 @@ namespace WorkFlowManager.Web
                 cfg.CreateMap<TestWorkFlowFormViewModel, TestForm>();
 
                 cfg.CreateMap<WorkFlowFormViewModel, TestWorkFlowFormViewModel>();
+                cfg.CreateMap<WorkFlowFormViewModel, HealthInformationFormViewModel>();
 
             }
             );

@@ -109,6 +109,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomForms\HealthInformationWorkFlowForm.cs" />
     <Compile Include="CustomForms\TestWorkFlowForm.cs" />
     <Compile Include="DbServices\DocumentService.cs" />
     <Compile Include="DbServices\DynamicMethodCallService.cs" />
