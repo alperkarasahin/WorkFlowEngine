@@ -28,10 +28,6 @@ namespace WorkFlowManager.Common.DataAccess._Context
         {
             base.OnModelCreating(modelBuilder);
 
-
-
-
-            modelBuilder.Entity<MasterTest>().ToTable("MasterTestTbl");
             modelBuilder.Entity<WorkFlowEngineVariable>().ToTable("WorkFlowEngineVariableTbl");
 
             modelBuilder.Configurations.Add(new BaseTableTableMap());
@@ -50,7 +46,7 @@ namespace WorkFlowManager.Common.DataAccess._Context
             modelBuilder.Configurations.Add(new DecisionPointMap());
             modelBuilder.Configurations.Add(new WorkFlowTraceMap());
             modelBuilder.Configurations.Add(new TestFormMap());
-            modelBuilder.Configurations.Add(new HealthInformationFormMap());
+            modelBuilder.Configurations.Add(new BusinessProcessMap());
 
 
 

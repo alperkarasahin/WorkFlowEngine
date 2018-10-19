@@ -3,13 +3,13 @@ using WorkFlowManager.Common.Tables;
 
 namespace WorkFlowManager.Common.Mapping
 {
-    public class HealthInformationFormMap : EntityTypeConfiguration<HealthInformationForm>
+    public class BusinessProcessMap : EntityTypeConfiguration<BusinessProcess>
     {
-        public HealthInformationFormMap()
+        public BusinessProcessMap()
         {
-            ToTable("HealthInformationFormTbl");
+            ToTable("BusinessProcessTbl");
 
-            HasRequired(s => s.Owner)
+            HasOptional(s => s.Owner)
                .WithMany()
                .WillCascadeOnDelete(false);
         }

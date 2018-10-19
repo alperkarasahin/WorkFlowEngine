@@ -481,6 +481,20 @@ namespace WorkFlowManager.Services.DbServices
                 {
                     return workFlowEngineVariable.Value;
                 }
+                else
+                {
+                    //If variable not found inside main business process variable list
+                    //We fill search it inside sub business process list
+                    var subProcessList = _unitOfWork.Repository<BusinessProcess>().GetAll().Where(x => x.OwnerId == ownerId).ToList();
+                    foreach (var subProcess in subProcessList)
+                    {
+                        var rslt = GetVariable(key, subProcess.Id);
+                        if (rslt != null)
+                        {
+                            return rslt;
+                        }
+                    }
+                }
             }
             return null;
         }
@@ -533,6 +547,23 @@ namespace WorkFlowManager.Services.DbServices
             if (currentProcess.NextProcessId != null)
             {
                 CreateNewWorkFlowTrace(currentProcess.NextProcess, ownerId);
+            }
+            else
+            {
+                //If process is last node of the work flow
+                //And business process has a master work flow
+                //We will trigger master work flow process waiting job
+                var businessProcess = _unitOfWork.Repository<BusinessProcess>().Get(ownerId);
+                if (businessProcess.OwnerId != null)
+                {
+                    var masterWorkFlowActiveProcess = _unitOfWork.Repository<WorkFlowTrace>().GetAll().FirstOrDefault(x => x.OwnerId == businessProcess.OwnerId && x.ProcessStatus == ProcessStatus.Draft);
+                    if (masterWorkFlowActiveProcess.JobId != null)
+                    {
+                        RecurringJob.Trigger(masterWorkFlowActiveProcess.JobId);
+                    }
+                }
+
+
             }
         }
 

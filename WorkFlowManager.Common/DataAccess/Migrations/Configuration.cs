@@ -23,11 +23,11 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
             IUnitOfWork _unitOfWork = new UnitOfWork(context);
 
 
-            var masterTest1 = _unitOfWork.Repository<MasterTest>().Get(x => x.Name == "Applicant Information");
+            var masterTest1 = _unitOfWork.Repository<BusinessProcess>().Get(x => x.Name == "Applicant Information");
             if (masterTest1 == null)
             {
-                masterTest1 = new MasterTest() { Name = "Applicant Information" };
-                _unitOfWork.Repository<MasterTest>().Add(masterTest1);
+                masterTest1 = new BusinessProcess() { Name = "Applicant Information" };
+                _unitOfWork.Repository<BusinessProcess>().Add(masterTest1);
 
 
                 var workFlow = new WorkFlow { Name = "Application Flow" };

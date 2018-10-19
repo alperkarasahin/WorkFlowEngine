@@ -31,20 +31,21 @@ namespace WorkFlowManager.Services.CustomForms
 
         public WorkFlowFormViewModel Load(WorkFlowFormViewModel workFlowFormViewModel)
         {
-            var healthInformationFormList = _unitOfWork.Repository<HealthInformationForm>().GetList(x => x.OwnerId == workFlowFormViewModel.OwnerId).ToList();
+
+            var healthInformationFormList = _unitOfWork.Repository<BusinessProcess>().GetList(x => x.OwnerId == workFlowFormViewModel.OwnerId).ToList();
 
             if (healthInformationFormList.Count() == 0)
             {
-                var physicalExamination = new HealthInformationForm() { Name = "Physical Examination", OwnerId = workFlowFormViewModel.OwnerId };
-                var psychotechniqueResult = new HealthInformationForm() { Name = "Psychotechnique Result", OwnerId = workFlowFormViewModel.OwnerId };
+                var physicalExamination = new BusinessProcess() { Name = "Physical Examination", OwnerId = workFlowFormViewModel.OwnerId };
+                var psychotechniqueResult = new BusinessProcess() { Name = "Psychotechnique Result", OwnerId = workFlowFormViewModel.OwnerId };
 
-                _unitOfWork.Repository<HealthInformationForm>().Add(physicalExamination);
-                _unitOfWork.Repository<HealthInformationForm>().Add(psychotechniqueResult);
+                _unitOfWork.Repository<BusinessProcess>().Add(physicalExamination);
+                _unitOfWork.Repository<BusinessProcess>().Add(psychotechniqueResult);
                 _unitOfWork.Complete();
                 healthInformationFormList.Add(physicalExamination);
                 healthInformationFormList.Add(psychotechniqueResult);
             }
-            HealthInformationFormViewModel healthInformationForm = new HealthInformationFormViewModel { HealthInformationFormList = healthInformationFormList };
+            SubBusinessProcessViewModel healthInformationForm = new SubBusinessProcessViewModel { SubBusinessProcessList = healthInformationFormList };
 
             Mapper.Map(workFlowFormViewModel, healthInformationForm);
 

@@ -171,7 +171,7 @@ namespace WorkFlowManager.Web
                 cfg.CreateMap<TestWorkFlowFormViewModel, TestForm>();
 
                 cfg.CreateMap<WorkFlowFormViewModel, TestWorkFlowFormViewModel>();
-                cfg.CreateMap<WorkFlowFormViewModel, HealthInformationFormViewModel>();
+                cfg.CreateMap<WorkFlowFormViewModel, SubBusinessProcessViewModel>();
 
             }
             );

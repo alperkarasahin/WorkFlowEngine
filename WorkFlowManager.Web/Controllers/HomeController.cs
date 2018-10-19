@@ -15,7 +15,7 @@ namespace WorkFlowManager.Web.Controllers
         }
         public ActionResult Index()
         {
-            var masterTest = _unitOfWork.Repository<MasterTest>().GetAll().FirstOrDefault();
+            var masterTest = _unitOfWork.Repository<BusinessProcess>().GetAll().FirstOrDefault();
 
             return View(new WorkFlowTestModel { masterTestId = masterTest.Id });
         }

@@ -1,4 +1,4 @@
-﻿@model WorkFlowManager.Common.ViewModels.HealthInformationFormViewModel
+﻿@model WorkFlowManager.Common.ViewModels.SubBusinessProcessViewModel
 
 
 <div class="box">
@@ -12,7 +12,7 @@
         @Html.HiddenFor(x => x.OwnerId)
 
 
-        @if (Model.HealthInformationFormList!= null)
+        @if (Model.SubBusinessProcessList != null)
         {
         <table class="table">
             <thead>
@@ -22,7 +22,7 @@
                 </tr>
             </thead>
             <tbody>
-            @foreach (var item in Model.HealthInformationFormList)
+            @foreach (var item in Model.SubBusinessProcessList)
             {
                 <tr>
                     <td>

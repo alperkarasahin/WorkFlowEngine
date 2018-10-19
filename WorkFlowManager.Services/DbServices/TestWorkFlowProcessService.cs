@@ -83,6 +83,21 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
+        public char IsSubProcessCompleted(string id)
+        {
+            var rslt = 'N';
+            int ownerId = GetOwnerIdFromId(int.Parse(id));
+            var psychotechicque = GetVariable("PSYCHOTECHNICQUE", ownerId);
+            var physicalexamination = GetVariable("PHYSICALEXAMINATION", ownerId);
+
+            if (psychotechicque != null && physicalexamination != null)
+            {
+                rslt = 'Y';
+            }
+
+            return rslt;
+        }
+
         #endregion
 
         #region Workflow
