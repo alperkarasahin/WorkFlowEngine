@@ -1,4 +1,7 @@
-﻿using WorkFlowManager.Common.Enums;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using WorkFlowManager.Common.Dto;
+using WorkFlowManager.Common.Enums;
 using WorkFlowManager.Common.Tables;
 
 namespace WorkFlowManager.Common.Factory
@@ -9,6 +12,12 @@ namespace WorkFlowManager.Common.Factory
         {
             return new Process(task, name, assignedRole, description, formView);
         }
+
+        public static SubProcess CreateSubProcess(Task task, string name, List<TaskVariable> taskVariableList)
+        {
+            return new SubProcess(task, name, JsonConvert.SerializeObject(taskVariableList));
+        }
+
 
         public static Condition CreateCondition(Task task, string name, ProjectRole assignedRole, string variableName, string description = null, FormView formView = null)
         {

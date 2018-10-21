@@ -74,6 +74,9 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -119,6 +122,7 @@
     <Compile Include="DataAccess\_Context\DataContext.cs" />
     <Compile Include="DataAccess\_UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="DataAccess\_UnitOfWork\UnitOfWork.cs" />
+    <Compile Include="Dto\TaskVariable.cs" />
     <Compile Include="Dto\WorlFlowDto.cs" />
     <Compile Include="Enums\FileType.cs" />
     <Compile Include="Enums\FormComplexity.cs" />
@@ -156,6 +160,7 @@
     <Compile Include="Tables\Document.cs" />
     <Compile Include="Tables\FormView.cs" />
     <Compile Include="Tables\BusinessProcess.cs" />
+    <Compile Include="Tables\SubProcess.cs" />
     <Compile Include="Tables\Task.cs" />
     <Compile Include="Tables\Process.cs" />
     <Compile Include="Tables\ProcessMonitoringRole.cs" />

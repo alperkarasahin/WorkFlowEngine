@@ -12,6 +12,11 @@ namespace WorkFlowManager.Common.Mapping
             HasOptional(s => s.Owner)
                .WithMany()
                .WillCascadeOnDelete(false);
+
+
+            HasOptional(s => s.OwnerSubProcessTrace)
+                .WithMany(s => s.SubProcessList)
+                .WillCascadeOnDelete(false);
         }
     }
 }

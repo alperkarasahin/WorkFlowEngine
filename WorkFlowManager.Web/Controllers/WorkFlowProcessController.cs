@@ -35,8 +35,8 @@ namespace WorkFlowManager.Web.Controllers
 
         public ActionResult StartWorkFlow(int ownerId, string taskName)
         {
-            int torSatinAlmaIslemId = _workFlowProcessService.StartWorkFlow(ownerId, taskName);
-            return Index(torSatinAlmaIslemId);
+            int workFlowTraceId = _workFlowProcessService.StartWorkFlow(ownerId, taskName);
+            return Index(workFlowTraceId);
         }
 
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]

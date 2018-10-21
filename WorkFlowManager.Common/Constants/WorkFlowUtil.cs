@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
 using WorkFlowManager.Common.Tables;
 
@@ -6,7 +8,6 @@ namespace WorkFlowManager.Common.Constants
 {
     public static class WorkFlowUtil
     {
-
         private static string SentenceForDecisionPoint(bool systemAction, string sentence)
         {
             string rslt = "";
@@ -38,6 +39,11 @@ namespace WorkFlowManager.Common.Constants
         }
 
 
+        private static string SubProcessDiagram(string processUniqueId, string name)
+        {
+            return string.Format("subgraph {1};b3-->{0}-subProcessEndPoint;{0}( ) --> b2( );{0} --> b3( );b2( )-->{0}-subProcessEndPoint( );end;", processUniqueId, name);
+        }
+
         public static void SetWorkFlowDiagram(IUnitOfWork _unitOfWork, int taskId)
         {
             string charForPrefixProcess = "(";
@@ -49,6 +55,7 @@ namespace WorkFlowManager.Common.Constants
             string startDummyProcessCode = "dummy_starting_point";
             string startDummyProcessName = "Start";
 
+            var subProcessList = new Dictionary<string, string>();
             var task = _unitOfWork.Repository<Task>().Get(x => x.Id == taskId);
             string workFlowDiagram = "";
             StringBuilder resultDiagram = new StringBuilder();
@@ -80,7 +87,19 @@ namespace WorkFlowManager.Common.Constants
                         }
                         else
                         {
-                            workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{6}""{5}""{7};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.GetType() == typeof(DecisionPoint), conditionForOption.Name), islem.Name, islem.NextProcess.ProcessUniqueCode, islem.NextProcess.Name, charForPrefixProcess, charForSuffixProcess);
+                            if (islem.NextProcess.GetType() == typeof(SubProcess))
+                            {
+                                if (!subProcessList.TryGetValue(islem.NextProcess.ProcessUniqueCode, out _))
+                                {
+                                    subProcessList.Add(islem.NextProcess.ProcessUniqueCode, islem.NextProcess.Name);
+                                }
+                                var subProcessStartPoint = string.Format("{0}", islem.NextProcess.ProcessUniqueCode);
+                                workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{6}""{5}""{7};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.GetType() == typeof(DecisionPoint), conditionForOption.Name), islem.Name, subProcessStartPoint, islem.NextProcess.Name, charForPrefixProcess, charForSuffixProcess);
+                            }
+                            else
+                            {
+                                workFlowDiagram = string.Format(@"{0}{1}{{""{2}""}}-->|""{3}""|{4}{6}""{5}""{7};", workFlowDiagram, conditionForOption.ProcessUniqueCode, SentenceForDecisionPoint(conditionForOption.GetType() == typeof(DecisionPoint), conditionForOption.Name), islem.Name, islem.NextProcess.ProcessUniqueCode, islem.NextProcess.Name, charForPrefixProcess, charForSuffixProcess);
+                            }
                         }
                     }
                     else
@@ -110,6 +129,30 @@ namespace WorkFlowManager.Common.Constants
                         workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}((""{4}""));", workFlowDiagram, islem.ProcessUniqueCode, islem.Name, stopDummyProcessCode, stopDummyProcessName, charForPrefixProcess, charForSuffixProcess);
                     }
                 }
+                else if (islem.GetType() == typeof(SubProcess))
+                {
+                    if (!subProcessList.TryGetValue(islem.ProcessUniqueCode, out _))
+                    {
+                        subProcessList.Add(islem.ProcessUniqueCode, islem.Name);
+                    }
+                    var subProcessEndPoint = string.Format("{0}-subProcessEndPoint", islem.ProcessUniqueCode);
+
+                    if (islem.NextProcess != null)
+                    {
+                        if (islem.NextProcess.GetType() == typeof(Condition) || islem.NextProcess.GetType() == typeof(DecisionPoint))
+                        {
+                            workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}{{""{4}""}};", workFlowDiagram, subProcessEndPoint, islem.Name, islem.NextProcess.ProcessUniqueCode, SentenceForDecisionPoint(islem.NextProcess.GetType() == typeof(DecisionPoint), islem.NextProcess.Name), charForPrefixProcess, charForSuffixProcess);
+                        }
+                        else
+                        {
+                            workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}{5}""{4}""{6};", workFlowDiagram, subProcessEndPoint, islem.Name, islem.NextProcess.ProcessUniqueCode, islem.NextProcess.Name, charForPrefixProcess, charForSuffixProcess);
+                        }
+                    }
+                    else
+                    {
+                        workFlowDiagram = string.Format(@"{0}{1}{5}""{2}""{6}-->{3}((""{4}""));", workFlowDiagram, subProcessEndPoint, islem.Name, stopDummyProcessCode, stopDummyProcessName, charForPrefixProcess, charForSuffixProcess);
+                    }
+                }
 
                 if (workFlowDiagram.CompareTo("") != 0)
                 {
@@ -122,6 +165,14 @@ namespace WorkFlowManager.Common.Constants
             {
                 workFlowDiagram = string.Format("style {0} fill:#f96,stroke:#333,stroke-width:2px;;", stopDummyProcessCode);
                 resultDiagram.Append(workFlowDiagram);
+            }
+            if (subProcessList.Count() > 0)
+            {
+
+                foreach (var subProcess in subProcessList)
+                {
+                    resultDiagram.Append(SubProcessDiagram(subProcess.Key, subProcess.Value));
+                }
             }
 
             task.WorkFlowDiagram = string.Format("{0}{1}", "graph TD;", resultDiagram.ToString());

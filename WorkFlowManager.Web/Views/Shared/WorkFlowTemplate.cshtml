@@ -101,6 +101,17 @@
                         </div>
                     }
 
+                    @if (Model.SubProcessList != null && Model.SubProcessList.Count() > 0)
+                    {
+                        <span>Sub Process List</span><br>
+                        foreach (var subprocess in Model.SubProcessList)
+                        {
+                            <a target="_blank" href="@Url.Action("GetProcess", "WorkFlowProcess", new { ownerId = subprocess.Id, taskName= subprocess.Name  })">
+                                <i class="glyphicon glyphicon-play"></i>
+                                <span>@subprocess.Name</span>
+                            </a><br/>
+                        }
+                    }
 
                     @if (Model.ProcessAssignedRole != ProjectRole.System)
                     {

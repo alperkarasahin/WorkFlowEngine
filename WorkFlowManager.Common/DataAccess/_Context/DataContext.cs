@@ -30,6 +30,9 @@ namespace WorkFlowManager.Common.DataAccess._Context
 
             modelBuilder.Entity<WorkFlowEngineVariable>().ToTable("WorkFlowEngineVariableTbl");
 
+            modelBuilder.Entity<SubProcess>().ToTable("SubProcessTbl");
+
+
             modelBuilder.Configurations.Add(new BaseTableTableMap());
             modelBuilder.Configurations.Add(new ConditionMap());
 

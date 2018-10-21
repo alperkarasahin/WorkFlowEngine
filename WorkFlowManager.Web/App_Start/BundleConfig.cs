@@ -41,7 +41,7 @@ namespace WorkFlowManager.Web
                       "~/Content/kendo.default.min.css",
                       "~/Content/AdminLTE.min.css",
                       "~/Content/progress-wizard.min.css",
-                      "~/Content/mermaid.dark.css",
+                      "~/Content/mermaid.forest.css",
                       "~/Content/bootstrap-switch.min.css",
                       "~/Content/plugins/iCheck/all.css",
                       "~/Content/fileUploader.css",

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hangfire;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,10 +45,8 @@ namespace WorkFlowManager.Services.DbServices
 
         }
 
-
-        public int StartWorkFlow(int ownerId, string taskName)
+        public int StartWorkFlow(int ownerId, Task task)
         {
-            var task = _unitOfWork.Repository<Task>().GetAll().Where(x => x.Name == taskName).FirstOrDefault();
             WorkFlowTrace workFlowTrace = null;
 
             workFlowTrace = new WorkFlowTrace()
@@ -58,6 +57,12 @@ namespace WorkFlowManager.Services.DbServices
             };
             AddOrUpdate(workFlowTrace);
             return workFlowTrace.Id;
+        }
+
+        public int StartWorkFlow(int ownerId, string taskName)
+        {
+            var task = _unitOfWork.Repository<Task>().GetAll().Where(x => x.Name == taskName).FirstOrDefault();
+            return StartWorkFlow(ownerId, task);
         }
 
         public virtual void AddOrUpdate(WorkFlowTrace workFlowTrace)
@@ -352,6 +357,12 @@ namespace WorkFlowManager.Services.DbServices
                 ((Condition)WorkFlowTrace.Process).OptionList = _unitOfWork.Repository<ConditionOption>().GetList(x => x.ConditionId == WorkFlowTrace.ProcessId).ToList();
             }
 
+            if (WorkFlowTrace.Process.GetType() == typeof(SubProcess))
+            {
+                WorkFlowTrace.SubProcessList = _unitOfWork.Repository<BusinessProcess>().GetList(x => x.OwnerSubProcessTraceId == workFlowTraceId).ToList();
+            }
+
+
             return WorkFlowTrace;
         }
 
@@ -551,19 +562,33 @@ namespace WorkFlowManager.Services.DbServices
             else
             {
                 //If process is last node of the work flow
-                //And business process has a master work flow
-                //We will trigger master work flow process waiting job
+                //And business process is a sub flow
+                //We will check all sub flows (except current) 
                 var businessProcess = _unitOfWork.Repository<BusinessProcess>().Get(ownerId);
-                if (businessProcess.OwnerId != null)
+                if (businessProcess.OwnerSubProcessTraceId != null)
                 {
-                    var masterWorkFlowActiveProcess = _unitOfWork.Repository<WorkFlowTrace>().GetAll().FirstOrDefault(x => x.OwnerId == businessProcess.OwnerId && x.ProcessStatus == ProcessStatus.Draft);
-                    if (masterWorkFlowActiveProcess.JobId != null)
+                    var allSubFlowsExceptCurrent = _unitOfWork.Repository<BusinessProcess>().GetAll().Where(x => x.OwnerSubProcessTraceId == businessProcess.OwnerSubProcessTraceId && x.Id != ownerId);
+                    bool allSubProcessCompleted = true;
+                    foreach (var subFlow in allSubFlowsExceptCurrent)
                     {
-                        RecurringJob.Trigger(masterWorkFlowActiveProcess.JobId);
+
+                        var draftProcess = _unitOfWork.Repository<WorkFlowTrace>().GetAll().FirstOrDefault(x => x.OwnerId == subFlow.Id && x.ProcessStatus == ProcessStatus.Draft);
+                        allSubProcessCompleted = draftProcess == null;
+                        if (!allSubProcessCompleted)
+                        {
+                            break;
+                        }
+
                     }
+
+
+                    if (allSubProcessCompleted)
+                    {
+                        GoToWorkFlowNextProcess((int)businessProcess.OwnerId);
+                    }
+
+
                 }
-
-
             }
         }
 
@@ -587,6 +612,32 @@ namespace WorkFlowManager.Services.DbServices
             if (targetProcess is DecisionPoint)
             {
                 DecisionPointTakeTheNextStep(workFlowTrace.Id);
+            }
+            else if (targetProcess is SubProcess)
+            {
+                //Sub process will be start
+                var taskVariableList = JsonConvert.DeserializeObject<List<TaskVariable>>(((SubProcess)targetProcess).TaskVariableList);
+                foreach (var taskVariable in taskVariableList)
+                {
+                    var numberOfSubProcessCount = 0;
+                    var numberOfSubProcessCountString = GetVariable(taskVariable.VariableName, ownerId);
+                    if (numberOfSubProcessCountString == null)
+                    {
+                        numberOfSubProcessCount = 1;
+                    }
+                    else
+                    {
+                        numberOfSubProcessCount = int.Parse(numberOfSubProcessCountString);
+                    }
+
+                    var task = _unitOfWork.Repository<Task>().Get(taskVariable.TaskId);
+
+                    var subBusinessProcess = new BusinessProcess() { OwnerId = ownerId, Name = task.Name, OwnerSubProcessTraceId = workFlowTrace.Id };
+                    _unitOfWork.Repository<BusinessProcess>().Add(subBusinessProcess);
+                    _unitOfWork.Complete();
+
+                    StartWorkFlow(subBusinessProcess.Id, task);
+                }
             }
         }
 

@@ -1,10 +1,12 @@
 namespace WorkFlowManager.Common.DataAccess.Migrations
 {
     using Factory;
+    using System.Collections.Generic;
     using System.Data.Entity.Migrations;
     using WorkFlowManager.Common.Constants;
     using WorkFlowManager.Common.DataAccess._Context;
     using WorkFlowManager.Common.DataAccess._UnitOfWork;
+    using WorkFlowManager.Common.Dto;
     using WorkFlowManager.Common.Tables;
 
     internal sealed class Configuration : DbMigrationsConfiguration<DataContext>
@@ -121,23 +123,12 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
 
                 process2.NextProcess = ifAgeLessThan18;
 
-                var healthForm = new FormView() { FormName = "Health Information", ViewName = "HealthInformationWorkFlowForm", Task = task, Completed = true };
-                _unitOfWork.Repository<FormView>().Add(healthForm);
-
-                var processHealthInformation = ProcessFactory.CreateProcess(task, "Health Information (Start Sub-Process)", Enums.ProjectRole.Officer, "Health Information Sub Process Starting Area", healthForm);
-
-                var isSubProcessCompleted = new DecisionMethod() { MethodName = "Is Sub Process Completed", MethodFunction = "IsSubProcessCompleted(Id)", Task = task };
-                _unitOfWork.Repository<DecisionMethod>().Add(isSubProcessCompleted);
-
-                var ifSubProcessCompleted = ProcessFactory.CreateDecisionPoint(task, "If Sub Process Completed", isSubProcessCompleted);
-
-                var ifSubProcessCompletedOption1 = ProcessFactory.CreateDecisionPointYesOption("Yes - Sub Process Completed", ifSubProcessCompleted);
-                var ifSubProcessCompletedOption2 = ProcessFactory.CreateDecisionPointNoOption("No - Sub Process Does Not Completed", ifSubProcessCompleted);
-
-                processHealthInformation.NextProcess = ifSubProcessCompleted;
-                ifSubProcessCompletedOption2.NextProcess = ifSubProcessCompleted;
+                List<TaskVariable> taskVariableList = new List<TaskVariable>();
+                taskVariableList.Add(new TaskVariable { TaskId = subTask1.Id, VariableName = "PSYCHOTECHNICQUETASKCOUNT" });
+                taskVariableList.Add(new TaskVariable { TaskId = subTask2.Id, VariableName = "PHYSICALEXAMINATIONTASKCOUNT" });
 
 
+                var processHealthInformation = ProcessFactory.CreateSubProcess(task, "Health Information", taskVariableList);
 
                 var isCandidateColorBlind = new DecisionMethod() { MethodName = "Is Candidate Color Blind", MethodFunction = "IsCandidateColorBlind(Id)", Task = task };
                 _unitOfWork.Repository<DecisionMethod>().Add(isCandidateColorBlind);
@@ -159,7 +150,7 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                 var option6 = ProcessFactory.CreateDecisionPointYesOption("Yes - Age Raised To 18", isAgeRaisedTo18DecisionPoint);
                 option6.NextProcess = processHealthInformation;
 
-                ifSubProcessCompletedOption1.NextProcess = ifCandidateIsColorBlind;
+                processHealthInformation.NextProcess = ifCandidateIsColorBlind;
 
                 var normalDrivingLicense = ProcessFactory.CreateProcess(task, "Normal driving license", Enums.ProjectRole.Officer);
                 var restrictedDrivingLicense = ProcessFactory.CreateProcess(task, "Restricted driving license", Enums.ProjectRole.Officer);

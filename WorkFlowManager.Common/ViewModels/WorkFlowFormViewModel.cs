@@ -51,6 +51,8 @@ namespace WorkFlowManager.Common.ViewModels
         public int TargetProcessId { get; set; }
         public string ProcessTaskController { get; set; }
         public string ProcessTaskSpecialFormTemplateView { get; set; }
+
+        public List<BusinessProcess> SubProcessList { get; set; }
     }
 
     [Serializable]
