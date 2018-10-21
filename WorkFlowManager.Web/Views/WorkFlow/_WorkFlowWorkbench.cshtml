@@ -40,12 +40,18 @@
             <i class="fa fa-arrows"></i> New Decision Point
         </a>
     </div>
+    <div class="btn-group">
+        <a href="@Url.Action("New", new { taskId = Model.ActiveTaskId, processType = ProcessType.SubProcess })" class="btn btn-primary btn-sm">
+            <i class="fa fa-sitemap"></i> New Sub Process
+        </a>
+    </div>
 </div>
 <div class="row">
     <div class="col-lg-12">
         <h5><i class="fa fa-check" aria-hidden="true"></i> New Process: Process which has special form or standart form</h5>
         <h5><i class="fa fa-check" aria-hidden="true"></i> New Condition: Process which has more than one direction </h5>
         <h5><i class="fa fa-check" aria-hidden="true"></i> New Decision Point: Method which will be developed. Return value must be [Y]es or [N]o</h5>
+        <h5><i class="fa fa-check" aria-hidden="true"></i> New Sub Process: Definition for parallel task instance area which includes sub process.</h5>
     </div>
 </div>
 

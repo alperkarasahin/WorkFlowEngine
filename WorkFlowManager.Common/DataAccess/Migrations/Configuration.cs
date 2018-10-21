@@ -107,8 +107,8 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                 process.NextProcess = eyeCondition;
 
 
-                var candidateBlind = ProcessFactory.CreateProcess(task, "Candidate is not suitable for driving license", Enums.ProjectRole.Officer);
-                eyeConditionOption1.NextProcess = candidateBlind;
+                var candidateIsNotSuitableForDrivingLicense = ProcessFactory.CreateProcess(task, "Candidate is not suitable for driving license", Enums.ProjectRole.Officer);
+                eyeConditionOption1.NextProcess = candidateIsNotSuitableForDrivingLicense;
 
 
 
@@ -123,12 +123,27 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
 
                 process2.NextProcess = ifAgeLessThan18;
 
+                //var healthForm = new FormView() { FormName = "Health Information", ViewName = "HealthInformationWorkFlowForm", Task = task, Completed = true };
+                //_unitOfWork.Repository<FormView>().Add(healthForm);
                 List<TaskVariable> taskVariableList = new List<TaskVariable>();
                 taskVariableList.Add(new TaskVariable { TaskId = subTask1.Id, VariableName = "PSYCHOTECHNICQUETASKCOUNT" });
                 taskVariableList.Add(new TaskVariable { TaskId = subTask2.Id, VariableName = "PHYSICALEXAMINATIONTASKCOUNT" });
 
 
                 var processHealthInformation = ProcessFactory.CreateSubProcess(task, "Health Information", taskVariableList);
+
+                var isHealthStatusAdequate = new DecisionMethod() { MethodName = "Is Health Status Adequate", MethodFunction = "IsHealthStatusAdequate(Id)", Task = task };
+                _unitOfWork.Repository<DecisionMethod>().Add(isHealthStatusAdequate);
+
+                var ifHealthStatusAdequate = ProcessFactory.CreateDecisionPoint(task, "If Health Status Adequate", isHealthStatusAdequate);
+
+                var ifHealthStatusAdequateOption1 = ProcessFactory.CreateDecisionPointYesOption("Yes - Health Status Is Adequate", ifHealthStatusAdequate);
+                var ifHealthStatusAdequateOption2 = ProcessFactory.CreateDecisionPointNoOption("No - Health Status Is Not Adequate", ifHealthStatusAdequate);
+
+                processHealthInformation.NextProcess = ifHealthStatusAdequate;
+                ifHealthStatusAdequateOption2.NextProcess = candidateIsNotSuitableForDrivingLicense;
+
+
 
                 var isCandidateColorBlind = new DecisionMethod() { MethodName = "Is Candidate Color Blind", MethodFunction = "IsCandidateColorBlind(Id)", Task = task };
                 _unitOfWork.Repository<DecisionMethod>().Add(isCandidateColorBlind);
@@ -150,7 +165,7 @@ namespace WorkFlowManager.Common.DataAccess.Migrations
                 var option6 = ProcessFactory.CreateDecisionPointYesOption("Yes - Age Raised To 18", isAgeRaisedTo18DecisionPoint);
                 option6.NextProcess = processHealthInformation;
 
-                processHealthInformation.NextProcess = ifCandidateIsColorBlind;
+                ifHealthStatusAdequateOption1.NextProcess = ifCandidateIsColorBlind;
 
                 var normalDrivingLicense = ProcessFactory.CreateProcess(task, "Normal driving license", Enums.ProjectRole.Officer);
                 var restrictedDrivingLicense = ProcessFactory.CreateProcess(task, "Restricted driving license", Enums.ProjectRole.Officer);

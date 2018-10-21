@@ -51,7 +51,7 @@
                         }
 
 
-                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.DecisionPoint)
+                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.DecisionPoint || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.SubProcess)
                         {
                             @Html.HiddenFor(x => x.AssignedRole)
                         }
@@ -136,7 +136,7 @@
 
                         }
 
-                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
+                        @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.SubProcess || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
                         {
                             if ((Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process || Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList) && Model.AssignedRole != WorkFlowManager.Common.Enums.ProjectRole.System)
                             {
@@ -204,6 +204,22 @@
                                     </div>
                                 </div>
                             }
+                            if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.SubProcess)
+                            {
+                                <div class="form-group">
+                                    @Html.LabelFor(x => x.AssignedRole, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(x => x.AssignedRole, new { @class = "form-control", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(x => x.TaskVariableList, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextAreaFor(x => x.TaskVariableList, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.TaskVariableList)
+                                    </div>
+                                </div>
+                            }
                             <div class="form-group">
                                 @Html.LabelFor(x => x.NextProcessId, new { @class = "col-sm-3 control-label" })
                                 <div class="col-sm-9">
@@ -218,6 +234,7 @@
                                     @Html.ValidationMessageFor(x => x.MessageForMonitor)
                                 </div>
                             </div>
+
                         }
 
 
@@ -233,7 +250,7 @@
                     <a href="@Url.Action("Index", new { taskId = Model.TaskId})"> | Cancel</a>
                 </div>
             </div>
-            @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process|| Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
+            @if (Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.SubProcess||Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.Process|| Model.ProcessType == WorkFlowManager.Common.Enums.ProcessType.OptionList)
             {
                 <div class="panel panel-info">
                     <div class="panel-heading">Select Monitoring Roles (S-System / U-Unit)</div>

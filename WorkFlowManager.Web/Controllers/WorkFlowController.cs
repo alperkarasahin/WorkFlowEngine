@@ -143,11 +143,14 @@ namespace WorkFlowManager.Web.Controllers
         }
         public void ProcessFormInitialize(ref ProcessForm formData)
         {
-            var process = _workFlowService.GetProcess(formData.Id);
-            formData.TaskId = process.TaskId;
-
+            if (formData.Id != 0)
+            {
+                Process process = _workFlowService.GetProcess(formData.Id);
+                Mapper.Map(process, formData);
+            }
             var mainProcessList = _workFlowService.GetMainProcessList(formData.TaskId);
-            Mapper.Map(process, formData);
+
+
             formData.MainProcessList = (mainProcessList != null ? new SelectList(mainProcessList, "Id", "Name") : null);
 
             if (formData.ProcessType == ProcessType.DecisionPoint)
@@ -161,7 +164,7 @@ namespace WorkFlowManager.Web.Controllers
             }
 
 
-            if (formData.ProcessType == ProcessType.OptionList || formData.ProcessType == ProcessType.Process)
+            if (formData.ProcessType == ProcessType.OptionList || formData.ProcessType == ProcessType.Process || formData.ProcessType == ProcessType.SubProcess)
             {
                 var monitoringList = formData.MonitoringRoleList;
                 formData.MonitoringRoleList = Global.GetAllRoles().Select(rol => new MonitoringRoleCheckbox
@@ -184,7 +187,7 @@ namespace WorkFlowManager.Web.Controllers
             {
                 if (formData.Id == 0)
                 {
-                    formData.AssignedRole = (formData.ProcessType == ProcessType.DecisionPoint ? ProjectRole.System : ProjectRole.Officer);
+                    formData.AssignedRole = (formData.ProcessType == ProcessType.DecisionPoint || formData.ProcessType == ProcessType.SubProcess ? ProjectRole.System : ProjectRole.Officer);
                 }
             }
             formData = ProcessFormLoad(formData);

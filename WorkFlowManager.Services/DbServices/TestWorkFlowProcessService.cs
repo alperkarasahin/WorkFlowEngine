@@ -83,14 +83,14 @@ namespace WorkFlowManager.Services.DbServices
         }
 
 
-        public char IsSubProcessCompleted(string id)
+        public char IsHealthStatusAdequate(string id)
         {
             var rslt = 'N';
             int ownerId = GetOwnerIdFromId(int.Parse(id));
             var psychotechicque = GetVariable("PSYCHOTECHNICQUE", ownerId);
             var physicalexamination = GetVariable("PHYSICALEXAMINATION", ownerId);
 
-            if (psychotechicque != null && physicalexamination != null)
+            if (psychotechicque?.CompareTo("ADEQUATE") == 0 && physicalexamination?.CompareTo("ADEQUATE") == 0)
             {
                 rslt = 'Y';
             }

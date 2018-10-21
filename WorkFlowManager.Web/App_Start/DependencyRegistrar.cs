@@ -124,6 +124,7 @@ namespace WorkFlowManager.Web
                 cfg.CreateMap<ProcessForm, Process>()
                     .ConstructUsing(x => new Process())
                     .Include<ProcessForm, Condition>()
+                    .Include<ProcessForm, SubProcess>()
                     .Include<ProcessForm, ConditionOption>()
                     .Include<ProcessForm, DecisionPoint>()
                     .ForMember(a => a.MonitoringRoleList,
@@ -139,6 +140,8 @@ namespace WorkFlowManager.Web
                     .ConstructUsing(x => new ConditionOption());
                 cfg.CreateMap<ProcessForm, DecisionPoint>()
                     .ConstructUsing(x => new DecisionPoint());
+                cfg.CreateMap<ProcessForm, SubProcess>()
+                    .ConstructUsing(x => new SubProcess());
 
                 cfg.CreateMap<DecisionMethodViewModel, DecisionMethod>();
                 cfg.CreateMap<FormViewViewModel, FormView>();
@@ -158,6 +161,9 @@ namespace WorkFlowManager.Web
 
                 cfg.CreateMap<Condition, ProcessForm>()
                     .ForMember(a => a.ProcessType, opt => opt.MapFrom(c => ProcessType.Condition));
+
+                cfg.CreateMap<SubProcess, ProcessForm>()
+                    .ForMember(a => a.ProcessType, opt => opt.MapFrom(c => ProcessType.SubProcess));
 
                 cfg.CreateMap<DecisionPoint, ProcessForm>()
                     .ForMember(a => a.ProcessType, opt => opt.MapFrom(c => ProcessType.DecisionPoint))

@@ -41,7 +41,7 @@ namespace WorkFlowManager.Common.Constants
 
         private static string SubProcessDiagram(string processUniqueId, string name)
         {
-            return string.Format("subgraph {1};b3-->{0}-subProcessEndPoint;{0}( ) --> b2( );{0} --> b3( );b2( )-->{0}-subProcessEndPoint( );end;", processUniqueId, name);
+            return string.Format("subgraph {1};{0}-b3-->{0}-subProcessEndPoint;{0}( ) --> {0}-b2( );{0} --> {0}-b3( );{0}-b2( )-->{0}-subProcessEndPoint( );end;", processUniqueId, name);
         }
 
         public static void SetWorkFlowDiagram(IUnitOfWork _unitOfWork, int taskId)

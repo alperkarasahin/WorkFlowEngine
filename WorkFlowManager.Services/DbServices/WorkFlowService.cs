@@ -437,8 +437,6 @@ namespace WorkFlowManager.Services.DbServices
 
             if (formData.ProcessType == ProcessType.Process)
             {
-
-
                 var process = Mapper.Map<ProcessForm, Process>(formData);
                 processId = AddOrUpdate(process);
             }
@@ -455,6 +453,11 @@ namespace WorkFlowManager.Services.DbServices
             else if (formData.ProcessType == ProcessType.DecisionPoint)
             {
                 var process = Mapper.Map<ProcessForm, DecisionPoint>(formData);
+                processId = AddOrUpdate(process);
+            }
+            else if (formData.ProcessType == ProcessType.SubProcess)
+            {
+                var process = Mapper.Map<ProcessForm, SubProcess>(formData);
                 processId = AddOrUpdate(process);
             }
 

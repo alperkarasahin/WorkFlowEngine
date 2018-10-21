@@ -89,6 +89,9 @@ namespace WorkFlowManager.Common.ViewModels
 
         [Display(Name = "Variable Name")]
         public string VariableName { get; set; }
+
+        [Display(Name = "TaskId,VariableName List JSON")]
+        public string TaskVariableList { get; set; }
     }
 
 

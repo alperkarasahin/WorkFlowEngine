@@ -11,17 +11,9 @@ namespace WorkFlowManager.Common.Enums
         [Description("Option List")]
         OptionList = 15,
         [Description("Decision Point")]
-        DecisionPoint = 20
-    }
-
-    public enum MainProcessType
-    {
-        [Description("Process")]
-        Process = 5,
-        [Description("Condition")]
-        Condition = 10,
-        [Description("Decision Point")]
-        DecisionPoint = 15
+        DecisionPoint = 20,
+        [Description("SubProcess")]
+        SubProcess = 25,
     }
 
     public enum DecisionPointValue
