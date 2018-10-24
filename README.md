@@ -5,7 +5,7 @@ You can design simple work flow with using three process type.
 * Process: Process which has special form or standart form
 * Condition: Process which has more than one direction
 * Decision Point: Process which include a method which will be developed. Return value must be [Y]es or [N]o
-* New Sub Process: Definition for parallel task instance area which includes sub process.
+* Sub Process: Definition for parallel task instance area which includes sub process.
 
 You can create a relation between all process type. Work flow diagram is showed automatically by mermaid.js 
 You can select process with single click or edit process with double click inside diagram.
