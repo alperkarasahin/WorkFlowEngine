@@ -1,7 +1,7 @@
 # Work Flow Engine
 Simple Work Flow Engine with C# .NET MVC
 
-You can design simple work flow with using three process type.
+You can design simple work flow with using four process type.
 * Process: Process which has special form or standart form
 * Condition: Process which has more than one direction
 * Decision Point: Process which include a method which will be developed. Return value must be [Y]es or [N]o
