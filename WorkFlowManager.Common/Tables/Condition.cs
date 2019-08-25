@@ -8,7 +8,7 @@ namespace WorkFlowManager.Common.Tables
         public Condition()
         {
         }
-        public Condition(Task task, string name, ProjectRole assignedRole, string variableName, string description = null, FormView formView = null) : base(task, name, assignedRole, description, formView)
+        public Condition(Task task, string name, ProjectRole assignedRole, string variableName = null, string description = null, FormView formView = null) : base(task, name, assignedRole, description, formView)
         {
             OptionList = new List<ConditionOption>();
             VariableName = variableName;

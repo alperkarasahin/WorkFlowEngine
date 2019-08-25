@@ -31,6 +31,17 @@ namespace WorkFlowManager.Services.DbServices
             _workFlowDataService = workFlowDataService;
         }
 
+        protected int GetOwnerIdFromId(int id)
+        {
+            var workFlowTrace = _unitOfWork.Repository<WorkFlowTrace>().Get(x => x.Id == id);
+            int rslt = -1;
+            if (workFlowTrace != null)
+            {
+                rslt = workFlowTrace.OwnerId;
+            }
+            return rslt;
+        }
+
         public int GetLastProcessId(int ownerId)
         {
             var workFlowTraceList = _unitOfWork.Repository<WorkFlowTrace>().Find(x => x.OwnerId == ownerId).OrderByDescending(x => x.Id);
@@ -64,6 +75,13 @@ namespace WorkFlowManager.Services.DbServices
             var task = _unitOfWork.Repository<Task>().GetAll().Where(x => x.Name == taskName).FirstOrDefault();
             return StartWorkFlow(ownerId, task);
         }
+
+        public int StartWorkFlow(int ownerId, int taskId)
+        {
+            var task = _unitOfWork.Repository<Task>().Get(taskId);
+            return StartWorkFlow(ownerId, task);
+        }
+
 
         public virtual void AddOrUpdate(WorkFlowTrace workFlowTrace)
         {
@@ -392,7 +410,7 @@ namespace WorkFlowManager.Services.DbServices
         {
             WorkFlowFormViewModel workFlowForm = workFlowFormViewModel;
 
-            if (workFlowFormViewModel.ProcessFormViewViewName != null)
+            if (workFlowFormViewModel.ProcessFormViewViewName != null && workFlowFormViewModel.ProcessFormViewCompleted)
             {
                 IWorkFlowForm form = GetWorkFlowForm(workFlowFormViewModel.ProcessFormViewViewName);
                 if (form != null)
@@ -423,20 +441,26 @@ namespace WorkFlowManager.Services.DbServices
 
         public void CustomFormSave(WorkFlowFormViewModel formData)
         {
-            IWorkFlowForm form = GetWorkFlowForm(formData.ProcessFormViewViewName);
-            if (form != null)
+            if (formData.ProcessFormViewCompleted && formData.ProcessFormViewViewName != null)
             {
-                form.Save(formData);
+                IWorkFlowForm form = GetWorkFlowForm(formData.ProcessFormViewViewName);
+                if (form != null)
+                {
+                    form.Save(formData);
+                }
             }
         }
 
 
         public bool CustomFormValidate(WorkFlowFormViewModel formData, ModelStateDictionary modelState)
         {
-            IWorkFlowForm form = GetWorkFlowForm(formData.ProcessFormViewViewName);
-            if (form != null)
+            if (formData.ProcessFormViewCompleted && formData.ProcessFormViewViewName != null)
             {
-                return form.Validate(formData, modelState);
+                IWorkFlowForm form = GetWorkFlowForm(formData.ProcessFormViewViewName);
+                if (form != null)
+                {
+                    return form.Validate(formData, modelState);
+                }
             }
             return true;
         }

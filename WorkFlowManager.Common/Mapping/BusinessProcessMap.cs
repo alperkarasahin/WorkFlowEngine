@@ -13,6 +13,11 @@ namespace WorkFlowManager.Common.Mapping
                .WithMany()
                .WillCascadeOnDelete(false);
 
+            HasOptional(s => s.RelatedTask)
+                .WithMany()
+                .HasForeignKey(s => s.RelatedTaskId)
+                .WillCascadeOnDelete(false);
+
 
             HasOptional(s => s.OwnerSubProcessTrace)
                 .WithMany(s => s.SubProcessList)

@@ -115,6 +115,7 @@
     <Compile Include="DbServices\DynamicMethodCallService.cs" />
     <Compile Include="DbServices\FormService.cs" />
     <Compile Include="DbServices\IWorkFlow.cs" />
+    <Compile Include="DbServices\PurchasingWorkFlowProcessService.cs" />
     <Compile Include="DbServices\TestWorkFlowProcessService.cs" />
     <Compile Include="DbServices\WorkFlowDataService.cs" />
     <Compile Include="DbServices\WorkFlowProcessService.cs" />

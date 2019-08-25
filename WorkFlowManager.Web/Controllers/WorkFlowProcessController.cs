@@ -22,7 +22,7 @@ namespace WorkFlowManager.Web.Controllers
             _workFlowService = DependencyResolver.Current.GetService<WorkFlowService>();
         }
 
-        public ActionResult GetProcess(int ownerId, string taskName)
+        public ActionResult GetProcess(int ownerId, int taskId)
         {
             var lastProcessId = _workFlowProcessService.GetLastProcessId(ownerId);
 
@@ -30,12 +30,12 @@ namespace WorkFlowManager.Web.Controllers
             {
                 return Index(lastProcessId);
             }
-            return StartWorkFlow(ownerId, taskName);
+            return StartWorkFlow(ownerId, taskId);
         }
 
-        public ActionResult StartWorkFlow(int ownerId, string taskName)
+        public ActionResult StartWorkFlow(int ownerId, int taskId)
         {
-            int workFlowTraceId = _workFlowProcessService.StartWorkFlow(ownerId, taskName);
+            int workFlowTraceId = _workFlowProcessService.StartWorkFlow(ownerId, taskId);
             return Index(workFlowTraceId);
         }
 

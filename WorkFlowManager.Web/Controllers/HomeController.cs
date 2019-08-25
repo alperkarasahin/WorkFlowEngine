@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using WorkFlowManager.Common.DataAccess._UnitOfWork;
 using WorkFlowManager.Common.Tables;
@@ -15,9 +16,15 @@ namespace WorkFlowManager.Web.Controllers
         }
         public ActionResult Index()
         {
-            var masterTest = _unitOfWork.Repository<BusinessProcess>().GetAll().FirstOrDefault();
+            var businessProcessList = _unitOfWork.Repository<BusinessProcess>().GetAll().Where(s => s.RelatedTaskId != null);
 
-            return View(new WorkFlowTestModel { masterTestId = masterTest.Id });
+            var businessProcessDtoList = new List<BusinessProcesDto>();
+            foreach (var businessProcess in businessProcessList)
+            {
+                businessProcessDtoList.Add(new BusinessProcesDto { BusinessProcessId = businessProcess.Id, BusinessProcessName = businessProcess.Name, TaskId = (int)businessProcess.RelatedTaskId });
+            }
+
+            return View(new WorkFlowTestModel { TestList = businessProcessDtoList });
         }
 
         public ActionResult About()

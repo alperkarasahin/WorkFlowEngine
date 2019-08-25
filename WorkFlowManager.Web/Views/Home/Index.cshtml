@@ -12,7 +12,23 @@
 
 <hr />
 
-<a href="@Url.Action("GetProcess", "WorkFlowProcess", new { ownerId = Model.masterTestId, taskName="Driving License Application Flow"  })">
-    <i class="glyphicon glyphicon-play fa-5x"></i> <br />
-    <span>Task 1 Test</span>
-</a>
+
+
+<div class="container">
+    <div class="page-header">
+        <h1>Example Work Flow On Action</h1>
+    </div>
+
+    @foreach (var item in Model.TestList)
+    {
+
+        <a href="@Url.Action("GetProcess", "WorkFlowProcess", new { ownerId = item.BusinessProcessId, taskId = item.TaskId })">
+            <i class="glyphicon glyphicon-play fa-5x"></i> <br />
+            <span>@item.BusinessProcessName</span>
+        </a>
+
+        <br /><br />
+    }
+
+</div>
+

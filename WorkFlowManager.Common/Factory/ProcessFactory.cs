@@ -19,7 +19,7 @@ namespace WorkFlowManager.Common.Factory
         }
 
 
-        public static Condition CreateCondition(Task task, string name, ProjectRole assignedRole, string variableName, string description = null, FormView formView = null)
+        public static Condition CreateCondition(Task task, string name, ProjectRole assignedRole, string variableName = null, string description = null, FormView formView = null)
         {
             return new Condition(task, name, assignedRole, variableName, description, formView);
         }
@@ -29,7 +29,7 @@ namespace WorkFlowManager.Common.Factory
         }
 
 
-        public static ConditionOption CreateConditionOption(string name, ProjectRole assignedRole, Condition condition, string value)
+        public static ConditionOption CreateConditionOption(string name, ProjectRole assignedRole, Condition condition, string value = null)
         {
             return new ConditionOption(condition.Task, name, assignedRole, condition, value);
         }

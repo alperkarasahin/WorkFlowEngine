@@ -5,33 +5,24 @@ namespace WorkFlowManager.Common.Enums
 {
     public enum ProjectRole
     {
-        [Description("SYSTEM")]
-        [Display(Name = "S-Admin")]
+        [Display(Name = "Admin")]
         Admin = 10,
 
-
-        [Description("SYSTEM")]
-        [Display(Name = "S-Monitor")]
+        [Display(Name = "Monitor")]
         Monitor = 70,
 
-        [Description("UNIT")]
-        [Display(Name = "U-Officer")]
+        [Display(Name = "Officer")]
         Officer = 80,
 
+        [Display(Name = "Unit Purchasing Officer")]
+        UnitPurchasingOfficer = 90,
 
-        //[Description("UNIT")]
-        //[Display(Name = "U-Project Manager")]
-        //ProjectManager = 80,
+        [Display(Name = "Spending Officer")]
+        SpendingOfficer = 100,
 
-        //[Description("UNIT")]
-        //[Display(Name = "U-Project Procurement Officer")]
-        //ProjectProcurmentOfficer = 100,
+        [Display(Name = "Purchasing Officer")]
+        PurchasingOfficer = 110,
 
-        //[Description("UNIT")]
-        //[Display(Name = "U-Project Finance Officer")]
-        //ProjectFinanceOfficer = 110,
-
-        [Description("APPLICATION")]
         [Display(Name = "System")]
         System = 1000
     }

@@ -8,5 +8,8 @@
 
         public int? OwnerSubProcessTraceId { get; set; }
         public WorkFlowTrace OwnerSubProcessTrace { get; set; }
+
+        public int? RelatedTaskId {  get; set; }
+        public Task RelatedTask { get; set; }
     }
 }
