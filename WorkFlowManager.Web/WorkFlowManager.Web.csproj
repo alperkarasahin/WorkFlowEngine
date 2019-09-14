@@ -556,10 +556,10 @@
     <Content Include="Views\Shared\EditorTemplates\_ComplexityEnum.cshtml" />
     <Content Include="Views\Shared\WorkFlowTemplate.cshtml" />
     <Content Include="Views\Shared\_WorkFlowTraceStatus.cshtml" />
-    <Content Include="Views\Shared\_IslemButon.cshtml" />
-    <Content Include="Views\Shared\_SatinAlmaIslemler.cshtml" />
-    <Content Include="Views\Shared\_Kunye.cshtml" />
-    <Content Include="Views\Shared\_MAkisGoster.cshtml" />
+    <Content Include="Views\Shared\_ProcessButton.cshtml" />
+    <Content Include="Views\Shared\_AuthorizedProcess.cshtml" />
+    <Content Include="Views\Shared\_ProcessInformation.cshtml" />
+    <Content Include="Views\Shared\_ShowWorkflowPartial.cshtml" />
     <Content Include="Views\WorkFlowProcess\TestWorkFlowForm.cshtml" />
     <Content Include="Views\WorkFlowProcess\HealthInformationWorkFlowForm.cshtml" />
   </ItemGroup>

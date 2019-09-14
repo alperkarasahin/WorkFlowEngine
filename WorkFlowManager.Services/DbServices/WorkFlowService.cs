@@ -369,6 +369,38 @@ namespace WorkFlowManager.Services.DbServices
             return workFlowSummary;
         }
 
+        public int CreateNewTask(WorkFlow testWorkFlow)
+        {
+            var newTask = new Task()
+            {
+                WorkFlow = testWorkFlow,
+                Name = string.Format("Test - {0}", Guid.NewGuid()),
+                MethodServiceName = "TestWorkFlowProcessService",
+                Controller = "WorkFlowProcess",
+                SpecialFormTemplateView = "WorkFlowTemplate"
+            };
+            _unitOfWork.Repository<Task>().Add(newTask);
+            _unitOfWork.Complete();
+            return newTask.Id;
+        }
+
+        public WorkFlow GetTestWorkFlow()
+        {
+            var testFlow = _unitOfWork.Repository<WorkFlow>().GetAll().FirstOrDefault(x => x.Name.CompareTo("Test Work Flow") == 0);
+            if (testFlow == null)
+            {
+                testFlow = new WorkFlow()
+                {
+                    Name = "Test Work Flow"
+                };
+
+                _unitOfWork.Repository<WorkFlow>().Add(testFlow);
+                _unitOfWork.Complete();
+            }
+
+            return testFlow;
+        }
+
         public IEnumerable<Process> GetMainProcessList(int gorevId)
         {
             return _unitOfWork.Repository<Process>().GetList().Where(x =>

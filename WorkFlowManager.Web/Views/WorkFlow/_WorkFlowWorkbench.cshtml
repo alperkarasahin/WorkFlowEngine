@@ -259,7 +259,7 @@ if (task.Process.NextProcessId != null)
                 var url = '@Html.Raw(Url.Action("SetNext", "WorkFlow", new { processCode = "_processCode_", nextId = "_nextId_", taskId = "_taskId_" }))';
                 url = url.replace('_processCode_', processCode);
                 url = url.replace('_nextId_', nextId);
-                url = url.replace('_gorevId_', taskId);
+                url = url.replace('_taskId_', taskId);
                 window.location = url;
 
             }

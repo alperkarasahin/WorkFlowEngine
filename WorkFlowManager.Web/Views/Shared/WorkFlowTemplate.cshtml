@@ -59,7 +59,7 @@
                         </div>
 
                         <div style="display:none" class="islemButonBolum">
-                            @Html.Partial("_IslemButon", Model)
+                            @Html.Partial("_ProcessButton", Model)
                         </div>
 
                         <a style="cursor:pointer" class="sayfaGenislet" title="Sayfayı Genişletmek İçin Tıklayın">
@@ -138,17 +138,17 @@
                 </div>
             </div>
 
-            @Html.Partial("_SatinAlmaIslemler", Model.AuthorizedProcessList)
+            @Html.Partial("_AuthorizedProcess", Model.AuthorizedProcessList)
         </div>
         <div class="col-lg-4 islemDetayBolum">
             <div class="panel panel-info">
                 <div class="panel-heading">Actions</div>
                 <div class="panel-body">
-                    @Html.Partial("_IslemButon", Model)
+                    @Html.Partial("_ProcessButton", Model)
                 </div>
             </div>
 
-            @Html.Partial("_Kunye", Model)
+            @Html.Partial("_ProcessInformation", Model)
 
             <div class="panel panel-info">
                 <div class="panel-heading">Reports</div>

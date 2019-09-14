@@ -309,5 +309,11 @@ namespace WorkFlowManager.Web.Controllers
             return PartialView("_MShowWorkFlow", new WorkFlowView { Flag = false, WorkFlowText = gorevAkis });
         }
 
+        public ActionResult NewTask()
+        {
+            var testWorkFlow = _workFlowService.GetTestWorkFlow();
+            var newTaskId = _workFlowService.CreateNewTask(testWorkFlow);
+            return RedirectToAction("Index", new { taskId = newTaskId });
+        }
     }
 }

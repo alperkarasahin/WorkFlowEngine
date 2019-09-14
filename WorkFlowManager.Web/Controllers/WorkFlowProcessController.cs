@@ -56,7 +56,7 @@ namespace WorkFlowManager.Web.Controllers
             UserProcessViewModel userProcessVM = _workFlowProcessService.GetUserProcessVM(workFlowTraceId);
             string workFlowDiagram = _workFlowService.GetWorkFlowDiagram(userProcessVM.TaskId);
             var workFlow = _workFlowProcessService.GetWorkFlow(workFlowDiagram, workFlowTraceId);
-            return PartialView("_MAkisGoster", new WorkFlowView { Flag = true, WorkFlowText = workFlow });
+            return PartialView("_ShowWorkflowPartial", new WorkFlowView { Flag = true, WorkFlowText = workFlow });
         }
 
         public ActionResult Index(int workFlowTraceId)
